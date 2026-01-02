@@ -127,10 +127,8 @@ export function CalendarPage() {
           style={{ height: '100%' }}
           onSelectEvent={handleSelectEvent}
           onSelectSlot={handleSelectSlot}
-          onEventDrop={handleEventDrop}
           eventPropGetter={eventStyleGetter}
           selectable
-          resizable
           views={['month', 'week', 'day', 'agenda']}
           defaultView="month"
           popup

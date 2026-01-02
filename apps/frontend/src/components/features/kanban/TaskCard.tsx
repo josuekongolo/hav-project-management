@@ -47,14 +47,13 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
       {task.labels.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-3">
           {task.labels.slice(0, 3).map((label) => (
-            <Badge
+            <span
               key={label.id}
-              size="sm"
-              className="text-xs"
+              className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full"
               style={{ backgroundColor: `${label.color}20`, color: label.color }}
             >
               {label.name}
-            </Badge>
+            </span>
           ))}
           {task.labels.length > 3 && (
             <Badge size="sm" variant="secondary">

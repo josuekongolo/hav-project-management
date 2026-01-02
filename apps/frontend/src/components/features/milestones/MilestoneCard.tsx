@@ -10,11 +10,11 @@ interface MilestoneCardProps {
   onDelete: (id: string) => void;
 }
 
-const statusConfig: Record<MilestoneStatus, { label: string; color: 'blue' | 'green' | 'purple' | 'gray' }> = {
-  [MilestoneStatus.PLANNED]: { label: 'Planned', color: 'blue' },
-  [MilestoneStatus.ACTIVE]: { label: 'Active', color: 'green' },
-  [MilestoneStatus.COMPLETED]: { label: 'Completed', color: 'purple' },
-  [MilestoneStatus.ARCHIVED]: { label: 'Archived', color: 'gray' },
+const statusConfig: Record<MilestoneStatus, { label: string; variant: 'info' | 'success' | 'primary' | 'secondary' }> = {
+  [MilestoneStatus.PLANNED]: { label: 'Planned', variant: 'info' },
+  [MilestoneStatus.ACTIVE]: { label: 'Active', variant: 'success' },
+  [MilestoneStatus.COMPLETED]: { label: 'Completed', variant: 'primary' },
+  [MilestoneStatus.ARCHIVED]: { label: 'Archived', variant: 'secondary' },
 };
 
 export function MilestoneCard({ milestone, onEdit, onDelete }: MilestoneCardProps) {
@@ -34,7 +34,7 @@ export function MilestoneCard({ milestone, onEdit, onDelete }: MilestoneCardProp
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
             <h3 className="text-lg font-semibold text-gray-900">{milestone.name}</h3>
-            <Badge color={statusInfo.color}>{statusInfo.label}</Badge>
+            <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
           </div>
           {milestone.description && (
             <p className="text-sm text-gray-600 mb-3">{milestone.description}</p>

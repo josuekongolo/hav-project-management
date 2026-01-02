@@ -18,7 +18,7 @@ export function UserCard({ user, taskCount }: UserCardProps) {
           <div className="flex items-center gap-2 mb-2">
             <h3 className="text-lg font-semibold text-gray-900 truncate">{user.name}</h3>
             {user.role === 'ADMIN' && (
-              <Badge color="purple" size="sm">
+              <Badge variant="primary" size="sm">
                 <Shield className="w-3 h-3 mr-1" />
                 Admin
               </Badge>

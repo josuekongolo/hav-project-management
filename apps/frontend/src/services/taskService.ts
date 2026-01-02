@@ -137,6 +137,15 @@ export const labelService = {
     const response = await api.post<{ label: Label }>('/labels', data);
     return response.data.label;
   },
+
+  async update(id: string, data: { name?: string; color?: string }): Promise<Label> {
+    const response = await api.patch<{ label: Label }>(`/labels/${id}`, data);
+    return response.data.label;
+  },
+
+  async delete(id: string): Promise<void> {
+    await api.delete(`/labels/${id}`);
+  },
 };
 
 export const userService = {

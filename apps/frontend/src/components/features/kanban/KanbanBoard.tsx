@@ -56,7 +56,7 @@ export function KanbanBoard({ onTaskClick, onAddTask, milestoneFilter, labelFilt
       result = result.filter((task) =>
         task.title.toLowerCase().includes(query) ||
         task.description?.toLowerCase().includes(query) ||
-        task.assignee?.name.toLowerCase().includes(query)
+        task.assignees?.some((assignee) => assignee.name.toLowerCase().includes(query))
       );
     }
 

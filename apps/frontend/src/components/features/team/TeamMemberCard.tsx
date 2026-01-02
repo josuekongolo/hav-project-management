@@ -7,11 +7,11 @@ interface TeamMemberCardProps {
   member: TeamMemberWorkload;
 }
 
-const priorityColors: Record<string, 'red' | 'yellow' | 'blue' | 'gray'> = {
-  URGENT: 'red',
-  HIGH: 'yellow',
-  MEDIUM: 'blue',
-  LOW: 'gray',
+const priorityVariants: Record<string, 'danger' | 'warning' | 'info' | 'secondary'> = {
+  URGENT: 'danger',
+  HIGH: 'warning',
+  MEDIUM: 'info',
+  LOW: 'secondary',
 };
 
 export function TeamMemberCard({ member }: TeamMemberCardProps) {
@@ -48,7 +48,7 @@ export function TeamMemberCard({ member }: TeamMemberCardProps) {
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-blue-900 mb-1">Currently working on:</p>
               <p className="text-sm text-blue-800 truncate">{member.currentTask.title}</p>
-              <Badge color={priorityColors[member.currentTask.priority]} className="mt-1">
+              <Badge variant={priorityVariants[member.currentTask.priority]} className="mt-1">
                 {member.currentTask.priority}
               </Badge>
             </div>

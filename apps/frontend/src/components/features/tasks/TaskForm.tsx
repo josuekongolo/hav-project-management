@@ -187,7 +187,6 @@ export function TaskForm({ task, initialStatus, onSubmit, onCancel, isLoading }:
                 style={{
                   backgroundColor: `${label.color}20`,
                   color: label.color,
-                  ringColor: label.color,
                 }}
               >
                 {label.name}
