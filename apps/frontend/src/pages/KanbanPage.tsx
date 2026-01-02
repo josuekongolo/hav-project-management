@@ -12,13 +12,15 @@ export function KanbanPage() {
   const [initialStatus, setInitialStatus] = useState<TaskStatus | undefined>(undefined);
   const [selectedMilestoneId, setSelectedMilestoneId] = useState<string>('');
   const [selectedLabelId, setSelectedLabelId] = useState<string>('');
+  const [selectedAssigneeId, setSelectedAssigneeId] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const { milestones, labels, fetchMilestones, fetchLabels } = useTaskStore();
+  const { milestones, labels, users, fetchMilestones, fetchLabels, fetchUsers } = useTaskStore();
 
   useEffect(() => {
     fetchMilestones();
     fetchLabels();
-  }, [fetchMilestones, fetchLabels]);
+    fetchUsers();
+  }, [fetchMilestones, fetchLabels, fetchUsers]);
 
   const handleTaskClick = (task: Task) => {
     setSelectedTask(task);
@@ -87,13 +89,24 @@ export function KanbanPage() {
               ]}
             />
           </div>
-          {(selectedMilestoneId || selectedLabelId || searchQuery) && (
+          <div className="flex-1 sm:flex-initial sm:min-w-[180px]">
+            <Select
+              value={selectedAssigneeId}
+              onChange={(e) => setSelectedAssigneeId(e.target.value)}
+              options={[
+                { value: '', label: 'All Assignees' },
+                ...users.map((u) => ({ value: u.id, label: u.name })),
+              ]}
+            />
+          </div>
+          {(selectedMilestoneId || selectedLabelId || selectedAssigneeId || searchQuery) && (
             <Button
               variant="secondary"
               size="sm"
               onClick={() => {
                 setSelectedMilestoneId('');
                 setSelectedLabelId('');
+                setSelectedAssigneeId('');
                 setSearchQuery('');
               }}
               title="Clear all filters"
@@ -110,6 +123,7 @@ export function KanbanPage() {
           onAddTask={handleAddTask}
           milestoneFilter={selectedMilestoneId}
           labelFilter={selectedLabelId}
+          assigneeFilter={selectedAssigneeId}
           searchQuery={searchQuery}
         />
       </div>

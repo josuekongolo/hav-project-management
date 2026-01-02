@@ -44,7 +44,7 @@ export const KanbanColumn = memo(function KanbanColumn({ status, title, tasks, c
       <div
         ref={setNodeRef}
         className={clsx(
-          'flex-1 space-y-3 min-h-[200px] p-2 rounded-lg transition-colors overflow-y-auto',
+          'flex-1 space-y-3 min-h-[200px] max-h-[calc(100vh-280px)] p-2 rounded-lg transition-colors overflow-y-auto',
           isOver && 'bg-primary-50 ring-2 ring-primary-300'
         )}
       >

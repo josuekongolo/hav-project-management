@@ -20,6 +20,7 @@ interface KanbanBoardProps {
   onAddTask: (status: TaskStatus) => void;
   milestoneFilter?: string;
   labelFilter?: string;
+  assigneeFilter?: string;
   searchQuery?: string;
 }
 
@@ -30,7 +31,7 @@ const COLUMNS = [
   { status: TaskStatus.DONE, title: 'Done', color: 'green' },
 ];
 
-export function KanbanBoard({ onTaskClick, onAddTask, milestoneFilter, labelFilter, searchQuery }: KanbanBoardProps) {
+export function KanbanBoard({ onTaskClick, onAddTask, milestoneFilter, labelFilter, assigneeFilter, searchQuery }: KanbanBoardProps) {
   const { tasks, isLoading, fetchTasks, moveTask } = useTaskStore();
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
@@ -50,6 +51,13 @@ export function KanbanBoard({ onTaskClick, onAddTask, milestoneFilter, labelFilt
       );
     }
 
+    // Apply assignee filter
+    if (assigneeFilter) {
+      result = result.filter((task) =>
+        task.assignees?.some((assignee) => assignee.id === assigneeFilter)
+      );
+    }
+
     // Apply search filter
     if (searchQuery && searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -61,7 +69,7 @@ export function KanbanBoard({ onTaskClick, onAddTask, milestoneFilter, labelFilt
     }
 
     return result;
-  }, [tasks, milestoneFilter, labelFilter, searchQuery]);
+  }, [tasks, milestoneFilter, labelFilter, assigneeFilter, searchQuery]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
