@@ -28,6 +28,17 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.get('/', (_req, res) => {
+  res.json({
+    message: 'HAV Project Management API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      api: '/api'
+    }
+  });
+});
+
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', message: 'HAV API is running' });
 });
