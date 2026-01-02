@@ -61,11 +61,15 @@ export async function getTeamWorkload(): Promise<TeamMemberWorkload[]> {
   const users = await prisma.user.findMany({
     include: {
       assignedTasks: {
-        select: {
-          id: true,
-          title: true,
-          status: true,
-          priority: true,
+        include: {
+          task: {
+            select: {
+              id: true,
+              title: true,
+              status: true,
+              priority: true,
+            },
+          },
         },
       },
     },
@@ -75,21 +79,22 @@ export async function getTeamWorkload(): Promise<TeamMemberWorkload[]> {
   });
 
   return users.map((user) => {
-    const totalTasks = user.assignedTasks.length;
-    const completedTasks = user.assignedTasks.filter((t) => t.status === 'DONE').length;
-    const inProgressTasks = user.assignedTasks.filter((t) => t.status === 'IN_PROGRESS').length;
-    const todoTasks = user.assignedTasks.filter((t) => t.status === 'TODO').length;
-    const inReviewTasks = user.assignedTasks.filter((t) => t.status === 'IN_REVIEW').length;
+    const tasks = user.assignedTasks.map((ta) => ta.task);
+    const totalTasks = tasks.length;
+    const completedTasks = tasks.filter((t) => t.status === 'DONE').length;
+    const inProgressTasks = tasks.filter((t) => t.status === 'IN_PROGRESS').length;
+    const todoTasks = tasks.filter((t) => t.status === 'TODO').length;
+    const inReviewTasks = tasks.filter((t) => t.status === 'IN_REVIEW').length;
 
-    const currentTask = user.assignedTasks.find((t) => t.status === 'IN_PROGRESS') || null;
+    const currentTask = tasks.find((t) => t.status === 'IN_PROGRESS') || null;
 
     // Workload score: more weight to in-progress and high priority tasks
     const workloadScore =
       inProgressTasks * 3 +
       todoTasks * 2 +
       inReviewTasks * 2 +
-      user.assignedTasks.filter((t) => t.priority === 'URGENT').length * 2 +
-      user.assignedTasks.filter((t) => t.priority === 'HIGH').length * 1;
+      tasks.filter((t) => t.priority === 'URGENT').length * 2 +
+      tasks.filter((t) => t.priority === 'HIGH').length * 1;
 
     return {
       id: user.id,
