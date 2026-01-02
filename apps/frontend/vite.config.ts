@@ -17,6 +17,7 @@ export default defineConfig({
     },
   },
   server: {
+    host: '0.0.0.0',
     port: 5173,
     proxy: {
       '/api': {
@@ -26,9 +27,8 @@ export default defineConfig({
     },
   },
   preview: {
-    host: '0.0.0.0',
+    host: true,
     port: parseInt(process.env.PORT || '4173', 10),
     strictPort: true,
-    allowedHosts: ['all'],
   },
 });
