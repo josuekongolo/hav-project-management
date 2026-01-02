@@ -66,8 +66,23 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
 
       <div className="flex items-center justify-between text-xs text-gray-500">
         <div className="flex items-center gap-2">
-          {task.assignee && (
-            <Avatar src={task.assignee.avatar} name={task.assignee.name} size="xs" />
+          {task.assignees.length > 0 && (
+            <div className="flex -space-x-2">
+              {task.assignees.slice(0, 3).map((assignee) => (
+                <Avatar
+                  key={assignee.id}
+                  src={assignee.avatar}
+                  name={assignee.name}
+                  size="xs"
+                  className="ring-2 ring-white"
+                />
+              ))}
+              {task.assignees.length > 3 && (
+                <div className="h-6 w-6 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-[10px] font-medium text-gray-600">
+                  +{task.assignees.length - 3}
+                </div>
+              )}
+            </div>
           )}
           {task.dueDate && (
             <div className="flex items-center gap-1">

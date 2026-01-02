@@ -70,7 +70,7 @@ export async function createTaskHandler(req: AuthRequest, res: Response): Promis
       return;
     }
 
-    const { title, description, status, priority, assigneeId, milestoneId, dueDate, labels } =
+    const { title, description, status, priority, assigneeIds, milestoneId, dueDate, labels } =
       req.body;
 
     if (!title || title.trim() === '') {
@@ -83,7 +83,7 @@ export async function createTaskHandler(req: AuthRequest, res: Response): Promis
       description: description?.trim(),
       status,
       priority,
-      assigneeId,
+      assigneeIds,
       milestoneId,
       dueDate: dueDate ? new Date(dueDate) : undefined,
       creatorId: req.userId,
@@ -99,7 +99,7 @@ export async function createTaskHandler(req: AuthRequest, res: Response): Promis
 export async function updateTaskHandler(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { id } = req.params;
-    const { title, description, status, priority, assigneeId, milestoneId, dueDate, labels } =
+    const { title, description, status, priority, assigneeIds, milestoneId, dueDate, labels } =
       req.body;
 
     const updateData: any = {};
@@ -124,8 +124,8 @@ export async function updateTaskHandler(req: AuthRequest, res: Response): Promis
       updateData.priority = priority;
     }
 
-    if (assigneeId !== undefined) {
-      updateData.assigneeId = assigneeId || null;
+    if (assigneeIds !== undefined) {
+      updateData.assigneeIds = assigneeIds;
     }
 
     if (milestoneId !== undefined) {

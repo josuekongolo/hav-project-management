@@ -34,7 +34,7 @@ export function TaskForm({ task, initialStatus, onSubmit, onCancel, isLoading }:
     description: task?.description || '',
     status: task?.status || initialStatus || TaskStatus.TODO,
     priority: task?.priority || TaskPriority.MEDIUM,
-    assigneeId: task?.assigneeId || '',
+    assigneeIds: task?.assignees?.map((a) => a.id) || [],
     milestoneId: task?.milestoneId || '',
     dueDate: task?.dueDate ? task.dueDate.split('T')[0] : '',
     labels: task?.labels?.map((l) => l.id) || [],
@@ -53,7 +53,7 @@ export function TaskForm({ task, initialStatus, onSubmit, onCancel, isLoading }:
       description: formData.description || undefined,
       status: formData.status,
       priority: formData.priority,
-      assigneeId: formData.assigneeId || undefined,
+      assigneeIds: formData.assigneeIds.length > 0 ? formData.assigneeIds : undefined,
       milestoneId: formData.milestoneId || undefined,
       dueDate: formData.dueDate || undefined,
       labels: formData.labels.length > 0 ? formData.labels : undefined,
@@ -76,10 +76,14 @@ export function TaskForm({ task, initialStatus, onSubmit, onCancel, isLoading }:
     }));
   };
 
-  const userOptions = [
-    { value: '', label: 'Unassigned' },
-    ...users.map((user) => ({ value: user.id, label: user.name })),
-  ];
+  const toggleAssignee = (userId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      assigneeIds: prev.assigneeIds.includes(userId)
+        ? prev.assigneeIds.filter((id) => id !== userId)
+        : [...prev.assigneeIds, userId],
+    }));
+  };
 
   const milestoneOptions = [
     { value: '', label: 'No Milestone' },
@@ -125,23 +129,13 @@ export function TaskForm({ task, initialStatus, onSubmit, onCancel, isLoading }:
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Select
-          label="Assignee"
-          name="assigneeId"
-          value={formData.assigneeId}
-          onChange={handleChange}
-          options={userOptions}
-        />
-
-        <Input
-          label="Due Date"
-          name="dueDate"
-          type="date"
-          value={formData.dueDate}
-          onChange={handleChange}
-        />
-      </div>
+      <Input
+        label="Due Date"
+        name="dueDate"
+        type="date"
+        value={formData.dueDate}
+        onChange={handleChange}
+      />
 
       <Select
         label="Milestone"
@@ -150,6 +144,31 @@ export function TaskForm({ task, initialStatus, onSubmit, onCancel, isLoading }:
         onChange={handleChange}
         options={milestoneOptions}
       />
+
+      {users.length > 0 && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Assignees</label>
+          <div className="flex flex-wrap gap-2">
+            {users.map((user) => (
+              <button
+                key={user.id}
+                type="button"
+                onClick={() => toggleAssignee(user.id)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all border-2 ${
+                  formData.assigneeIds.includes(user.id)
+                    ? 'bg-primary-50 border-primary-500 text-primary-700'
+                    : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                {user.name}
+                {formData.assigneeIds.includes(user.id) && (
+                  <X className="inline-block ml-1 h-3 w-3" />
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {labels.length > 0 && (
         <div>

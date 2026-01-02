@@ -41,13 +41,12 @@ export interface Task {
   status: TaskStatus;
   priority: TaskPriority;
   position: number;
-  assigneeId: string | null;
   creatorId: string;
   milestoneId: string | null;
   dueDate: string | null;
   createdAt: string;
   updatedAt: string;
-  assignee: User | null;
+  assignees: User[];
   creator: User;
   milestone: Milestone | null;
   labels: Label[];
@@ -58,7 +57,7 @@ export interface CreateTaskDto {
   description?: string;
   status?: TaskStatus;
   priority?: TaskPriority;
-  assigneeId?: string;
+  assigneeIds?: string[];
   milestoneId?: string;
   dueDate?: string;
   labels?: string[];
@@ -69,7 +68,7 @@ export interface UpdateTaskDto {
   description?: string;
   status?: TaskStatus;
   priority?: TaskPriority;
-  assigneeId?: string | null;
+  assigneeIds?: string[];
   milestoneId?: string | null;
   dueDate?: string | null;
   labels?: string[];

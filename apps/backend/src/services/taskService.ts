@@ -7,7 +7,7 @@ export interface CreateTaskData {
   description?: string;
   status?: TaskStatus;
   priority?: TaskPriority;
-  assigneeId?: string;
+  assigneeIds?: string[];
   milestoneId?: string;
   dueDate?: Date;
   creatorId: string;
@@ -19,7 +19,7 @@ export interface UpdateTaskData {
   description?: string;
   status?: TaskStatus;
   priority?: TaskPriority;
-  assigneeId?: string | null;
+  assigneeIds?: string[];
   milestoneId?: string | null;
   dueDate?: Date | null;
   labels?: string[];
@@ -46,7 +46,11 @@ export async function getAllTasks(filters?: TaskFilters) {
   }
 
   if (filters?.assigneeId) {
-    where.assigneeId = filters.assigneeId;
+    where.assignees = {
+      some: {
+        userId: filters.assigneeId,
+      },
+    };
   }
 
   if (filters?.milestoneId) {
@@ -67,12 +71,16 @@ export async function getAllTasks(filters?: TaskFilters) {
   const tasks = await prisma.task.findMany({
     where,
     include: {
-      assignee: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          avatar: true,
+      assignees: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              avatar: true,
+            },
+          },
         },
       },
       creator: {
@@ -101,6 +109,7 @@ export async function getAllTasks(filters?: TaskFilters) {
 
   return tasks.map((task) => ({
     ...task,
+    assignees: task.assignees.map((ta) => ta.user),
     labels: task.labels.map((tl) => tl.label),
   }));
 }
@@ -109,12 +118,16 @@ export async function getTaskById(taskId: string) {
   const task = await prisma.task.findUnique({
     where: { id: taskId },
     include: {
-      assignee: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          avatar: true,
+      assignees: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              avatar: true,
+            },
+          },
         },
       },
       creator: {
@@ -154,6 +167,7 @@ export async function getTaskById(taskId: string) {
 
   return {
     ...task,
+    assignees: task.assignees.map((ta) => ta.user),
     labels: task.labels.map((tl) => tl.label),
   };
 }
@@ -170,10 +184,16 @@ export async function createTask(data: CreateTaskData) {
       status: data.status || TaskStatus.TODO,
       priority: data.priority || TaskPriority.MEDIUM,
       position: tasksInColumn,
-      assigneeId: data.assigneeId,
       milestoneId: data.milestoneId,
       dueDate: data.dueDate,
       creatorId: data.creatorId,
+      assignees: data.assigneeIds
+        ? {
+            create: data.assigneeIds.map((userId) => ({
+              userId,
+            })),
+          }
+        : undefined,
       labels: data.labels
         ? {
             create: data.labels.map((labelId) => ({
@@ -183,12 +203,16 @@ export async function createTask(data: CreateTaskData) {
         : undefined,
     },
     include: {
-      assignee: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          avatar: true,
+      assignees: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              avatar: true,
+            },
+          },
         },
       },
       creator: {
@@ -216,6 +240,7 @@ export async function createTask(data: CreateTaskData) {
 
   return {
     ...task,
+    assignees: task.assignees.map((ta) => ta.user),
     labels: task.labels.map((tl) => tl.label),
   };
 }
@@ -223,7 +248,7 @@ export async function createTask(data: CreateTaskData) {
 export async function updateTask(taskId: string, data: UpdateTaskData) {
   const existingTask = await prisma.task.findUnique({
     where: { id: taskId },
-    include: { labels: true },
+    include: { labels: true, assignees: true },
   });
 
   if (!existingTask) {
@@ -237,9 +262,16 @@ export async function updateTask(taskId: string, data: UpdateTaskData) {
       description: data.description,
       status: data.status,
       priority: data.priority,
-      assigneeId: data.assigneeId,
       milestoneId: data.milestoneId,
       dueDate: data.dueDate,
+      assignees: data.assigneeIds
+        ? {
+            deleteMany: {},
+            create: data.assigneeIds.map((userId) => ({
+              userId,
+            })),
+          }
+        : undefined,
       labels: data.labels
         ? {
             deleteMany: {},
@@ -250,12 +282,16 @@ export async function updateTask(taskId: string, data: UpdateTaskData) {
         : undefined,
     },
     include: {
-      assignee: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          avatar: true,
+      assignees: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              avatar: true,
+            },
+          },
         },
       },
       creator: {
@@ -283,6 +319,7 @@ export async function updateTask(taskId: string, data: UpdateTaskData) {
 
   return {
     ...task,
+    assignees: task.assignees.map((ta) => ta.user),
     labels: task.labels.map((tl) => tl.label),
   };
 }
@@ -382,19 +419,23 @@ export async function moveTask(taskId: string, newStatus: TaskStatus, newPositio
       });
     }
 
-    return await tx.task.update({
+    const updatedTask = await tx.task.update({
       where: { id: taskId },
       data: {
         status: newStatus,
         position: newPosition,
       },
       include: {
-        assignee: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            avatar: true,
+        assignees: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                avatar: true,
+              },
+            },
           },
         },
         creator: {
@@ -419,5 +460,11 @@ export async function moveTask(taskId: string, newStatus: TaskStatus, newPositio
         },
       },
     });
+
+    return {
+      ...updatedTask,
+      assignees: updatedTask.assignees.map((ta) => ta.user),
+      labels: updatedTask.labels.map((tl) => tl.label),
+    };
   });
 }
