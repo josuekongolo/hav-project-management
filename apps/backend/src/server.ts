@@ -59,7 +59,9 @@ app.use('/api', (_req, res) => {
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+const HOST = '0.0.0.0';
+app.listen(PORT, HOST, () => {
+  console.log(`Server running on http://${HOST}:${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV}`);
+  console.log(`Database: ${process.env.DATABASE_URL ? 'Connected' : 'Not configured'}`);
 });
