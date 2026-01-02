@@ -1,0 +1,7 @@
+-- CreateEnum
+CREATE TYPE "UserStatus" AS ENUM ('AVAILABLE', 'BUSY', 'AWAY', 'OFFLINE');
+
+-- AlterTable
+ALTER TABLE "users" ADD COLUMN "bio" TEXT,
+ADD COLUMN "status" "UserStatus" NOT NULL DEFAULT 'AVAILABLE',
+ADD COLUMN "timezone" TEXT NOT NULL DEFAULT 'UTC';

@@ -8,14 +8,17 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
+  id        String     @id @default(uuid())
+  email     String     @unique
   password  String
   name      String
   avatar    String?
-  role      UserRole @default(MEMBER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role      UserRole   @default(MEMBER)
+  bio       String?
+  status    UserStatus @default(AVAILABLE)
+  timezone  String     @default("UTC")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
   assignedTasks TaskAssignee[]
   createdTasks  Task[]         @relation("CreatedTasks")
@@ -29,6 +32,13 @@ model User {
 enum UserRole {
   ADMIN
   MEMBER
+}
+
+enum UserStatus {
+  AVAILABLE
+  BUSY
+  AWAY
+  OFFLINE
 }
 
 model Task {

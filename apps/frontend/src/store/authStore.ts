@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { authService, User, LoginData } from '../services/authService';
+import { authService, User, LoginData, UpdateProfileData } from '../services/authService';
 import { api } from '../services/api';
 
 interface AuthState {
@@ -13,6 +13,7 @@ interface AuthState {
   login: (data: LoginData) => Promise<void>;
   logout: () => void;
   checkAuth: () => Promise<void>;
+  updateProfile: (data: UpdateProfileData) => Promise<void>;
   clearError: () => void;
 }
 
@@ -79,6 +80,15 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: false,
             isLoading: false,
           });
+        }
+      },
+
+      updateProfile: async (data: UpdateProfileData) => {
+        try {
+          const response = await authService.updateProfile(data);
+          set({ user: response.user });
+        } catch (error) {
+          throw error;
         }
       },
 

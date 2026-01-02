@@ -1,13 +1,31 @@
 import { api } from './api';
 
+export enum UserStatus {
+  AVAILABLE = 'AVAILABLE',
+  BUSY = 'BUSY',
+  AWAY = 'AWAY',
+  OFFLINE = 'OFFLINE',
+}
+
 export interface User {
   id: string;
   email: string;
   name: string;
   avatar: string | null;
   role: 'ADMIN' | 'MEMBER';
+  bio?: string | null;
+  status: UserStatus;
+  timezone: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface UpdateProfileData {
+  name?: string;
+  bio?: string;
+  status?: UserStatus;
+  timezone?: string;
+  avatar?: string;
 }
 
 export interface LoginData {
@@ -40,6 +58,11 @@ export const authService = {
 
   async getMe(): Promise<{ user: User }> {
     const response = await api.get<{ user: User }>('/auth/me');
+    return response.data;
+  },
+
+  async updateProfile(data: UpdateProfileData): Promise<{ user: User }> {
+    const response = await api.patch<{ user: User }>('/users/profile', data);
     return response.data;
   },
 };

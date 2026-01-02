@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware.js';
-import { getAllUsers, getUserTasks } from '../services/userService.js';
+import { getAllUsers, getUserTasks, updateProfile } from '../services/userService.js';
 
 export async function getUsersHandler(_req: AuthRequest, res: Response): Promise<void> {
   try {
@@ -16,6 +16,33 @@ export async function getUserTasksHandler(req: AuthRequest, res: Response): Prom
     const { id } = req.params;
     const tasks = await getUserTasks(id);
     res.status(200).json({ tasks });
+  } catch (error) {
+    if (error instanceof Error && error.message === 'User not found') {
+      res.status(404).json({ error: error.message });
+      return;
+    }
+    throw error;
+  }
+}
+
+export async function updateProfileHandler(req: AuthRequest, res: Response): Promise<void> {
+  try {
+    if (!req.userId) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { name, bio, status, timezone, avatar } = req.body;
+
+    const user = await updateProfile(req.userId, {
+      name,
+      bio,
+      status,
+      timezone,
+      avatar,
+    });
+
+    res.status(200).json({ user });
   } catch (error) {
     if (error instanceof Error && error.message === 'User not found') {
       res.status(404).json({ error: error.message });
