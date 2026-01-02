@@ -1,0 +1,60 @@
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { ProtectedRoute } from './components/layout/ProtectedRoute';
+import { AppLayout } from './components/layout/AppLayout';
+import { LoginPage } from './pages/LoginPage';
+import { Dashboard } from './pages/Dashboard';
+import { KanbanPage } from './pages/KanbanPage';
+import { TeamPage } from './pages/TeamPage';
+import { MilestonesPage } from './pages/MilestonesPage';
+import { LabelsPage } from './pages/LabelsPage';
+import { UsersPage } from './pages/UsersPage';
+import { CalendarPage } from './pages/CalendarPage';
+
+export const router = createBrowserRouter([
+  {
+    path: '/login',
+    element: <LoginPage />,
+  },
+  {
+    path: '/',
+    element: (
+      <ProtectedRoute>
+        <AppLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
+      },
+      {
+        path: 'kanban',
+        element: <KanbanPage />,
+      },
+      {
+        path: 'calendar',
+        element: <CalendarPage />,
+      },
+      {
+        path: 'team',
+        element: <TeamPage />,
+      },
+      {
+        path: 'milestones',
+        element: <MilestonesPage />,
+      },
+      {
+        path: 'labels',
+        element: <LabelsPage />,
+      },
+      {
+        path: 'users',
+        element: <UsersPage />,
+      },
+    ],
+  },
+  {
+    path: '*',
+    element: <Navigate to="/" replace />,
+  },
+]);

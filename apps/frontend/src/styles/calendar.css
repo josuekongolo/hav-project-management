@@ -1,0 +1,90 @@
+/* Custom calendar styles */
+.rbc-calendar {
+  font-family: inherit;
+}
+
+.rbc-header {
+  padding: 12px 8px;
+  font-weight: 600;
+  color: #374151;
+  background-color: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.rbc-today {
+  background-color: #eff6ff;
+}
+
+.rbc-event {
+  padding: 2px 5px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.rbc-event:hover {
+  opacity: 1 !important;
+}
+
+.rbc-event-label {
+  font-size: 0.75rem;
+}
+
+.rbc-selected-cell {
+  background-color: #dbeafe;
+}
+
+.rbc-off-range-bg {
+  background-color: #f9fafb;
+}
+
+.rbc-btn-group button {
+  color: #4b5563;
+  border-color: #d1d5db;
+}
+
+.rbc-btn-group button:hover {
+  background-color: #f3f4f6;
+}
+
+.rbc-btn-group button.rbc-active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.rbc-toolbar button {
+  font-size: 0.875rem;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.rbc-toolbar-label {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.rbc-agenda-view {
+  border-radius: 8px;
+}
+
+.rbc-agenda-date-cell,
+.rbc-agenda-time-cell {
+  font-weight: 500;
+}
+
+.rbc-agenda-event-cell {
+  cursor: pointer;
+}
+
+.rbc-agenda-event-cell:hover {
+  background-color: #f9fafb;
+}
+
+.rbc-month-view,
+.rbc-time-view,
+.rbc-agenda-view {
+  border-radius: 8px;
+  overflow: hidden;
+}
