@@ -6,51 +6,51 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Starting database seeding...');
 
-  const password = await bcrypt.hash('password123', 12);
+  const password = await bcrypt.hash('Havdis1234!?', 12);
 
   const users = await Promise.all([
     prisma.user.upsert({
-      where: { email: 'admin@hav.com' },
+      where: { email: 'Andreas@havdis.no' },
       update: {},
       create: {
-        email: 'admin@hav.com',
+        email: 'Andreas@havdis.no',
         password,
-        name: 'Admin User',
+        name: 'Andreas',
         role: 'ADMIN',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Andreas',
       },
     }),
     prisma.user.upsert({
-      where: { email: 'alice@hav.com' },
+      where: { email: 'Josue@havdis.no' },
       update: {},
       create: {
-        email: 'alice@hav.com',
+        email: 'Josue@havdis.no',
         password,
-        name: 'Alice Johnson',
+        name: 'Josue',
         role: 'MEMBER',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Josue',
       },
     }),
     prisma.user.upsert({
-      where: { email: 'bob@hav.com' },
+      where: { email: 'Lalit@havdis.no' },
       update: {},
       create: {
-        email: 'bob@hav.com',
+        email: 'Lalit@havdis.no',
         password,
-        name: 'Bob Smith',
+        name: 'Lalit',
         role: 'MEMBER',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lalit',
       },
     }),
     prisma.user.upsert({
-      where: { email: 'carol@hav.com' },
+      where: { email: 'Ben@havdis.no' },
       update: {},
       create: {
-        email: 'carol@hav.com',
+        email: 'Ben@havdis.no',
         password,
-        name: 'Carol Williams',
+        name: 'Ben',
         role: 'MEMBER',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carol',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ben',
       },
     }),
   ]);
@@ -242,10 +242,10 @@ async function main() {
 
   console.log('\nSeeding completed successfully!');
   console.log('\nDefault login credentials:');
-  console.log('  Email: admin@hav.com | Password: password123');
-  console.log('  Email: alice@hav.com | Password: password123');
-  console.log('  Email: bob@hav.com   | Password: password123');
-  console.log('  Email: carol@hav.com | Password: password123');
+  console.log('  Email: Andreas@havdis.no | Password: Havdis1234!?');
+  console.log('  Email: Josue@havdis.no   | Password: Havdis1234!?');
+  console.log('  Email: Lalit@havdis.no   | Password: Havdis1234!?');
+  console.log('  Email: Ben@havdis.no     | Password: Havdis1234!?');
 }
 
 main()
