@@ -55,7 +55,7 @@ export function Header({ onMenuClick }: HeaderProps) {
             >
               <Menu className="h-5 w-5" />
             </button>
-            <h1 className="text-xl md:text-2xl font-bold text-primary-600">HAV</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-primary-600">Havdis Ctrl</h1>
           </div>
 
           <div className="flex items-center gap-2 md:gap-4">
