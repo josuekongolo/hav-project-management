@@ -74,9 +74,25 @@ export async function getUserTasks(userId: string) {
 
   const tasks = await prisma.task.findMany({
     where: {
-      assigneeId: userId,
+      assignees: {
+        some: {
+          userId: userId,
+        },
+      },
     },
     include: {
+      assignees: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              avatar: true,
+            },
+          },
+        },
+      },
       milestone: {
         select: {
           id: true,
@@ -93,8 +109,9 @@ export async function getUserTasks(userId: string) {
     orderBy: [{ status: 'asc' }, { position: 'asc' }],
   });
 
-  return tasks.map((task) => ({
+  return tasks.map((task: any) => ({
     ...task,
-    labels: task.labels.map((tl) => tl.label),
+    assignees: task.assignees.map((ta: any) => ta.user),
+    labels: task.labels.map((tl: any) => tl.label),
   }));
 }

@@ -1,13 +1,15 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { AuthRequest } from '../middleware/authMiddleware.js';
 import * as commentService from '../services/commentService.js';
 
-export async function createComment(req: Request, res: Response) {
+export async function createComment(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { content, taskId } = req.body;
-    const authorId = req.user!.userId;
+    const authorId = req.userId!;
 
     if (!content || !taskId) {
-      return res.status(400).json({ error: 'Content and taskId are required' });
+      res.status(400).json({ error: 'Content and taskId are required' });
+      return;
     }
 
     const comment = await commentService.createComment({
@@ -23,7 +25,7 @@ export async function createComment(req: Request, res: Response) {
   }
 }
 
-export async function getCommentsByTask(req: Request, res: Response) {
+export async function getCommentsByTask(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { taskId } = req.params;
     const comments = await commentService.getCommentsByTask(taskId);
@@ -34,13 +36,14 @@ export async function getCommentsByTask(req: Request, res: Response) {
   }
 }
 
-export async function updateComment(req: Request, res: Response) {
+export async function updateComment(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { id } = req.params;
     const { content } = req.body;
 
     if (!content) {
-      return res.status(400).json({ error: 'Content is required' });
+      res.status(400).json({ error: 'Content is required' });
+      return;
     }
 
     const comment = await commentService.updateComment(id, { content });
@@ -51,7 +54,7 @@ export async function updateComment(req: Request, res: Response) {
   }
 }
 
-export async function deleteComment(req: Request, res: Response) {
+export async function deleteComment(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { id } = req.params;
     await commentService.deleteComment(id);

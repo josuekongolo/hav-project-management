@@ -54,12 +54,16 @@ export async function getMilestoneById(milestoneId: string) {
     include: {
       tasks: {
         include: {
-          assignee: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              avatar: true,
+          assignees: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  avatar: true,
+                },
+              },
             },
           },
           labels: {
@@ -78,14 +82,15 @@ export async function getMilestoneById(milestoneId: string) {
   }
 
   const totalTasks = milestone.tasks.length;
-  const completedTasks = milestone.tasks.filter((task) => task.status === 'DONE').length;
+  const completedTasks = milestone.tasks.filter((task: any) => task.status === 'DONE').length;
   const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   return {
     ...milestone,
-    tasks: milestone.tasks.map((task) => ({
+    tasks: milestone.tasks.map((task: any) => ({
       ...task,
-      labels: task.labels.map((tl) => tl.label),
+      assignees: task.assignees.map((ta: any) => ta.user),
+      labels: task.labels.map((tl: any) => tl.label),
     })),
     totalTasks,
     completedTasks,

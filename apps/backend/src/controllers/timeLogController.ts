@@ -1,17 +1,20 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { AuthRequest } from '../middleware/authMiddleware.js';
 import * as timeLogService from '../services/timeLogService.js';
 
-export async function createTimeLog(req: Request, res: Response) {
+export async function createTimeLog(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { hours, description, taskId, loggedAt } = req.body;
-    const userId = req.user!.userId;
+    const userId = req.userId!;
 
     if (!hours || !taskId) {
-      return res.status(400).json({ error: 'Hours and taskId are required' });
+      res.status(400).json({ error: 'Hours and taskId are required' });
+      return;
     }
 
     if (hours <= 0 || hours > 24) {
-      return res.status(400).json({ error: 'Hours must be between 0 and 24' });
+      res.status(400).json({ error: 'Hours must be between 0 and 24' });
+      return;
     }
 
     const timeLog = await timeLogService.createTimeLog({
@@ -29,7 +32,7 @@ export async function createTimeLog(req: Request, res: Response) {
   }
 }
 
-export async function getTimeLogsByTask(req: Request, res: Response) {
+export async function getTimeLogsByTask(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { taskId } = req.params;
     const result = await timeLogService.getTimeLogsByTask(taskId);
@@ -40,7 +43,7 @@ export async function getTimeLogsByTask(req: Request, res: Response) {
   }
 }
 
-export async function getTimeLogsByUser(req: Request, res: Response) {
+export async function getTimeLogsByUser(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { userId } = req.params;
     const { startDate, endDate } = req.query;
@@ -58,7 +61,7 @@ export async function getTimeLogsByUser(req: Request, res: Response) {
   }
 }
 
-export async function deleteTimeLog(req: Request, res: Response) {
+export async function deleteTimeLog(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { id } = req.params;
     await timeLogService.deleteTimeLog(id);

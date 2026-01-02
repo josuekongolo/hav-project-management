@@ -1,9 +1,10 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { AuthRequest } from '../middleware/authMiddleware.js';
 import * as notificationService from '../services/notificationService.js';
 
-export async function getNotifications(req: Request, res: Response) {
+export async function getNotifications(req: AuthRequest, res: Response): Promise<void> {
   try {
-    const userId = req.user!.userId;
+    const userId = req.userId!;
     const unreadOnly = req.query.unreadOnly === 'true';
 
     const notifications = await notificationService.getNotificationsByUser(userId, unreadOnly);
@@ -14,9 +15,9 @@ export async function getNotifications(req: Request, res: Response) {
   }
 }
 
-export async function getUnreadCount(req: Request, res: Response) {
+export async function getUnreadCount(req: AuthRequest, res: Response): Promise<void> {
   try {
-    const userId = req.user!.userId;
+    const userId = req.userId!;
     const count = await notificationService.getUnreadCount(userId);
     res.json({ count });
   } catch (error: any) {
@@ -25,7 +26,7 @@ export async function getUnreadCount(req: Request, res: Response) {
   }
 }
 
-export async function markAsRead(req: Request, res: Response) {
+export async function markAsRead(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { id } = req.params;
     const notification = await notificationService.markAsRead(id);
@@ -36,9 +37,9 @@ export async function markAsRead(req: Request, res: Response) {
   }
 }
 
-export async function markAllAsRead(req: Request, res: Response) {
+export async function markAllAsRead(req: AuthRequest, res: Response): Promise<void> {
   try {
-    const userId = req.user!.userId;
+    const userId = req.userId!;
     await notificationService.markAllAsRead(userId);
     res.status(204).send();
   } catch (error: any) {
@@ -47,7 +48,7 @@ export async function markAllAsRead(req: Request, res: Response) {
   }
 }
 
-export async function deleteNotification(req: Request, res: Response) {
+export async function deleteNotification(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { id } = req.params;
     await notificationService.deleteNotification(id);

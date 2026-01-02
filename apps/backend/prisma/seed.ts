@@ -111,7 +111,9 @@ async function main() {
         priority: 'HIGH',
         position: 0,
         creatorId: users[0].id,
-        assigneeId: users[0].id,
+        assignees: {
+          create: [{ userId: users[0].id }],
+        },
         milestoneId: milestone.id,
         labels: {
           create: [{ labelId: labels[1].id }],
@@ -126,7 +128,9 @@ async function main() {
         priority: 'HIGH',
         position: 1,
         creatorId: users[0].id,
-        assigneeId: users[1].id,
+        assignees: {
+          create: [{ userId: users[1].id }],
+        },
         milestoneId: milestone.id,
         labels: {
           create: [{ labelId: labels[1].id }],
@@ -141,7 +145,9 @@ async function main() {
         priority: 'HIGH',
         position: 0,
         creatorId: users[0].id,
-        assigneeId: users[1].id,
+        assignees: {
+          create: [{ userId: users[1].id }],
+        },
         milestoneId: milestone.id,
         dueDate: new Date('2026-01-15'),
         labels: {
@@ -157,7 +163,9 @@ async function main() {
         priority: 'HIGH',
         position: 1,
         creatorId: users[0].id,
-        assigneeId: users[2].id,
+        assignees: {
+          create: [{ userId: users[2].id }],
+        },
         milestoneId: milestone.id,
         dueDate: new Date('2026-01-20'),
         labels: {
@@ -173,7 +181,9 @@ async function main() {
         priority: 'MEDIUM',
         position: 0,
         creatorId: users[0].id,
-        assigneeId: users[3].id,
+        assignees: {
+          create: [{ userId: users[3].id }],
+        },
         milestoneId: milestone.id,
         labels: {
           create: [{ labelId: labels[1].id }],
@@ -202,7 +212,9 @@ async function main() {
         priority: 'LOW',
         position: 2,
         creatorId: users[1].id,
-        assigneeId: users[2].id,
+        assignees: {
+          create: [{ userId: users[2].id }],
+        },
         labels: {
           create: [{ labelId: labels[0].id }],
         },
@@ -216,7 +228,9 @@ async function main() {
         priority: 'LOW',
         position: 3,
         creatorId: users[1].id,
-        assigneeId: users[3].id,
+        assignees: {
+          create: [{ userId: users[3].id }],
+        },
         labels: {
           create: [{ labelId: labels[3].id }],
         },
