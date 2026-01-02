@@ -31,6 +31,17 @@ export interface TeamMemberWorkload {
   workloadScore: number;
 }
 
+export interface RecentActivity {
+  id: string;
+  taskId: string;
+  taskTitle: string;
+  userName: string;
+  userAvatar: string | null;
+  action: string;
+  status: string;
+  timestamp: Date;
+}
+
 export async function getDashboardStats(): Promise<DashboardStats> {
   const [totalTasks, completedTasks, inProgressTasks, todoTasks, totalMilestones, activeMilestones, totalUsers] =
     await Promise.all([
@@ -114,6 +125,55 @@ export async function getTeamWorkload(): Promise<TeamMemberWorkload[]> {
           }
         : null,
       workloadScore,
+    };
+  });
+}
+
+export async function getRecentActivity(limit: number = 10): Promise<RecentActivity[]> {
+  const recentTasks = await prisma.task.findMany({
+    take: limit,
+    orderBy: {
+      updatedAt: 'desc',
+    },
+    include: {
+      assignees: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              avatar: true,
+            },
+          },
+        },
+        take: 1,
+      },
+    },
+  });
+
+  return recentTasks.map((task) => {
+    const user = task.assignees[0]?.user || { name: 'Unknown', avatar: null };
+
+    let action = 'updated';
+    if (task.status === 'DONE') {
+      action = 'completed';
+    } else if (task.status === 'IN_PROGRESS') {
+      action = 'is working on';
+    } else if (task.status === 'IN_REVIEW') {
+      action = 'submitted for review';
+    } else if (task.status === 'TODO') {
+      action = 'created';
+    }
+
+    return {
+      id: task.id,
+      taskId: task.id,
+      taskTitle: task.title,
+      userName: user.name,
+      userAvatar: user.avatar,
+      action,
+      status: task.status,
+      timestamp: task.updatedAt,
     };
   });
 }

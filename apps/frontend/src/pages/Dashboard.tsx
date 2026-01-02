@@ -3,26 +3,32 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { StatCard, Card } from '../components/ui';
 import { CheckSquare, Clock, CheckCircle, Target, TrendingUp, Users } from 'lucide-react';
-import { dashboardService, DashboardStats } from '../services/dashboardService';
+import { dashboardService, DashboardStats, RecentActivity } from '../services/dashboardService';
 import { Spinner } from '../components/ui/Spinner';
+import { formatDistanceToNow } from 'date-fns';
 
 export function Dashboard() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [activities, setActivities] = useState<RecentActivity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchStats();
+    fetchDashboardData();
   }, []);
 
-  const fetchStats = async () => {
+  const fetchDashboardData = async () => {
     try {
       setIsLoading(true);
-      const data = await dashboardService.getStats();
-      setStats(data);
+      const [statsData, activitiesData] = await Promise.all([
+        dashboardService.getStats(),
+        dashboardService.getRecentActivity(5),
+      ]);
+      setStats(statsData);
+      setActivities(activitiesData);
     } catch (error) {
-      console.error('Failed to fetch dashboard stats:', error);
+      console.error('Failed to fetch dashboard data:', error);
     } finally {
       setIsLoading(false);
     }
@@ -135,36 +141,33 @@ export function Dashboard() {
           <TrendingUp className="h-5 w-5 text-gray-400" />
         </div>
         <div className="space-y-4">
-          <div className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0">
-            <div className="w-2 h-2 rounded-full bg-green-500 mt-2"></div>
-            <div className="flex-1">
-              <p className="text-sm text-gray-900">
-                <span className="font-medium">Alice Johnson</span> completed{' '}
-                <span className="font-medium">Design database schema</span>
-              </p>
-              <p className="text-xs text-gray-500 mt-1">2 hours ago</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0">
-            <div className="w-2 h-2 rounded-full bg-blue-500 mt-2"></div>
-            <div className="flex-1">
-              <p className="text-sm text-gray-900">
-                <span className="font-medium">Bob Smith</span> is working on{' '}
-                <span className="font-medium">Build Kanban board UI</span>
-              </p>
-              <p className="text-xs text-gray-500 mt-1">4 hours ago</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0">
-            <div className="w-2 h-2 rounded-full bg-purple-500 mt-2"></div>
-            <div className="flex-1">
-              <p className="text-sm text-gray-900">
-                <span className="font-medium">Admin User</span> created milestone{' '}
-                <span className="font-medium">MVP Launch</span>
-              </p>
-              <p className="text-xs text-gray-500 mt-1">Yesterday</p>
-            </div>
-          </div>
+          {activities.length === 0 ? (
+            <p className="text-sm text-gray-500 text-center py-4">No recent activity</p>
+          ) : (
+            activities.map((activity) => {
+              const statusColors: Record<string, string> = {
+                DONE: 'bg-green-500',
+                IN_PROGRESS: 'bg-blue-500',
+                IN_REVIEW: 'bg-yellow-500',
+                TODO: 'bg-gray-500',
+              };
+
+              return (
+                <div key={activity.id} className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0">
+                  <div className={`w-2 h-2 rounded-full mt-2 ${statusColors[activity.status] || 'bg-purple-500'}`}></div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-900">
+                      <span className="font-medium">{activity.userName}</span> {activity.action}{' '}
+                      <span className="font-medium">{activity.taskTitle}</span>
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
+                    </p>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </Card>
     </div>

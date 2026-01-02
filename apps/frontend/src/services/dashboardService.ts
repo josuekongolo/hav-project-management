@@ -29,6 +29,17 @@ export interface TeamMemberWorkload {
   workloadScore: number;
 }
 
+export interface RecentActivity {
+  id: string;
+  taskId: string;
+  taskTitle: string;
+  userName: string;
+  userAvatar: string | null;
+  action: string;
+  status: string;
+  timestamp: string;
+}
+
 export const dashboardService = {
   async getStats(): Promise<DashboardStats> {
     const response = await api.get<{ stats: DashboardStats }>('/dashboard/stats');
@@ -38,5 +49,10 @@ export const dashboardService = {
   async getTeamWorkload(): Promise<TeamMemberWorkload[]> {
     const response = await api.get<{ team: TeamMemberWorkload[] }>('/dashboard/team');
     return response.data.team;
+  },
+
+  async getRecentActivity(limit: number = 10): Promise<RecentActivity[]> {
+    const response = await api.get<{ activities: RecentActivity[] }>(`/dashboard/activity?limit=${limit}`);
+    return response.data.activities;
   },
 };
