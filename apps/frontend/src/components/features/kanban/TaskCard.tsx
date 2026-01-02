@@ -1,11 +1,13 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Task } from '../../../services/taskService';
 import { PriorityBadge, Avatar, Badge } from '../../ui';
-import { Calendar, MessageSquare, Paperclip } from 'lucide-react';
+import { Calendar, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import clsx from 'clsx';
+import { useTaskStore } from '../../../store/taskStore';
+import { toast } from 'react-hot-toast';
 
 interface TaskCardProps {
   task: Task;
@@ -16,10 +18,30 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
   });
+  const { deleteTask } = useTaskStore();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+  };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!confirm(`Are you sure you want to delete "${task.title}"?`)) {
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      await deleteTask(task.id);
+      toast.success('Task deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete task');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -37,7 +59,17 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
     >
       <div className="flex items-start justify-between gap-2 mb-2">
         <h3 className="font-medium text-gray-900 text-sm line-clamp-2 flex-1">{task.title}</h3>
-        <PriorityBadge priority={task.priority} size="sm" />
+        <div className="flex items-center gap-1">
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+            title="Delete task"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+          <PriorityBadge priority={task.priority} size="sm" />
+        </div>
       </div>
 
       {task.description && (
