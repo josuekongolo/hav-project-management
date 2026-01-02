@@ -17,8 +17,11 @@ export interface LoginData {
 }
 
 export async function register(data: RegisterData) {
+  // Convert email to lowercase for case-insensitive storage
+  const normalizedEmail = data.email.toLowerCase().trim();
+
   const existingUser = await prisma.user.findUnique({
-    where: { email: data.email },
+    where: { email: normalizedEmail },
   });
 
   if (existingUser) {
@@ -32,7 +35,7 @@ export async function register(data: RegisterData) {
 
   const user = await prisma.user.create({
     data: {
-      email: data.email,
+      email: normalizedEmail,
       password: hashedPassword,
       name: data.name,
       avatar: avatarUrl,
@@ -54,8 +57,11 @@ export async function register(data: RegisterData) {
 }
 
 export async function login(data: LoginData) {
+  // Convert email to lowercase for case-insensitive login
+  const normalizedEmail = data.email.toLowerCase().trim();
+
   const user = await prisma.user.findUnique({
-    where: { email: data.email },
+    where: { email: normalizedEmail },
   });
 
   if (!user) {
