@@ -47,8 +47,18 @@ export interface AuthResponse {
 
 export const authService = {
   async login(data: LoginData): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>('/auth/login', data);
-    return response.data;
+    console.log('🔐 Attempting login with email:', data.email);
+    console.log('🌐 API Base URL:', api.defaults.baseURL);
+    try {
+      const response = await api.post<AuthResponse>('/auth/login', data);
+      console.log('✅ Login successful');
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Login failed:', error.message);
+      console.error('   Response:', error.response?.data);
+      console.error('   Status:', error.response?.status);
+      throw error;
+    }
   },
 
   async register(data: RegisterData): Promise<AuthResponse> {

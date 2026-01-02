@@ -2,6 +2,12 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
+// Debug logging
+console.log('🔧 API Configuration:');
+console.log('  VITE_API_URL:', import.meta.env.VITE_API_URL);
+console.log('  Final API_URL:', API_URL);
+console.log('  Environment Mode:', import.meta.env.MODE);
+
 export const api = axios.create({
   baseURL: API_URL,
   headers: {
