@@ -11,6 +11,7 @@ import { UsersPage } from './pages/UsersPage';
 import { CalendarPage } from './pages/CalendarPage';
 import { ContactsPage } from './pages/crm/ContactsPage';
 import { EmailTemplatesPage } from './pages/crm/EmailTemplatesPage';
+import { EmailsPage } from './pages/crm/EmailsPage';
 
 export const router = createBrowserRouter([
   {
@@ -60,6 +61,10 @@ export const router = createBrowserRouter([
       {
         path: 'crm/templates',
         element: <EmailTemplatesPage />,
+      },
+      {
+        path: 'crm/emails',
+        element: <EmailsPage />,
       },
     ],
   },
