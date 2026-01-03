@@ -8,7 +8,7 @@ import {
 import { Button } from '../../../ui/Button';
 import { Input } from '../../../ui/Input';
 import { Select } from '../../../ui/Select';
-import { Textarea } from '../../../ui/Textarea';
+import { RichTextEditor } from '../../../ui/RichTextEditor';
 import { Info } from 'lucide-react';
 
 interface EmailTemplateFormProps {
@@ -44,9 +44,9 @@ export function EmailTemplateForm({ template, onSubmit, onCancel }: EmailTemplat
   }, [template]);
 
   useEffect(() => {
-    // Extract variables from body
+    // Extract variables from htmlBody (which contains the rich text)
     const regex = /{{(\w+)}}/g;
-    const matches = formData.body.matchAll(regex);
+    const matches = (formData.htmlBody || '').matchAll(regex);
     const variables = new Set<string>();
 
     for (const match of matches) {
@@ -54,15 +54,23 @@ export function EmailTemplateForm({ template, onSubmit, onCancel }: EmailTemplat
     }
 
     setDetectedVariables(Array.from(variables));
-  }, [formData.body]);
+  }, [formData.htmlBody]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
+      // Convert HTML to plain text for body
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = formData.htmlBody || '';
+      const plainText = tempDiv.textContent || tempDiv.innerText || '';
+
       // Remove empty optional fields
-      const cleanedData: any = { ...formData };
-      if (cleanedData.htmlBody === '') {
+      const cleanedData: any = {
+        ...formData,
+        body: plainText || formData.body, // Use plain text extracted from HTML
+      };
+      if (!cleanedData.htmlBody || cleanedData.htmlBody === '') {
         delete cleanedData.htmlBody;
       }
       await onSubmit(cleanedData);
@@ -106,13 +114,13 @@ export function EmailTemplateForm({ template, onSubmit, onCancel }: EmailTemplat
       />
 
       <div>
-        <Textarea
-          label="Email Body"
-          value={formData.body}
-          onChange={(e) => setFormData({ ...formData, body: e.target.value })}
-          rows={10}
-          required
-          placeholder="Hi {{firstName}},&#10;&#10;Welcome to our platform!&#10;&#10;Best regards,&#10;{{senderName}}"
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Email Body <span className="text-red-500">*</span>
+        </label>
+        <RichTextEditor
+          value={formData.htmlBody || ''}
+          onChange={(value) => setFormData({ ...formData, htmlBody: value, body: value })}
+          placeholder="Hi {{firstName}}, Welcome to our platform!"
         />
         <div className="mt-2 p-3 bg-blue-50 rounded-lg">
           <div className="flex items-start gap-2">
@@ -142,14 +150,6 @@ export function EmailTemplateForm({ template, onSubmit, onCancel }: EmailTemplat
           </div>
         </div>
       </div>
-
-      <Textarea
-        label="HTML Body (Optional)"
-        value={formData.htmlBody}
-        onChange={(e) => setFormData({ ...formData, htmlBody: e.target.value })}
-        rows={6}
-        placeholder="<p>Hi {{firstName}},</p><p>Welcome to our platform!</p>"
-      />
 
       <div className="flex items-center gap-2">
         <input

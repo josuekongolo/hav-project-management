@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '../../../ui/Button';
 import { Input } from '../../../ui/Input';
 import { Select } from '../../../ui/Select';
-import { Textarea } from '../../../ui/Textarea';
+import { RichTextEditor } from '../../../ui/RichTextEditor';
 import { useEmailTemplateStore } from '../../../../store/emailTemplateStore';
 import { useContactStore } from '../../../../store/contactStore';
 import { SendEmailData, SendEmailWithTemplateData } from '../../../../services/emailService';
@@ -103,6 +103,11 @@ export function EmailComposer({ onSend, onSaveDraft, onCancel, initialContactId 
           true
         );
       } else {
+        // Convert HTML to plain text for body
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = formData.body;
+        const plainText = tempDiv.textContent || tempDiv.innerText || '';
+
         await onSend(
           {
             contactId: formData.contactId || undefined,
@@ -110,7 +115,8 @@ export function EmailComposer({ onSend, onSaveDraft, onCancel, initialContactId 
             cc: formData.cc ? formData.cc.split(',').map((e) => e.trim()) : undefined,
             bcc: formData.bcc ? formData.bcc.split(',').map((e) => e.trim()) : undefined,
             subject: formData.subject,
-            body: formData.body,
+            body: plainText,
+            htmlBody: formData.body,
           },
           false
         );
@@ -125,13 +131,19 @@ export function EmailComposer({ onSend, onSaveDraft, onCancel, initialContactId 
 
     setIsLoading(true);
     try {
+      // Convert HTML to plain text for body
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = formData.body;
+      const plainText = tempDiv.textContent || tempDiv.innerText || '';
+
       await onSaveDraft({
         contactId: formData.contactId || undefined,
         to: formData.to,
         cc: formData.cc ? formData.cc.split(',').map((e) => e.trim()) : undefined,
         bcc: formData.bcc ? formData.bcc.split(',').map((e) => e.trim()) : undefined,
         subject: formData.subject,
-        body: formData.body,
+        body: plainText,
+        htmlBody: formData.body,
         templateId: useTemplate ? selectedTemplateId : undefined,
       });
     } finally {
@@ -242,15 +254,17 @@ export function EmailComposer({ onSend, onSaveDraft, onCancel, initialContactId 
       />
 
       {/* Body */}
-      <Textarea
-        label="Message"
-        value={formData.body}
-        onChange={(e) => setFormData({ ...formData, body: e.target.value })}
-        rows={12}
-        required
-        disabled={useTemplate && selectedTemplate}
-        placeholder="Write your message here..."
-      />
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Message <span className="text-red-500">*</span>
+        </label>
+        <RichTextEditor
+          value={formData.body}
+          onChange={(value) => setFormData({ ...formData, body: value })}
+          placeholder="Write your message here..."
+          disabled={useTemplate && selectedTemplate}
+        />
+      </div>
 
       {/* Actions */}
       <div className="flex justify-end gap-3">
