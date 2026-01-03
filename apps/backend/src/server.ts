@@ -14,6 +14,7 @@ import notificationRoutes from './routes/notificationRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import emailTemplateRoutes from './routes/emailTemplateRoutes.js';
 import emailRoutes from './routes/emailRoutes.js';
+import dealRoutes from './routes/dealRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { emailService } from './services/emailService.js';
 
@@ -99,6 +100,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/contacts', contactRoutes);
 app.use('/api/email-templates', emailTemplateRoutes);
 app.use('/api/emails', emailRoutes);
+app.use('/api/deals', dealRoutes);
 
 app.use('/api', (_req, res) => {
   res.json({ message: 'HAV Project Management API' });
