@@ -172,7 +172,7 @@ export function EmailTemplatesPage() {
           setSelectedTemplate(null);
         }}
         title={selectedTemplate ? 'Edit Email Template' : 'New Email Template'}
-        size="lg"
+        size="xl"
       >
         <EmailTemplateForm
           template={selectedTemplate}
