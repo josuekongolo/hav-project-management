@@ -33,6 +33,13 @@ export interface Deal {
     email: string;
     avatar: string | null;
   };
+  companyId: string | null;
+  companyRel?: {
+    id: string;
+    name: string;
+    industry: string | null;
+    logo: string | null;
+  } | null;
   contactId: string;
   ownerId: string;
   _count?: {
@@ -49,6 +56,7 @@ export interface CreateDealData {
   expectedCloseDate?: string;
   contactId: string;
   ownerId: string;
+  companyId?: string;
 }
 
 export interface UpdateDealData {
@@ -61,6 +69,7 @@ export interface UpdateDealData {
   closedDate?: string;
   contactId?: string;
   ownerId?: string;
+  companyId?: string;
 }
 
 export interface DealFilters {

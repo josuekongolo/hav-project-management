@@ -18,6 +18,13 @@ export interface Contact {
   email: string;
   phone: string | null;
   company: string | null;
+  companyId: string | null;
+  companyRel?: {
+    id: string;
+    name: string;
+    industry: string | null;
+    logo: string | null;
+  } | null;
   website: string | null;
   address: string | null;
   city: string | null;
@@ -48,6 +55,7 @@ export interface CreateContactData {
   email: string;
   phone?: string;
   company?: string;
+  companyId?: string;
   website?: string;
   address?: string;
   city?: string;
@@ -64,6 +72,7 @@ export interface UpdateContactData {
   email?: string;
   phone?: string;
   company?: string;
+  companyId?: string;
   website?: string;
   address?: string;
   city?: string;
