@@ -240,6 +240,116 @@ async function main() {
 
   console.log(`Created ${tasks.length} sample tasks`);
 
+  // Create email templates
+  console.log('\nCreating email templates...');
+  const emailTemplates = await Promise.all([
+    prisma.emailTemplate.create({
+      data: {
+        name: 'Welcome Email',
+        subject: 'Welcome to {{company}}!',
+        body: `Hi {{firstName}},
+
+Welcome to {{company}}! We're thrilled to have you on board.
+
+We wanted to reach out and let you know that we're here to help you get the most out of our services. If you have any questions or need assistance, please don't hesitate to reach out.
+
+Looking forward to working with you!
+
+Best regards,
+The {{company}} Team`,
+        category: 'WELCOME',
+        variables: ['firstName', 'company'],
+        isActive: true,
+      },
+    }),
+    prisma.emailTemplate.create({
+      data: {
+        name: 'Follow-up Email',
+        subject: 'Following up on our conversation',
+        body: `Hi {{firstName}},
+
+I hope this email finds you well.
+
+I wanted to follow up on our recent conversation about {{topic}}. Do you have any questions or would you like to schedule a call to discuss this further?
+
+I'm available {{availability}} if you'd like to connect.
+
+Best regards,
+{{senderName}}`,
+        category: 'FOLLOW_UP',
+        variables: ['firstName', 'topic', 'availability', 'senderName'],
+        isActive: true,
+      },
+    }),
+    prisma.emailTemplate.create({
+      data: {
+        name: 'Proposal Email',
+        subject: 'Proposal for {{company}}',
+        body: `Hi {{firstName}},
+
+Thank you for your interest in working with us. We've prepared a customized proposal for {{company}} that we believe will help you achieve your goals.
+
+The proposal includes:
+- {{proposalItem1}}
+- {{proposalItem2}}
+- {{proposalItem3}}
+
+Total Investment: {{totalAmount}}
+
+Please review the attached proposal and let me know if you have any questions. I'm happy to schedule a call to discuss the details.
+
+Looking forward to working together!
+
+Best regards,
+{{senderName}}`,
+        category: 'PROPOSAL',
+        variables: [
+          'firstName',
+          'company',
+          'proposalItem1',
+          'proposalItem2',
+          'proposalItem3',
+          'totalAmount',
+          'senderName',
+        ],
+        isActive: true,
+      },
+    }),
+    prisma.emailTemplate.create({
+      data: {
+        name: 'Invoice Email',
+        subject: 'Invoice #{{invoiceNumber}} from {{company}}',
+        body: `Hi {{firstName}},
+
+Thank you for your business! Please find attached invoice #{{invoiceNumber}} for the services rendered.
+
+Invoice Details:
+- Invoice Number: {{invoiceNumber}}
+- Amount Due: {{amount}}
+- Due Date: {{dueDate}}
+
+Payment can be made via {{paymentMethod}}.
+
+If you have any questions about this invoice, please don't hesitate to reach out.
+
+Best regards,
+The {{company}} Team`,
+        category: 'INVOICE',
+        variables: [
+          'firstName',
+          'company',
+          'invoiceNumber',
+          'amount',
+          'dueDate',
+          'paymentMethod',
+        ],
+        isActive: true,
+      },
+    }),
+  ]);
+
+  console.log(`Created ${emailTemplates.length} email templates`);
+
   console.log('\nSeeding completed successfully!');
   console.log('\nDefault login credentials:');
   console.log('  Email: Andreas@havdis.no | Password: Havdis1234!?');
