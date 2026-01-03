@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTaskStore } from '../../../store/taskStore';
+import { useContactStore } from '../../../store/contactStore';
+import { useDealStore } from '../../../store/dealStore';
 import { Task, TaskStatus, TaskPriority, CreateTaskDto } from '../../../services/taskService';
 import { Input, Textarea, Select, Button } from '../../ui';
 import { X } from 'lucide-react';
@@ -28,6 +30,8 @@ const priorityOptions = [
 
 export function TaskForm({ task, initialStatus, onSubmit, onCancel, isLoading }: TaskFormProps) {
   const { users, labels, milestones, fetchUsers, fetchLabels, fetchMilestones } = useTaskStore();
+  const { contacts, fetchContacts } = useContactStore();
+  const { deals, fetchDeals } = useDealStore();
 
   const [formData, setFormData] = useState({
     title: task?.title || '',
@@ -38,13 +42,17 @@ export function TaskForm({ task, initialStatus, onSubmit, onCancel, isLoading }:
     milestoneId: task?.milestoneId || '',
     dueDate: task?.dueDate ? task.dueDate.split('T')[0] : '',
     labels: task?.labels?.map((l) => l.id) || [],
+    contactId: (task as any)?.contactId || '',
+    dealId: (task as any)?.dealId || '',
   });
 
   useEffect(() => {
     fetchUsers();
     fetchLabels();
     fetchMilestones();
-  }, [fetchUsers, fetchLabels, fetchMilestones]);
+    fetchContacts();
+    fetchDeals();
+  }, [fetchUsers, fetchLabels, fetchMilestones, fetchContacts, fetchDeals]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +65,9 @@ export function TaskForm({ task, initialStatus, onSubmit, onCancel, isLoading }:
       milestoneId: formData.milestoneId || undefined,
       dueDate: formData.dueDate || undefined,
       labels: formData.labels.length > 0 ? formData.labels : undefined,
-    });
+      contactId: formData.contactId || undefined,
+      dealId: formData.dealId || undefined,
+    } as any);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -143,6 +153,34 @@ export function TaskForm({ task, initialStatus, onSubmit, onCancel, isLoading }:
         value={formData.milestoneId}
         onChange={handleChange}
         options={milestoneOptions}
+      />
+
+      <Select
+        label="Link to Contact (Optional)"
+        name="contactId"
+        value={formData.contactId}
+        onChange={handleChange}
+        options={[
+          { value: '', label: 'No Contact' },
+          ...contacts.map((contact) => ({
+            value: contact.id,
+            label: `${contact.firstName} ${contact.lastName}${contact.company ? ` - ${contact.company}` : ''}`,
+          })),
+        ]}
+      />
+
+      <Select
+        label="Link to Deal (Optional)"
+        name="dealId"
+        value={formData.dealId}
+        onChange={handleChange}
+        options={[
+          { value: '', label: 'No Deal' },
+          ...deals.map((deal) => ({
+            value: deal.id,
+            label: `${deal.title} - $${deal.value.toLocaleString()}`,
+          })),
+        ]}
       />
 
       {users.length > 0 && (

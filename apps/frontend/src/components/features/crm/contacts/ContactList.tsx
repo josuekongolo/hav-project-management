@@ -2,6 +2,7 @@ import { Contact, ContactStatus } from '../../../../services/contactService';
 import { Building2, Mail, Phone, User, Trash2 } from 'lucide-react';
 import { Card } from '../../../ui/Card';
 import { Badge } from '../../../ui/Badge';
+import { useNavigate } from 'react-router-dom';
 
 interface ContactListProps {
   contacts: Contact[];
@@ -21,6 +22,8 @@ const statusColors: Record<ContactStatus, string> = {
 };
 
 export function ContactList({ contacts, onContactClick, onDeleteContact }: ContactListProps) {
+  const navigate = useNavigate();
+
   if (contacts.length === 0) {
     return (
       <div className="text-center py-12">
@@ -34,11 +37,12 @@ export function ContactList({ contacts, onContactClick, onDeleteContact }: Conta
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {contacts.map((contact) => (
-        <Card
+        <div
           key={contact.id}
-          className="hover:shadow-lg transition-shadow cursor-pointer relative group"
-          onClick={() => onContactClick(contact)}
+          className="cursor-pointer"
+          onClick={() => navigate(`/crm/contacts/${contact.id}`)}
         >
+          <Card className="hover:shadow-lg transition-shadow relative group">
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-start gap-3 flex-1 min-w-0">
               <div className="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
@@ -122,7 +126,8 @@ export function ContactList({ contacts, onContactClick, onDeleteContact }: Conta
               </div>
             </div>
           )}
-        </Card>
+          </Card>
+        </div>
       ))}
     </div>
   );

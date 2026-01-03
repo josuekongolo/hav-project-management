@@ -29,10 +29,11 @@ export function DealCard({ deal, onDealClick, onDeleteDeal }: DealCardProps) {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <Card
-        className="hover:shadow-lg transition-shadow cursor-pointer relative group mb-3"
-        onClick={() => onDealClick(deal)}
-      >
+      <Card className="hover:shadow-lg transition-shadow relative group mb-3">
+        <div
+          className="cursor-pointer"
+          onClick={() => onDealClick(deal)}
+        >
         <div className="flex items-start justify-between mb-2">
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-gray-900 truncate">{deal.title}</h3>
@@ -95,6 +96,7 @@ export function DealCard({ deal, onDealClick, onDeleteDeal }: DealCardProps) {
           {deal._count && deal._count.tasks > 0 && (
             <span className="text-xs text-gray-500">{deal._count.tasks} tasks</span>
           )}
+        </div>
         </div>
       </Card>
     </div>

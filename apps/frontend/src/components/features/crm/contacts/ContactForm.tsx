@@ -3,7 +3,7 @@ import { Contact, ContactStatus, CreateContactData, UpdateContactData } from '..
 import { Button } from '../../../ui/Button';
 import { Input } from '../../../ui/Input';
 import { Select } from '../../../ui/Select';
-import { TextArea } from '../../../ui/TextArea';
+import { Textarea } from '../../../ui/Textarea';
 import { useTaskStore } from '../../../../store/taskStore';
 
 interface ContactFormProps {
@@ -173,7 +173,7 @@ export function ContactForm({ contact, onSubmit, onCancel }: ContactFormProps) {
         placeholder="How did they find you? (e.g., Website, Referral, LinkedIn)"
       />
 
-      <TextArea
+      <Textarea
         label="Notes"
         value={formData.notes}
         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -182,7 +182,7 @@ export function ContactForm({ contact, onSubmit, onCancel }: ContactFormProps) {
       />
 
       <div className="flex justify-end gap-3">
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button type="button" variant="secondary" onClick={onCancel}>
           Cancel
         </Button>
         <Button type="submit" disabled={isLoading}>

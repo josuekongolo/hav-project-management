@@ -10,6 +10,7 @@ import { LabelsPage } from './pages/LabelsPage';
 import { UsersPage } from './pages/UsersPage';
 import { CalendarPage } from './pages/CalendarPage';
 import { ContactsPage } from './pages/crm/ContactsPage';
+import { ContactDetailPage } from './pages/crm/ContactDetailPage';
 import { EmailTemplatesPage } from './pages/crm/EmailTemplatesPage';
 import { EmailsPage } from './pages/crm/EmailsPage';
 import { DealsPage } from './pages/crm/DealsPage';
@@ -58,6 +59,10 @@ export const router = createBrowserRouter([
       {
         path: 'crm/contacts',
         element: <ContactsPage />,
+      },
+      {
+        path: 'crm/contacts/:id',
+        element: <ContactDetailPage />,
       },
       {
         path: 'crm/deals',

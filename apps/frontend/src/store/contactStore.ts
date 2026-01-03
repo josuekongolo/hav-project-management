@@ -12,13 +12,22 @@ import {
 interface ContactState {
   contacts: Contact[];
   selectedContact: Contact | null;
+  contactActivities: any[];
+  contactEmails: any[];
+  contactTasks: any[];
   isLoading: boolean;
+  isLoadingActivities: boolean;
+  isLoadingEmails: boolean;
+  isLoadingTasks: boolean;
   error: string | null;
   filters: ContactFilters;
 
   // Actions
   fetchContacts: () => Promise<void>;
   fetchContactById: (id: string) => Promise<void>;
+  fetchContactActivities: (id: string) => Promise<void>;
+  fetchContactEmails: (id: string) => Promise<void>;
+  fetchContactTasks: (id: string) => Promise<void>;
   createContact: (data: CreateContactData) => Promise<Contact>;
   updateContact: (id: string, data: UpdateContactData) => Promise<Contact>;
   deleteContact: (id: string) => Promise<void>;
@@ -32,7 +41,13 @@ export const useContactStore = create<ContactState>()(
     (set, get) => ({
       contacts: [],
       selectedContact: null,
+      contactActivities: [],
+      contactEmails: [],
+      contactTasks: [],
       isLoading: false,
+      isLoadingActivities: false,
+      isLoadingEmails: false,
+      isLoadingTasks: false,
       error: null,
       filters: {},
 
@@ -114,6 +129,45 @@ export const useContactStore = create<ContactState>()(
             isLoading: false,
           });
           throw error;
+        }
+      },
+
+      fetchContactActivities: async (id: string) => {
+        set({ isLoadingActivities: true, error: null });
+        try {
+          const { activities } = await contactService.getContactActivities(id);
+          set({ contactActivities: activities, isLoadingActivities: false });
+        } catch (error: any) {
+          set({
+            error: error.response?.data?.error || 'Failed to fetch activities',
+            isLoadingActivities: false,
+          });
+        }
+      },
+
+      fetchContactEmails: async (id: string) => {
+        set({ isLoadingEmails: true, error: null });
+        try {
+          const { emails } = await contactService.getContactEmails(id);
+          set({ contactEmails: emails, isLoadingEmails: false });
+        } catch (error: any) {
+          set({
+            error: error.response?.data?.error || 'Failed to fetch emails',
+            isLoadingEmails: false,
+          });
+        }
+      },
+
+      fetchContactTasks: async (id: string) => {
+        set({ isLoadingTasks: true, error: null });
+        try {
+          const { tasks } = await contactService.getContactTasks(id);
+          set({ contactTasks: tasks, isLoadingTasks: false });
+        } catch (error: any) {
+          set({
+            error: error.response?.data?.error || 'Failed to fetch tasks',
+            isLoadingTasks: false,
+          });
         }
       },
 

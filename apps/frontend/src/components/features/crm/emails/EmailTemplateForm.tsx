@@ -8,7 +8,7 @@ import {
 import { Button } from '../../../ui/Button';
 import { Input } from '../../../ui/Input';
 import { Select } from '../../../ui/Select';
-import { TextArea } from '../../../ui/TextArea';
+import { Textarea } from '../../../ui/Textarea';
 import { Info } from 'lucide-react';
 
 interface EmailTemplateFormProps {
@@ -106,7 +106,7 @@ export function EmailTemplateForm({ template, onSubmit, onCancel }: EmailTemplat
       />
 
       <div>
-        <TextArea
+        <Textarea
           label="Email Body"
           value={formData.body}
           onChange={(e) => setFormData({ ...formData, body: e.target.value })}
@@ -143,7 +143,7 @@ export function EmailTemplateForm({ template, onSubmit, onCancel }: EmailTemplat
         </div>
       </div>
 
-      <TextArea
+      <Textarea
         label="HTML Body (Optional)"
         value={formData.htmlBody}
         onChange={(e) => setFormData({ ...formData, htmlBody: e.target.value })}
@@ -165,7 +165,7 @@ export function EmailTemplateForm({ template, onSubmit, onCancel }: EmailTemplat
       </div>
 
       <div className="flex justify-end gap-3">
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button type="button" variant="secondary" onClick={onCancel}>
           Cancel
         </Button>
         <Button type="submit" disabled={isLoading}>

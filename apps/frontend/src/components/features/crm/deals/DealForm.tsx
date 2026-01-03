@@ -3,7 +3,7 @@ import { Deal, DealStage, CreateDealData, UpdateDealData } from '../../../../ser
 import { Button } from '../../../ui/Button';
 import { Input } from '../../../ui/Input';
 import { Select } from '../../../ui/Select';
-import { TextArea } from '../../../ui/TextArea';
+import { Textarea } from '../../../ui/Textarea';
 import { useContactStore } from '../../../../store/contactStore';
 import { useTaskStore } from '../../../../store/taskStore';
 import { useAuthStore } from '../../../../store/authStore';
@@ -77,7 +77,7 @@ export function DealForm({ deal, initialStage, onSubmit, onCancel }: DealFormPro
         placeholder="e.g., Website Redesign Project"
       />
 
-      <TextArea
+      <Textarea
         label="Description (Optional)"
         value={formData.description}
         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -156,7 +156,7 @@ export function DealForm({ deal, initialStage, onSubmit, onCancel }: DealFormPro
       />
 
       <div className="flex justify-end gap-3">
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button type="button" variant="secondary" onClick={onCancel}>
           Cancel
         </Button>
         <Button type="submit" disabled={isLoading}>

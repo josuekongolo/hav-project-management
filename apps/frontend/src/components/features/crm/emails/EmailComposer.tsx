@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '../../../ui/Button';
 import { Input } from '../../../ui/Input';
 import { Select } from '../../../ui/Select';
-import { TextArea } from '../../../ui/TextArea';
+import { Textarea } from '../../../ui/Textarea';
 import { useEmailTemplateStore } from '../../../../store/emailTemplateStore';
 import { useContactStore } from '../../../../store/contactStore';
 import { SendEmailData, SendEmailWithTemplateData } from '../../../../services/emailService';
@@ -242,7 +242,7 @@ export function EmailComposer({ onSend, onSaveDraft, onCancel, initialContactId 
       />
 
       {/* Body */}
-      <TextArea
+      <Textarea
         label="Message"
         value={formData.body}
         onChange={(e) => setFormData({ ...formData, body: e.target.value })}
@@ -254,14 +254,14 @@ export function EmailComposer({ onSend, onSaveDraft, onCancel, initialContactId 
 
       {/* Actions */}
       <div className="flex justify-end gap-3">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+        <Button type="button" variant="secondary" onClick={onCancel} disabled={isLoading}>
           <X className="h-4 w-4 mr-2" />
           Cancel
         </Button>
         {onSaveDraft && (
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             onClick={handleSaveDraft}
             disabled={isLoading}
           >

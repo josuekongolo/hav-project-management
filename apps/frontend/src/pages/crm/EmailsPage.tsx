@@ -128,7 +128,7 @@ export function EmailsPage() {
         isOpen={isComposerOpen}
         onClose={() => setIsComposerOpen(false)}
         title="Compose Email"
-        size="large"
+        size="lg"
       >
         <EmailComposer
           onSend={handleSendEmail}
