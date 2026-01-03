@@ -9,6 +9,7 @@ import { MilestonesPage } from './pages/MilestonesPage';
 import { LabelsPage } from './pages/LabelsPage';
 import { UsersPage } from './pages/UsersPage';
 import { CalendarPage } from './pages/CalendarPage';
+import { ContactsPage } from './pages/crm/ContactsPage';
 
 export const router = createBrowserRouter([
   {
@@ -50,6 +51,10 @@ export const router = createBrowserRouter([
       {
         path: 'users',
         element: <UsersPage />,
+      },
+      {
+        path: 'crm/contacts',
+        element: <ContactsPage />,
       },
     ],
   },

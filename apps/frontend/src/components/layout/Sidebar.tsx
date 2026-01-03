@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, KanbanSquare, Calendar, Users, Target, Tag, UserCircle, ChevronLeft } from 'lucide-react';
+import { LayoutDashboard, KanbanSquare, Calendar, Users, Target, Tag, UserCircle, ChevronLeft, Building2 } from 'lucide-react';
 import clsx from 'clsx';
 
 const navigation = [
@@ -10,6 +10,7 @@ const navigation = [
   { name: 'Milestones', href: '/milestones', icon: Target },
   { name: 'Labels', href: '/labels', icon: Tag },
   { name: 'Users', href: '/users', icon: UserCircle },
+  { name: 'CRM', href: '/crm/contacts', icon: Building2 },
 ];
 
 interface SidebarProps {
