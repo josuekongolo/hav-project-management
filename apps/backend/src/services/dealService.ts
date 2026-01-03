@@ -1,5 +1,6 @@
-import { prisma } from '../lib/prisma.js';
-import { DealStage } from '@prisma/client';
+import { PrismaClient, DealStage } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export interface CreateDealData {
   title: string;
@@ -304,7 +305,7 @@ export async function getDealStats(ownerId?: string) {
     wonValue: wonValue._sum.value || 0,
     lostDeals,
     winRate: totalDeals > 0 ? (wonDeals / totalDeals) * 100 : 0,
-    dealsByStage: dealsByStage.map((item) => ({
+    dealsByStage: dealsByStage.map((item: any) => ({
       stage: item.stage,
       count: item._count,
       value: item._sum.value || 0,

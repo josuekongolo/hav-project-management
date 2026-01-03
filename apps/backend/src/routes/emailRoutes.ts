@@ -4,11 +4,16 @@ import * as emailController from '../controllers/emailController.js';
 
 const router = Router();
 
-// All email routes require authentication
+// Tracking routes (no auth required - called from email clients)
+router.get('/track/open/:id', emailController.trackEmailOpen);
+router.get('/track/click/:id', emailController.trackEmailClick);
+
+// All other email routes require authentication
 router.use(authMiddleware);
 
 // Email history
 router.get('/', emailController.getEmails);
+router.get('/stats', emailController.getEmailStats);
 router.get('/:id', emailController.getEmailById);
 
 // Send emails

@@ -6,8 +6,10 @@ import { useNavigate } from 'react-router-dom';
 
 interface ContactListProps {
   contacts: Contact[];
+  selectedContacts?: Contact[];
   onContactClick: (contact: Contact) => void;
   onDeleteContact: (id: string) => void;
+  onToggleSelection?: (contact: Contact) => void;
 }
 
 const statusColors: Record<ContactStatus, string> = {
@@ -21,8 +23,18 @@ const statusColors: Record<ContactStatus, string> = {
   [ContactStatus.LOST]: 'bg-red-100 text-red-800',
 };
 
-export function ContactList({ contacts, onContactClick, onDeleteContact }: ContactListProps) {
+export function ContactList({
+  contacts,
+  selectedContacts = [],
+  onContactClick,
+  onDeleteContact,
+  onToggleSelection
+}: ContactListProps) {
   const navigate = useNavigate();
+
+  const isSelected = (contact: Contact) => {
+    return selectedContacts.some((c) => c.id === contact.id);
+  };
 
   if (contacts.length === 0) {
     return (
@@ -37,13 +49,27 @@ export function ContactList({ contacts, onContactClick, onDeleteContact }: Conta
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {contacts.map((contact) => (
-        <div
-          key={contact.id}
-          className="cursor-pointer"
-          onClick={() => navigate(`/crm/contacts/${contact.id}`)}
-        >
-          <Card className="hover:shadow-lg transition-shadow relative group">
-          <div className="flex items-start justify-between mb-3">
+        <div key={contact.id} className="relative">
+          {onToggleSelection && (
+            <div className="absolute top-4 left-4 z-10">
+              <input
+                type="checkbox"
+                checked={isSelected(contact)}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  onToggleSelection(contact);
+                }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500 cursor-pointer"
+              />
+            </div>
+          )}
+          <div
+            className="cursor-pointer"
+            onClick={() => navigate(`/crm/contacts/${contact.id}`)}
+          >
+            <Card className={`hover:shadow-lg transition-shadow relative group ${isSelected(contact) ? 'ring-2 ring-primary-500' : ''}`}>
+            <div className="flex items-start justify-between mb-3">
             <div className="flex items-start gap-3 flex-1 min-w-0">
               <div className="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
                 <User className="h-6 w-6 text-primary-600" />
@@ -127,6 +153,7 @@ export function ContactList({ contacts, onContactClick, onDeleteContact }: Conta
             </div>
           )}
           </Card>
+          </div>
         </div>
       ))}
     </div>

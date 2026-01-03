@@ -1,8 +1,9 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { AuthRequest } from '../middleware/authMiddleware.js';
 import * as dealService from '../services/dealService.js';
 import { DealStage } from '@prisma/client';
 
-export async function getDeals(req: Request, res: Response) {
+export async function getDeals(req: AuthRequest, res: Response) {
   const { stage, ownerId, contactId } = req.query;
 
   const filters: dealService.DealFilters = {};
@@ -23,40 +24,40 @@ export async function getDeals(req: Request, res: Response) {
   res.json({ deals });
 }
 
-export async function getDealById(req: Request, res: Response) {
+export async function getDealById(req: AuthRequest, res: Response) {
   const { id } = req.params;
   const deal = await dealService.getDealById(id);
   res.json({ deal });
 }
 
-export async function createDeal(req: Request, res: Response) {
-  const userId = req.user!.id;
+export async function createDeal(req: AuthRequest, res: Response) {
+  const userId = req.userId!;
   const deal = await dealService.createDeal(req.body, userId);
   res.status(201).json({ deal });
 }
 
-export async function updateDeal(req: Request, res: Response) {
+export async function updateDeal(req: AuthRequest, res: Response) {
   const { id } = req.params;
-  const userId = req.user!.id;
+  const userId = req.userId!;
   const deal = await dealService.updateDeal(id, req.body, userId);
   res.json({ deal });
 }
 
-export async function deleteDeal(req: Request, res: Response) {
+export async function deleteDeal(req: AuthRequest, res: Response) {
   const { id } = req.params;
   const result = await dealService.deleteDeal(id);
   res.json(result);
 }
 
-export async function updateDealStage(req: Request, res: Response) {
+export async function updateDealStage(req: AuthRequest, res: Response) {
   const { id } = req.params;
   const { stage } = req.body;
-  const userId = req.user!.id;
+  const userId = req.userId!;
   const deal = await dealService.updateDealStage(id, stage, userId);
   res.json({ deal });
 }
 
-export async function getDealStats(req: Request, res: Response) {
+export async function getDealStats(req: AuthRequest, res: Response) {
   const { ownerId } = req.query;
   const stats = await dealService.getDealStats(
     ownerId ? String(ownerId) : undefined

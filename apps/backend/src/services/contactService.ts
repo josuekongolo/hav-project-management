@@ -1,5 +1,6 @@
-import { prisma } from '../lib/prisma.js';
-import { ContactStatus } from '@prisma/client';
+import { PrismaClient, ContactStatus } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export interface CreateContactData {
   firstName: string;
@@ -360,4 +361,54 @@ export async function getContactTasks(id: string) {
   });
 
   return tasks;
+}
+
+export async function exportContactsToCSV(filters: ContactFilters = {}): Promise<string> {
+  const contacts = await getContacts(filters);
+
+  // CSV header
+  const header = [
+    'First Name',
+    'Last Name',
+    'Email',
+    'Phone',
+    'Company',
+    'Website',
+    'Address',
+    'City',
+    'Country',
+    'Status',
+    'Source',
+    'Assigned To',
+    'Created At',
+  ].join(',');
+
+  // CSV rows
+  const rows = contacts.map((contact: any) => {
+    return [
+      escapeCSV(contact.firstName),
+      escapeCSV(contact.lastName),
+      escapeCSV(contact.email),
+      escapeCSV(contact.phone || ''),
+      escapeCSV(contact.company || ''),
+      escapeCSV(contact.website || ''),
+      escapeCSV(contact.address || ''),
+      escapeCSV(contact.city || ''),
+      escapeCSV(contact.country || ''),
+      escapeCSV(contact.status),
+      escapeCSV(contact.source || ''),
+      escapeCSV(contact.assignedTo?.name || ''),
+      escapeCSV(new Date(contact.createdAt).toISOString()),
+    ].join(',');
+  });
+
+  return [header, ...rows].join('\n');
+}
+
+function escapeCSV(value: string): string {
+  // Escape double quotes and wrap in quotes if contains comma, newline, or quotes
+  if (value.includes(',') || value.includes('\n') || value.includes('"')) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
 }

@@ -1,5 +1,6 @@
-import { prisma } from '../lib/prisma.js';
-import { EmailTemplateCategory } from '@prisma/client';
+import { PrismaClient, EmailTemplateCategory } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export interface CreateEmailTemplateData {
   name: string;

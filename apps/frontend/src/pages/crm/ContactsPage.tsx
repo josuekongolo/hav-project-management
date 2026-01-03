@@ -8,8 +8,10 @@ import { Select } from '../../components/ui/Select';
 import { Modal } from '../../components/ui/Modal';
 import { Card } from '../../components/ui/Card';
 import { Contact, ContactStatus } from '../../services/contactService';
-import { UserPlus, Search, Filter, Users as UsersIcon } from 'lucide-react';
+import { UserPlus, Search, Filter, Users as UsersIcon, Mail, Download } from 'lucide-react';
 import { useTaskStore } from '../../store/taskStore';
+import { BulkEmailDialog } from '../../components/features/crm/emails/BulkEmailDialog';
+import { api } from '../../services/api';
 import toast from 'react-hot-toast';
 
 export function ContactsPage() {
@@ -27,7 +29,9 @@ export function ContactsPage() {
   const { users, fetchUsers } = useTaskStore();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isBulkEmailOpen, setIsBulkEmailOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [assigneeFilter, setAssigneeFilter] = useState('');
@@ -85,6 +89,56 @@ export function ContactsPage() {
     }
   };
 
+  const handleBulkEmail = () => {
+    if (selectedContacts.length === 0) {
+      toast.error('Please select at least one contact');
+      return;
+    }
+    setIsBulkEmailOpen(true);
+  };
+
+  const handleExportCSV = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (statusFilter) params.append('status', statusFilter);
+      if (assigneeFilter) params.append('assignedToId', assigneeFilter);
+      if (searchQuery) params.append('search', searchQuery);
+
+      const response = await api.get(`/contacts/export/csv?${params.toString()}`, {
+        responseType: 'blob',
+      });
+
+      // Create download link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `contacts_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      toast.success('Contacts exported successfully');
+    } catch (error: any) {
+      toast.error('Failed to export contacts');
+    }
+  };
+
+  const toggleContactSelection = (contact: Contact) => {
+    setSelectedContacts((prev) =>
+      prev.find((c) => c.id === contact.id)
+        ? prev.filter((c) => c.id !== contact.id)
+        : [...prev, contact]
+    );
+  };
+
+  const selectAllContacts = () => {
+    if (selectedContacts.length === contacts.length) {
+      setSelectedContacts([]);
+    } else {
+      setSelectedContacts(contacts);
+    }
+  };
+
   // Calculate stats
   const stats = {
     total: contacts.length,
@@ -100,11 +154,28 @@ export function ContactsPage() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Contacts</h1>
           <p className="text-gray-600 mt-1">Manage your customer relationships</p>
+          {selectedContacts.length > 0 && (
+            <p className="text-sm text-primary-600 mt-1">
+              {selectedContacts.length} contact{selectedContacts.length !== 1 ? 's' : ''} selected
+            </p>
+          )}
         </div>
-        <Button onClick={handleCreateContact}>
-          <UserPlus className="h-4 w-4 mr-2" />
-          New Contact
-        </Button>
+        <div className="flex gap-2">
+          {selectedContacts.length > 0 && (
+            <Button variant="secondary" onClick={handleBulkEmail}>
+              <Mail className="h-4 w-4 mr-2" />
+              Send Email ({selectedContacts.length})
+            </Button>
+          )}
+          <Button variant="secondary" onClick={handleExportCSV}>
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
+          </Button>
+          <Button onClick={handleCreateContact}>
+            <UserPlus className="h-4 w-4 mr-2" />
+            New Contact
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -149,6 +220,19 @@ export function ContactsPage() {
 
       {/* Filters */}
       <Card className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={selectedContacts.length === contacts.length && contacts.length > 0}
+              onChange={selectAllContacts}
+              className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+            />
+            <span className="text-sm font-medium text-gray-700">
+              Select All ({contacts.length})
+            </span>
+          </label>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -193,8 +277,10 @@ export function ContactsPage() {
       ) : (
         <ContactList
           contacts={contacts}
+          selectedContacts={selectedContacts}
           onContactClick={handleEditContact}
           onDeleteContact={handleDeleteContact}
+          onToggleSelection={toggleContactSelection}
         />
       )}
 
@@ -213,6 +299,25 @@ export function ContactsPage() {
           onCancel={() => {
             setIsFormOpen(false);
             setSelectedContact(null);
+          }}
+        />
+      </Modal>
+
+      {/* Bulk Email Dialog */}
+      <Modal
+        isOpen={isBulkEmailOpen}
+        onClose={() => {
+          setIsBulkEmailOpen(false);
+          setSelectedContacts([]);
+        }}
+        title="Send Bulk Email"
+        size="lg"
+      >
+        <BulkEmailDialog
+          contacts={selectedContacts}
+          onClose={() => {
+            setIsBulkEmailOpen(false);
+            setSelectedContacts([]);
           }}
         />
       </Modal>

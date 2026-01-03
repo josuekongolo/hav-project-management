@@ -1,7 +1,8 @@
-import { prisma } from '../lib/prisma.js';
-import { EmailStatus } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { emailService } from './emailService.js';
 import * as emailTemplateService from './emailTemplateService.js';
+
+const prisma = new PrismaClient();
 
 export interface SendEmailData {
   contactId?: string;
@@ -302,4 +303,105 @@ export async function deleteEmail(id: string) {
   });
 
   return { message: 'Email deleted successfully' };
+}
+
+export async function trackEmailOpen(id: string) {
+  const email = await prisma.email.findUnique({ where: { id } });
+  if (!email) {
+    return;
+  }
+
+  // Only track the first open
+  if (!email.openedAt) {
+    await prisma.email.update({
+      where: { id },
+      data: {
+        status: 'OPENED',
+        openedAt: new Date(),
+      },
+    });
+
+    // Log activity if linked to contact
+    if (email.contactId) {
+      await prisma.activity.create({
+        data: {
+          type: 'EMAIL_OPENED',
+          title: 'Email opened',
+          description: `Email opened: ${email.subject}`,
+          contactId: email.contactId,
+          userId: email.senderId,
+        },
+      });
+    }
+  }
+}
+
+export async function trackEmailClick(id: string) {
+  const email = await prisma.email.findUnique({ where: { id } });
+  if (!email) {
+    return;
+  }
+
+  // Only track the first click
+  if (!email.clickedAt) {
+    await prisma.email.update({
+      where: { id },
+      data: {
+        status: 'CLICKED',
+        clickedAt: new Date(),
+      },
+    });
+
+    // Log activity if linked to contact
+    if (email.contactId) {
+      await prisma.activity.create({
+        data: {
+          type: 'EMAIL_CLICKED',
+          title: 'Email clicked',
+          description: `Email link clicked: ${email.subject}`,
+          contactId: email.contactId,
+          userId: email.senderId,
+        },
+      });
+    }
+  }
+}
+
+export async function getEmailStats(senderId?: string) {
+  const where: any = {};
+  if (senderId) {
+    where.senderId = senderId;
+  }
+
+  const [
+    totalEmails,
+    sentEmails,
+    openedEmails,
+    clickedEmails,
+    failedEmails,
+    draftEmails,
+  ] = await Promise.all([
+    prisma.email.count({ where }),
+    prisma.email.count({ where: { ...where, status: { in: ['SENT', 'OPENED', 'CLICKED'] } } }),
+    prisma.email.count({ where: { ...where, openedAt: { not: null } } }),
+    prisma.email.count({ where: { ...where, clickedAt: { not: null } } }),
+    prisma.email.count({ where: { ...where, status: 'FAILED' } }),
+    prisma.email.count({ where: { ...where, status: 'DRAFT' } }),
+  ]);
+
+  const openRate = sentEmails > 0 ? (openedEmails / sentEmails) * 100 : 0;
+  const clickRate = sentEmails > 0 ? (clickedEmails / sentEmails) * 100 : 0;
+  const clickThroughRate = openedEmails > 0 ? (clickedEmails / openedEmails) * 100 : 0;
+
+  return {
+    totalEmails,
+    sentEmails,
+    openedEmails,
+    clickedEmails,
+    failedEmails,
+    draftEmails,
+    openRate,
+    clickRate,
+    clickThroughRate,
+  };
 }

@@ -9,6 +9,7 @@ router.use(authMiddleware);
 
 // Contact CRUD
 router.get('/', contactController.getContacts);
+router.get('/export/csv', contactController.exportContactsToCSV);
 router.get('/:id', contactController.getContactById);
 router.post('/', contactController.createContact);
 router.patch('/:id', contactController.updateContact);
