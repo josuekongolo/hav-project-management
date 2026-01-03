@@ -13,6 +13,9 @@
     "prisma:studio": "prisma studio",
     "normalize-emails": "tsx scripts/normalize-emails.ts"
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "dependencies": {
     "@prisma/client": "^5.7.1",
     "bcrypt": "^5.1.1",
@@ -22,7 +25,10 @@
     "express-async-errors": "^3.1.1",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^7.0.12",
+    "prisma": "^5.7.1",
     "resend": "^6.6.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -31,10 +37,7 @@
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.10.5",
-    "@types/nodemailer": "^7.0.4",
-    "prisma": "^5.7.1",
-    "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "@types/nodemailer": "^7.0.4"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
