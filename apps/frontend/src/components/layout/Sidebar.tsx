@@ -11,6 +11,7 @@ const navigation = [
   { name: 'Labels', href: '/labels', icon: Tag },
   { name: 'Users', href: '/users', icon: UserCircle },
   { name: 'CRM', href: '/crm/contacts', icon: Building2 },
+  { name: 'Companies', href: '/crm/companies', icon: Building2 },
   { name: 'Deals', href: '/crm/deals', icon: TrendingUp },
   { name: 'Emails', href: '/crm/emails', icon: Send },
   { name: 'Email Templates', href: '/crm/templates', icon: Mail },

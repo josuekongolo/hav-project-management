@@ -87,6 +87,7 @@ export interface ContactFilters {
   status?: ContactStatus;
   assignedToId?: string;
   search?: string;
+  companyId?: string;
 }
 
 export const contactService = {

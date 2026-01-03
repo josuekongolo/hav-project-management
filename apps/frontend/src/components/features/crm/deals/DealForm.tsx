@@ -7,6 +7,7 @@ import { Textarea } from '../../../ui/Textarea';
 import { useContactStore } from '../../../../store/contactStore';
 import { useTaskStore } from '../../../../store/taskStore';
 import { useAuthStore } from '../../../../store/authStore';
+import { CompanySelector } from '../shared/CompanySelector';
 
 interface DealFormProps {
   deal?: Deal | null;
@@ -29,6 +30,7 @@ export function DealForm({ deal, initialStage, onSubmit, onCancel }: DealFormPro
     probability: 50,
     expectedCloseDate: '',
     contactId: '',
+    companyId: '',
     ownerId: user?.id || '',
   });
 
@@ -49,6 +51,7 @@ export function DealForm({ deal, initialStage, onSubmit, onCancel }: DealFormPro
           ? new Date(deal.expectedCloseDate).toISOString().split('T')[0]
           : '',
         contactId: deal.contactId,
+        companyId: deal.companyId || '',
         ownerId: deal.ownerId,
       });
     }
@@ -146,6 +149,17 @@ export function DealForm({ deal, initialStage, onSubmit, onCancel }: DealFormPro
           })),
         ]}
       />
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Company (Optional)
+        </label>
+        <CompanySelector
+          value={formData.companyId || null}
+          onChange={(companyId) => setFormData({ ...formData, companyId: companyId || '' })}
+          placeholder="Search and select company..."
+        />
+      </div>
 
       <Select
         label="Deal Owner"

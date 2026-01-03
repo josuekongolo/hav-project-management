@@ -14,6 +14,11 @@ interface MeetingDialogProps {
   onSuccess?: () => void;
 }
 
+type MeetingFormData = Omit<CreateMeetingData, 'startTime' | 'endTime'> & {
+  startTime: string;
+  endTime: string;
+};
+
 export function MeetingDialog({
   isOpen,
   onClose,
@@ -29,7 +34,7 @@ export function MeetingDialog({
   const nextHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 0);
   const oneHourLater = new Date(nextHour.getTime() + 60 * 60 * 1000);
 
-  const [formData, setFormData] = useState<Partial<CreateMeetingData>>({
+  const [formData, setFormData] = useState<Partial<MeetingFormData>>({
     title: '',
     description: '',
     location: '',
@@ -187,7 +192,7 @@ export function MeetingDialog({
             <Button type="submit" disabled={isLoading}>
               {isLoading ? 'Scheduling...' : 'Schedule Meeting'}
             </Button>
-            <Button type="button" variant="outline" onClick={handleClose}>
+            <Button type="button" variant="secondary" onClick={handleClose}>
               Cancel
             </Button>
           </div>

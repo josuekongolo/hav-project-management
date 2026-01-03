@@ -5,6 +5,7 @@ import { Input } from '../../../ui/Input';
 import { Select } from '../../../ui/Select';
 import { Textarea } from '../../../ui/Textarea';
 import { useTaskStore } from '../../../../store/taskStore';
+import { CompanySelector } from '../shared/CompanySelector';
 
 interface ContactFormProps {
   contact?: Contact | null;
@@ -20,7 +21,7 @@ export function ContactForm({ contact, onSubmit, onCancel }: ContactFormProps) {
     lastName: '',
     email: '',
     phone: '',
-    company: '',
+    companyId: '',
     website: '',
     address: '',
     city: '',
@@ -42,7 +43,7 @@ export function ContactForm({ contact, onSubmit, onCancel }: ContactFormProps) {
         lastName: contact.lastName,
         email: contact.email,
         phone: contact.phone || '',
-        company: contact.company || '',
+        companyId: contact.companyId || '',
         website: contact.website || '',
         address: contact.address || '',
         city: contact.city || '',
@@ -106,11 +107,16 @@ export function ContactForm({ contact, onSubmit, onCancel }: ContactFormProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Input
-          label="Company"
-          value={formData.company}
-          onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-        />
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Company
+          </label>
+          <CompanySelector
+            value={formData.companyId || null}
+            onChange={(companyId) => setFormData({ ...formData, companyId: companyId || '' })}
+            placeholder="Search and select company..."
+          />
+        </div>
         <Input
           label="Website"
           type="url"

@@ -14,6 +14,11 @@ interface CallLogDialogProps {
   onSuccess?: () => void;
 }
 
+type CallLogFormData = Omit<CreateCallLogData, 'completedAt' | 'scheduledAt'> & {
+  completedAt?: string;
+  scheduledAt?: string;
+};
+
 export function CallLogDialog({
   isOpen,
   onClose,
@@ -23,7 +28,7 @@ export function CallLogDialog({
   onSuccess,
 }: CallLogDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState<Partial<CreateCallLogData>>({
+  const [formData, setFormData] = useState<Partial<CallLogFormData>>({
     subject: '',
     notes: '',
     duration: undefined,
@@ -162,7 +167,7 @@ export function CallLogDialog({
             <Button type="submit" disabled={isLoading}>
               {isLoading ? 'Logging...' : 'Log Call'}
             </Button>
-            <Button type="button" variant="outline" onClick={handleClose}>
+            <Button type="button" variant="secondary" onClick={handleClose}>
               Cancel
             </Button>
           </div>

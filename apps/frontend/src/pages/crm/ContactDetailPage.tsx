@@ -4,6 +4,9 @@ import { useContactStore } from '../../store/contactStore';
 import { useDealStore } from '../../store/dealStore';
 import { ActivityTimeline } from '../../components/features/crm/shared/ActivityTimeline';
 import { ContactForm } from '../../components/features/crm/contacts/ContactForm';
+import { NotesList } from '../../components/features/crm/shared/NotesList';
+import { CallLogDialog } from '../../components/features/crm/shared/CallLogDialog';
+import { MeetingDialog } from '../../components/features/crm/shared/MeetingDialog';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { Modal } from '../../components/ui/Modal';
@@ -20,6 +23,8 @@ import {
   CheckCircle,
   Clock,
   Target,
+  PhoneCall,
+  Calendar,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -54,6 +59,8 @@ export function ContactDetailPage() {
 
   const { deals, fetchDeals, setFilters: setDealFilters } = useDealStore();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCallDialogOpen, setIsCallDialogOpen] = useState(false);
+  const [isMeetingDialogOpen, setIsMeetingDialogOpen] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -139,6 +146,14 @@ export function ContactDetailPage() {
             <Button>
               <Mail className="h-4 w-4 mr-2" />
               Send Email
+            </Button>
+            <Button variant="secondary" onClick={() => setIsCallDialogOpen(true)}>
+              <PhoneCall className="h-4 w-4 mr-2" />
+              Log Call
+            </Button>
+            <Button variant="secondary" onClick={() => setIsMeetingDialogOpen(true)}>
+              <Calendar className="h-4 w-4 mr-2" />
+              Schedule Meeting
             </Button>
           </div>
         </div>
@@ -363,6 +378,12 @@ export function ContactDetailPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Activity Timeline</h2>
             <ActivityTimeline activities={contactActivities} isLoading={isLoadingActivities} />
           </Card>
+
+          {/* Notes */}
+          <Card>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Notes</h2>
+            <NotesList noteableType="Contact" noteableId={id!} />
+          </Card>
         </div>
       </div>
 
@@ -378,6 +399,30 @@ export function ContactDetailPage() {
           onCancel={() => setIsEditModalOpen(false)}
         />
       </Modal>
+
+      {/* Call Log Dialog */}
+      <CallLogDialog
+        isOpen={isCallDialogOpen}
+        onClose={() => setIsCallDialogOpen(false)}
+        contactId={id}
+        onSuccess={() => {
+          if (id) {
+            fetchContactActivities(id);
+          }
+        }}
+      />
+
+      {/* Meeting Dialog */}
+      <MeetingDialog
+        isOpen={isMeetingDialogOpen}
+        onClose={() => setIsMeetingDialogOpen(false)}
+        contactId={id}
+        onSuccess={() => {
+          if (id) {
+            fetchContactActivities(id);
+          }
+        }}
+      />
     </div>
   );
 }

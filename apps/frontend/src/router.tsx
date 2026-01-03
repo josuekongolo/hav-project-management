@@ -14,6 +14,9 @@ import { ContactDetailPage } from './pages/crm/ContactDetailPage';
 import { EmailTemplatesPage } from './pages/crm/EmailTemplatesPage';
 import { EmailsPage } from './pages/crm/EmailsPage';
 import { DealsPage } from './pages/crm/DealsPage';
+import { DealDetailPage } from './pages/crm/DealDetailPage';
+import { CompaniesPage } from './pages/crm/CompaniesPage';
+import { CompanyDetailPage } from './pages/crm/CompanyDetailPage';
 
 export const router = createBrowserRouter([
   {
@@ -67,6 +70,18 @@ export const router = createBrowserRouter([
       {
         path: 'crm/deals',
         element: <DealsPage />,
+      },
+      {
+        path: 'crm/deals/:id',
+        element: <DealDetailPage />,
+      },
+      {
+        path: 'crm/companies',
+        element: <CompaniesPage />,
+      },
+      {
+        path: 'crm/companies/:id',
+        element: <CompanyDetailPage />,
       },
       {
         path: 'crm/templates',

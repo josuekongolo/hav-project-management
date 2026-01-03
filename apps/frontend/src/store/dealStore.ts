@@ -13,14 +13,20 @@ import {
 interface DealState {
   deals: Deal[];
   selectedDeal: Deal | null;
+  dealActivities: any[];
+  dealTasks: any[];
   stats: DealStats | null;
   isLoading: boolean;
+  isLoadingActivities: boolean;
+  isLoadingTasks: boolean;
   error: string | null;
   filters: DealFilters;
 
   // Actions
   fetchDeals: () => Promise<void>;
   fetchDealById: (id: string) => Promise<void>;
+  fetchDealActivities: (id: string) => Promise<void>;
+  fetchDealTasks: (id: string) => Promise<void>;
   createDeal: (data: CreateDealData) => Promise<Deal>;
   updateDeal: (id: string, data: UpdateDealData) => Promise<Deal>;
   deleteDeal: (id: string) => Promise<void>;
@@ -36,8 +42,12 @@ export const useDealStore = create<DealState>()(
     (set, get) => ({
       deals: [],
       selectedDeal: null,
+      dealActivities: [],
+      dealTasks: [],
       stats: null,
       isLoading: false,
+      isLoadingActivities: false,
+      isLoadingTasks: false,
       error: null,
       filters: {},
 
@@ -63,6 +73,32 @@ export const useDealStore = create<DealState>()(
           set({
             error: error.response?.data?.error || 'Failed to fetch deal',
             isLoading: false,
+          });
+        }
+      },
+
+      fetchDealActivities: async (id: string) => {
+        set({ isLoadingActivities: true, error: null });
+        try {
+          const { activities } = await dealService.getDealActivities(id);
+          set({ dealActivities: activities, isLoadingActivities: false });
+        } catch (error: any) {
+          set({
+            error: error.response?.data?.error || 'Failed to fetch activities',
+            isLoadingActivities: false,
+          });
+        }
+      },
+
+      fetchDealTasks: async (id: string) => {
+        set({ isLoadingTasks: true, error: null });
+        try {
+          const { tasks } = await dealService.getDealTasks(id);
+          set({ dealTasks: tasks, isLoadingTasks: false });
+        } catch (error: any) {
+          set({
+            error: error.response?.data?.error || 'Failed to fetch tasks',
+            isLoadingTasks: false,
           });
         }
       },

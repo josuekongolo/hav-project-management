@@ -76,6 +76,7 @@ export interface DealFilters {
   stage?: DealStage;
   ownerId?: string;
   contactId?: string;
+  companyId?: string;
 }
 
 export interface DealStats {
@@ -107,6 +108,16 @@ export const dealService = {
 
   async getDealById(id: string): Promise<{ deal: Deal }> {
     const response = await api.get<{ deal: Deal }>(`/deals/${id}`);
+    return response.data;
+  },
+
+  async getDealActivities(id: string): Promise<{ activities: any[] }> {
+    const response = await api.get<{ activities: any[] }>(`/deals/${id}/activities`);
+    return response.data;
+  },
+
+  async getDealTasks(id: string): Promise<{ tasks: any[] }> {
+    const response = await api.get<{ tasks: any[] }>(`/deals/${id}/tasks`);
     return response.data;
   },
 

@@ -114,7 +114,7 @@ export function NotesList({ noteableType, noteableId }: NotesListProps) {
               <Save className="h-4 w-4 mr-2" />
               Save Note
             </Button>
-            <Button onClick={() => { setIsAddingNote(false); setNewNoteContent(''); }} variant="outline" size="sm">
+            <Button onClick={() => { setIsAddingNote(false); setNewNoteContent(''); }} variant="secondary" size="sm">
               <X className="h-4 w-4 mr-2" />
               Cancel
             </Button>
@@ -144,7 +144,7 @@ export function NotesList({ noteableType, noteableId }: NotesListProps) {
                     <Save className="h-4 w-4 mr-2" />
                     Save
                   </Button>
-                  <Button onClick={handleCancelEdit} variant="outline" size="sm">
+                  <Button onClick={handleCancelEdit} variant="secondary" size="sm">
                     <X className="h-4 w-4 mr-2" />
                     Cancel
                   </Button>
