@@ -8,6 +8,21 @@ const router = Router();
 router.get('/track/open/:id', emailController.trackEmailOpen);
 router.get('/track/click/:id', emailController.trackEmailClick);
 
+// Test SMTP connection (no auth required for testing)
+router.get('/test-smtp', async (_req, res) => {
+  try {
+    const { emailService } = await import('../services/emailService.js');
+    const isConnected = await emailService.verifyConnection();
+    res.json({
+      connected: isConnected,
+      message: isConnected ? 'SMTP connection successful' : 'SMTP connection failed - check console for details'
+    });
+  } catch (error) {
+    console.error('SMTP test error:', error);
+    res.status(500).json({ error: error instanceof Error ? error.message : 'SMTP test failed' });
+  }
+});
+
 // All other email routes require authentication
 router.use(authMiddleware);
 
