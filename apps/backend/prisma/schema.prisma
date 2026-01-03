@@ -29,6 +29,9 @@ model User {
   deals            Deal[]          @relation("DealOwner")
   sentEmails       Email[]         @relation("SentEmails")
   activities       Activity[]      @relation("UserActivities")
+  notes            Note[]          @relation("UserNotes")
+  calls            CallLog[]       @relation("UserCalls")
+  meetings         Meeting[]       @relation("UserMeetings")
 
   @@map("users")
 }
@@ -225,7 +228,7 @@ model Contact {
   lastName    String
   email       String        @unique
   phone       String?
-  company     String?
+  company     String?       // Keep temporarily for migration
   website     String?
   address     String?
   city        String?
@@ -236,16 +239,22 @@ model Contact {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
-  deals       Deal[]
-  emails      Email[]
-  tasks       Task[]     @relation("ContactTasks")
-  activities  Activity[]
-  assignedTo  User?      @relation("AssignedContacts", fields: [assignedToId], references: [id])
+  companyId    String?
+  companyRel   Company?   @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  deals        Deal[]
+  emails       Email[]
+  tasks        Task[]     @relation("ContactTasks")
+  activities   Activity[]
+  notesList    Note[]     @relation("ContactNotes")
+  calls        CallLog[]  @relation("ContactCalls")
+  meetings     Meeting[]  @relation("ContactMeetings")
+  assignedTo   User?      @relation("AssignedContacts", fields: [assignedToId], references: [id])
   assignedToId String?
 
   @@index([status])
   @@index([email])
   @@index([assignedToId])
+  @@index([companyId])
   @@map("contacts")
 }
 
@@ -272,15 +281,21 @@ model Deal {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
-  contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  contactId String
-  owner     User    @relation("DealOwner", fields: [ownerId], references: [id])
-  ownerId   String
-  tasks     Task[]  @relation("DealTasks")
+  contact    Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contactId  String
+  owner      User      @relation("DealOwner", fields: [ownerId], references: [id])
+  ownerId    String
+  companyId  String?
+  companyRel Company?  @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  tasks      Task[]    @relation("DealTasks")
+  notesList  Note[]    @relation("DealNotes")
+  calls      CallLog[] @relation("DealCalls")
+  meetings   Meeting[] @relation("DealMeetings")
 
   @@index([stage])
   @@index([ownerId])
   @@index([contactId])
+  @@index([companyId])
   @@map("deals")
 }
 
@@ -390,4 +405,130 @@ enum ActivityType {
   TASK_COMPLETED
   CALL_MADE
   MEETING_SCHEDULED
+}
+
+model Company {
+  id          String   @id @default(uuid())
+  name        String
+  industry    String?
+  website     String?
+  description String?
+  phone       String?
+  email       String?
+  address     String?
+  city        String?
+  country     String?
+  employees   Int?
+  revenue     Float?
+  logo        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  contacts Contact[]
+  deals    Deal[]
+  notes    Note[]
+  calls    CallLog[]
+  meetings Meeting[]
+
+  @@index([name])
+  @@map("companies")
+}
+
+model Note {
+  id           String   @id @default(uuid())
+  content      String
+  noteableType String   // "Contact", "Deal", "Company"
+  noteableId   String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  authorId String
+  author   User   @relation("UserNotes", fields: [authorId], references: [id])
+
+  contact   Contact? @relation("ContactNotes", fields: [contactId], references: [id], onDelete: Cascade)
+  contactId String?
+
+  deal   Deal?   @relation("DealNotes", fields: [dealId], references: [id], onDelete: Cascade)
+  dealId String?
+
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String?
+
+  @@index([noteableType, noteableId])
+  @@index([authorId])
+  @@map("notes")
+}
+
+model CallLog {
+  id          String        @id @default(uuid())
+  subject     String
+  notes       String?
+  duration    Int?          // Duration in minutes
+  direction   CallDirection
+  outcome     String?
+  scheduledAt DateTime?
+  completedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  userId String
+  user   User   @relation("UserCalls", fields: [userId], references: [id])
+
+  contactId String?
+  contact   Contact? @relation("ContactCalls", fields: [contactId], references: [id], onDelete: SetNull)
+
+  dealId String?
+  deal   Deal?  @relation("DealCalls", fields: [dealId], references: [id], onDelete: SetNull)
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([contactId])
+  @@index([dealId])
+  @@index([companyId])
+  @@map("call_logs")
+}
+
+enum CallDirection {
+  INBOUND
+  OUTBOUND
+}
+
+model Meeting {
+  id          String        @id @default(uuid())
+  title       String
+  description String?
+  location    String?
+  startTime   DateTime
+  endTime     DateTime
+  status      MeetingStatus @default(SCHEDULED)
+  notes       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  organizerId String
+  organizer   User   @relation("UserMeetings", fields: [organizerId], references: [id])
+
+  contactId String?
+  contact   Contact? @relation("ContactMeetings", fields: [contactId], references: [id], onDelete: SetNull)
+
+  dealId String?
+  deal   Deal?  @relation("DealMeetings", fields: [dealId], references: [id], onDelete: SetNull)
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  @@index([organizerId])
+  @@index([contactId])
+  @@index([dealId])
+  @@index([companyId])
+  @@index([startTime])
+  @@map("meetings")
+}
+
+enum MeetingStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
 }

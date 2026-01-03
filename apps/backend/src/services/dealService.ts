@@ -11,6 +11,7 @@ export interface CreateDealData {
   expectedCloseDate?: Date;
   contactId: string;
   ownerId: string;
+  companyId?: string;
 }
 
 export interface UpdateDealData {
@@ -23,6 +24,7 @@ export interface UpdateDealData {
   closedDate?: Date;
   contactId?: string;
   ownerId?: string;
+  companyId?: string;
 }
 
 export interface DealFilters {
@@ -66,6 +68,14 @@ export async function getDeals(filters?: DealFilters) {
           avatar: true,
         },
       },
+      companyRel: {
+        select: {
+          id: true,
+          name: true,
+          industry: true,
+          logo: true,
+        },
+      },
       _count: {
         select: {
           tasks: true,
@@ -101,6 +111,15 @@ export async function getDealById(id: string) {
           name: true,
           email: true,
           avatar: true,
+        },
+      },
+      companyRel: {
+        select: {
+          id: true,
+          name: true,
+          industry: true,
+          website: true,
+          logo: true,
         },
       },
       tasks: {
@@ -142,6 +161,7 @@ export async function createDeal(data: CreateDealData, userId: string) {
       expectedCloseDate: data.expectedCloseDate,
       contactId: data.contactId,
       ownerId: data.ownerId,
+      companyId: data.companyId,
     },
     include: {
       contact: {
@@ -159,6 +179,14 @@ export async function createDeal(data: CreateDealData, userId: string) {
           name: true,
           email: true,
           avatar: true,
+        },
+      },
+      companyRel: {
+        select: {
+          id: true,
+          name: true,
+          industry: true,
+          logo: true,
         },
       },
     },
@@ -203,6 +231,14 @@ export async function updateDeal(id: string, data: UpdateDealData, userId: strin
           name: true,
           email: true,
           avatar: true,
+        },
+      },
+      companyRel: {
+        select: {
+          id: true,
+          name: true,
+          industry: true,
+          logo: true,
         },
       },
     },

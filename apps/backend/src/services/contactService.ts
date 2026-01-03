@@ -8,6 +8,7 @@ export interface CreateContactData {
   email: string;
   phone?: string;
   company?: string;
+  companyId?: string;
   website?: string;
   address?: string;
   city?: string;
@@ -24,6 +25,7 @@ export interface UpdateContactData {
   email?: string;
   phone?: string;
   company?: string;
+  companyId?: string;
   website?: string;
   address?: string;
   city?: string;
@@ -57,6 +59,7 @@ export async function getContacts(filters?: ContactFilters) {
       { lastName: { contains: filters.search, mode: 'insensitive' } },
       { email: { contains: filters.search, mode: 'insensitive' } },
       { company: { contains: filters.search, mode: 'insensitive' } },
+      { companyRel: { name: { contains: filters.search, mode: 'insensitive' } } },
     ];
   }
 
@@ -69,6 +72,14 @@ export async function getContacts(filters?: ContactFilters) {
           name: true,
           email: true,
           avatar: true,
+        },
+      },
+      companyRel: {
+        select: {
+          id: true,
+          name: true,
+          industry: true,
+          logo: true,
         },
       },
       _count: {
@@ -98,6 +109,15 @@ export async function getContactById(id: string) {
           name: true,
           email: true,
           avatar: true,
+        },
+      },
+      companyRel: {
+        select: {
+          id: true,
+          name: true,
+          industry: true,
+          website: true,
+          logo: true,
         },
       },
       deals: {

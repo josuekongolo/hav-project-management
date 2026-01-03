@@ -15,6 +15,10 @@ import contactRoutes from './routes/contactRoutes.js';
 import emailTemplateRoutes from './routes/emailTemplateRoutes.js';
 import emailRoutes from './routes/emailRoutes.js';
 import dealRoutes from './routes/dealRoutes.js';
+import companyRoutes from './routes/companyRoutes.js';
+import noteRoutes from './routes/noteRoutes.js';
+import callLogRoutes from './routes/callLogRoutes.js';
+import meetingRoutes from './routes/meetingRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { emailService } from './services/emailService.js';
 
@@ -101,6 +105,10 @@ app.use('/api/contacts', contactRoutes);
 app.use('/api/email-templates', emailTemplateRoutes);
 app.use('/api/emails', emailRoutes);
 app.use('/api/deals', dealRoutes);
+app.use('/api/companies', companyRoutes);
+app.use('/api/notes', noteRoutes);
+app.use('/api/call-logs', callLogRoutes);
+app.use('/api/meetings', meetingRoutes);
 
 app.use('/api', (_req, res) => {
   res.json({ message: 'HAV Project Management API' });
