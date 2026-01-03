@@ -12,6 +12,7 @@ import commentRoutes from './routes/commentRoutes.js';
 import timeLogRoutes from './routes/timeLogRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { emailService } from './services/emailService.js';
 
 dotenv.config();
 
@@ -58,6 +59,29 @@ app.get('/', (_req, res) => {
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', message: 'HAV API is running' });
+});
+
+app.get('/api/test-smtp', async (_req, res) => {
+  try {
+    const isConnected = await emailService.verifyConnection();
+    res.json({
+      connected: isConnected,
+      message: isConnected
+        ? 'SMTP connection successful'
+        : 'SMTP connection failed - check server logs',
+      config: {
+        host: process.env.SMTP_HOST || 'smtp.domeneshop.no',
+        port: process.env.SMTP_PORT || '587',
+        user: process.env.SMTP_USER || 'Not configured',
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      connected: false,
+      message: 'SMTP connection error',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 });
 
 app.use('/api/auth', authRoutes);

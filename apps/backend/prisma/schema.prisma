@@ -20,11 +20,15 @@ model User {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
-  assignedTasks TaskAssignee[]
-  createdTasks  Task[]         @relation("CreatedTasks")
-  comments      Comment[]
-  timeLogs      TimeLog[]
-  notifications Notification[]
+  assignedTasks    TaskAssignee[]
+  createdTasks     Task[]         @relation("CreatedTasks")
+  comments         Comment[]
+  timeLogs         TimeLog[]
+  notifications    Notification[]
+  assignedContacts Contact[]      @relation("AssignedContacts")
+  deals            Deal[]          @relation("DealOwner")
+  sentEmails       Email[]         @relation("SentEmails")
+  activities       Activity[]      @relation("UserActivities")
 
   @@map("users")
 }
@@ -62,12 +66,20 @@ model Task {
   comments Comment[]
   timeLogs TimeLog[]
 
+  contact   Contact? @relation("ContactTasks", fields: [contactId], references: [id], onDelete: SetNull)
+  contactId String?
+
+  deal   Deal?   @relation("DealTasks", fields: [dealId], references: [id], onDelete: SetNull)
+  dealId String?
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   dueDate   DateTime?
 
   @@index([status])
   @@index([milestoneId])
+  @@index([contactId])
+  @@index([dealId])
   @@map("tasks")
 }
 
@@ -203,4 +215,179 @@ enum NotificationType {
   TASK_DUE_SOON
   TASK_COMPLETED
   MILESTONE_DUE_SOON
+}
+
+// ==================== CRM MODELS ====================
+
+model Contact {
+  id          String        @id @default(uuid())
+  firstName   String
+  lastName    String
+  email       String        @unique
+  phone       String?
+  company     String?
+  website     String?
+  address     String?
+  city        String?
+  country     String?
+  status      ContactStatus @default(LEAD)
+  source      String?
+  notes       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  deals       Deal[]
+  emails      Email[]
+  tasks       Task[]     @relation("ContactTasks")
+  activities  Activity[]
+  assignedTo  User?      @relation("AssignedContacts", fields: [assignedToId], references: [id])
+  assignedToId String?
+
+  @@index([status])
+  @@index([email])
+  @@index([assignedToId])
+  @@map("contacts")
+}
+
+enum ContactStatus {
+  LEAD
+  CONTACTED
+  QUALIFIED
+  PROPOSAL
+  NEGOTIATION
+  CUSTOMER
+  INACTIVE
+  LOST
+}
+
+model Deal {
+  id                String    @id @default(uuid())
+  title             String
+  description       String?
+  value             Float
+  stage             DealStage @default(PROSPECT)
+  probability       Int       @default(50)
+  expectedCloseDate DateTime?
+  closedDate        DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contactId String
+  owner     User    @relation("DealOwner", fields: [ownerId], references: [id])
+  ownerId   String
+  tasks     Task[]  @relation("DealTasks")
+
+  @@index([stage])
+  @@index([ownerId])
+  @@index([contactId])
+  @@map("deals")
+}
+
+enum DealStage {
+  PROSPECT
+  QUALIFICATION
+  PROPOSAL
+  NEGOTIATION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+model Email {
+  id           String      @id @default(uuid())
+  subject      String
+  body         String
+  htmlBody     String?
+  from         String
+  to           String[]
+  cc           String[]    @default([])
+  bcc          String[]    @default([])
+  status       EmailStatus @default(DRAFT)
+  sentAt       DateTime?
+  openedAt     DateTime?
+  clickedAt    DateTime?
+  errorMessage String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  contact   Contact?       @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  contactId String?
+  sender    User           @relation("SentEmails", fields: [senderId], references: [id])
+  senderId  String
+  template  EmailTemplate? @relation(fields: [templateId], references: [id])
+  templateId String?
+
+  @@index([status])
+  @@index([contactId])
+  @@index([senderId])
+  @@map("emails")
+}
+
+enum EmailStatus {
+  DRAFT
+  SCHEDULED
+  SENDING
+  SENT
+  FAILED
+  OPENED
+  CLICKED
+}
+
+model EmailTemplate {
+  id        String                @id @default(uuid())
+  name      String
+  subject   String
+  body      String
+  htmlBody  String?
+  category  EmailTemplateCategory
+  variables String[]              @default([])
+  isActive  Boolean               @default(true)
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+
+  emails Email[]
+
+  @@map("email_templates")
+}
+
+enum EmailTemplateCategory {
+  WELCOME
+  FOLLOW_UP
+  PROPOSAL
+  INVOICE
+  GENERAL
+}
+
+model Activity {
+  id          String       @id @default(uuid())
+  type        ActivityType
+  title       String
+  description String?
+  metadata    Json?
+  createdAt   DateTime     @default(now())
+
+  contact   Contact? @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contactId String?
+  user      User     @relation("UserActivities", fields: [userId], references: [id])
+  userId    String
+
+  @@index([contactId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("activities")
+}
+
+enum ActivityType {
+  EMAIL_SENT
+  EMAIL_OPENED
+  EMAIL_CLICKED
+  NOTE_ADDED
+  STATUS_CHANGED
+  DEAL_CREATED
+  DEAL_WON
+  DEAL_LOST
+  TASK_CREATED
+  TASK_COMPLETED
+  CALL_MADE
+  MEETING_SCHEDULED
 }
