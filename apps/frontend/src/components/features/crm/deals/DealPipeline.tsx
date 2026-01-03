@@ -89,14 +89,13 @@ export function DealPipeline({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="overflow-x-auto -mx-4 px-4 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
-        <div className="flex gap-4 pb-4 min-w-min">
-          {stages.map((stage) => {
-            const stageDeals = dealsByStage[stage.value] || [];
-            const stageValue = calculateStageValue(stageDeals);
+      <div className="flex gap-4 pb-4">
+        {stages.map((stage) => {
+          const stageDeals = dealsByStage[stage.value] || [];
+          const stageValue = calculateStageValue(stageDeals);
 
-            return (
-              <div key={stage.value} className="flex-shrink-0 w-72 sm:w-80">
+          return (
+            <div key={stage.value} className="flex-shrink-0 w-72 sm:w-80">
               <div className={`rounded-lg ${stage.color} p-3 mb-3`}>
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="font-semibold text-gray-900">{stage.label}</h3>
@@ -138,7 +137,6 @@ export function DealPipeline({
             </div>
           );
         })}
-        </div>
       </div>
 
       <DragOverlay>

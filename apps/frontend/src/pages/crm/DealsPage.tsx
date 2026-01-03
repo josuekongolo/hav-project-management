@@ -151,19 +151,23 @@ export function DealsPage() {
       )}
 
       {/* Pipeline */}
-      {isLoading ? (
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-        </div>
-      ) : (
-        <DealPipeline
-          deals={deals}
-          onDealClick={handleEditDeal}
-          onDeleteDeal={handleDeleteDeal}
-          onDealStageChange={handleDealStageChange}
-          onAddDeal={handleCreateDeal}
-        />
-      )}
+      <div className="overflow-x-auto -mx-4 md:-mx-6 lg:-mx-8">
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12 px-4 md:px-6 lg:px-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          </div>
+        ) : (
+          <div className="px-4 md:px-6 lg:px-8">
+            <DealPipeline
+              deals={deals}
+              onDealClick={handleEditDeal}
+              onDeleteDeal={handleDeleteDeal}
+              onDealStageChange={handleDealStageChange}
+              onAddDeal={handleCreateDeal}
+            />
+          </div>
+        )}
+      </div>
 
       {/* Deal Form Modal */}
       <Modal
