@@ -61,7 +61,8 @@ export async function uploadFile(req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
-    const { folderId } = req.body;
+    // Use the configured folder ID from environment
+    const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
 
     const result = await googleDriveService.uploadFile(
       req.file.originalname,
@@ -115,10 +116,13 @@ export async function getFileMetadata(req: AuthRequest, res: Response): Promise<
  */
 export async function listFiles(req: AuthRequest, res: Response): Promise<void> {
   try {
-    const { folderId, pageSize } = req.query;
+    const { pageSize } = req.query;
+
+    // Use the configured folder ID from environment
+    const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
 
     const files = await googleDriveService.listFiles(
-      folderId ? String(folderId) : undefined,
+      folderId,
       pageSize ? parseInt(String(pageSize)) : undefined
     );
 
@@ -148,12 +152,15 @@ export async function readXlsxFile(req: AuthRequest, res: Response): Promise<voi
  */
 export async function uploadXlsxFile(req: AuthRequest, res: Response): Promise<void> {
   try {
-    const { fileName, data, sheetName, folderId } = req.body;
+    const { fileName, data, sheetName } = req.body;
 
     if (!fileName || !data) {
       res.status(400).json({ error: 'fileName and data are required' });
       return;
     }
+
+    // Use the configured folder ID from environment
+    const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
 
     const result = await googleDriveService.uploadXlsxFile(
       fileName,
