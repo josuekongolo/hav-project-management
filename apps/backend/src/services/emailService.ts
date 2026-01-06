@@ -67,6 +67,15 @@ class EmailService {
           html: html || text,
         });
 
+        // Debug: Log the full response
+        console.log('[EmailService] Resend API Response:', JSON.stringify(result, null, 2));
+
+        // Check for errors
+        if (result.error) {
+          console.error('[EmailService] Resend API Error:', result.error);
+          throw new Error(`Resend API error: ${JSON.stringify(result.error)}`);
+        }
+
         const emailId = result.data?.id || 'unknown';
         console.log(`[EmailService] Email sent successfully via Resend. ID: ${emailId}`);
       } else if (this.transporter) {
