@@ -67,7 +67,7 @@ class EmailService {
           html: html || text,
         });
 
-        const emailId = result.data?.id || result.id || 'unknown';
+        const emailId = result.data?.id || 'unknown';
         console.log(`[EmailService] Email sent successfully via Resend. ID: ${emailId}`);
       } else if (this.transporter) {
         // Use SMTP
