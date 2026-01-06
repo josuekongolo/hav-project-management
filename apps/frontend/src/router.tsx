@@ -17,6 +17,7 @@ import { DealsPage } from './pages/crm/DealsPage';
 import { DealDetailPage } from './pages/crm/DealDetailPage';
 import { CompaniesPage } from './pages/crm/CompaniesPage';
 import { CompanyDetailPage } from './pages/crm/CompanyDetailPage';
+import { GoogleDrivePage } from './pages/GoogleDrivePage';
 
 export const router = createBrowserRouter([
   {
@@ -90,6 +91,10 @@ export const router = createBrowserRouter([
       {
         path: 'crm/emails',
         element: <EmailsPage />,
+      },
+      {
+        path: 'google-drive',
+        element: <GoogleDrivePage />,
       },
     ],
   },

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, KanbanSquare, Calendar, Users, Target, Tag, UserCircle, ChevronLeft, Building2, Mail, Send, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, KanbanSquare, Calendar, Users, Target, Tag, UserCircle, ChevronLeft, Building2, Mail, Send, TrendingUp, Cloud } from 'lucide-react';
 import clsx from 'clsx';
 
 const navigation = [
@@ -15,6 +15,7 @@ const navigation = [
   { name: 'Deals', href: '/crm/deals', icon: TrendingUp },
   { name: 'Emails', href: '/crm/emails', icon: Send },
   { name: 'Email Templates', href: '/crm/templates', icon: Mail },
+  { name: 'Google Drive', href: '/google-drive', icon: Cloud },
 ];
 
 interface SidebarProps {
