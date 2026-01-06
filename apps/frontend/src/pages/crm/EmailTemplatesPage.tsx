@@ -172,9 +172,10 @@ export function EmailTemplatesPage() {
           setSelectedTemplate(null);
         }}
         title={selectedTemplate ? 'Edit Email Template' : 'New Email Template'}
-        size="xl"
+        size="full"
       >
         <EmailTemplateForm
+          key={selectedTemplate?.id || 'new'}
           template={selectedTemplate}
           onSubmit={handleFormSubmit}
           onCancel={() => {

@@ -40,6 +40,16 @@ export function EmailTemplateForm({ template, onSubmit, onCancel }: EmailTemplat
         category: template.category,
         isActive: template.isActive,
       });
+    } else {
+      // Reset form when no template (creating new)
+      setFormData({
+        name: '',
+        subject: '',
+        body: '',
+        htmlBody: '',
+        category: EmailTemplateCategory.GENERAL,
+        isActive: true,
+      });
     }
   }, [template]);
 
