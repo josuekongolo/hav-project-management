@@ -4,7 +4,6 @@ import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Upload, Download, Trash2, Share2, FileSpreadsheet, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { authService } from '../services/authService';
 
 interface DriveFile {
   id: string;
@@ -24,7 +23,7 @@ export function GoogleDrivePage() {
   const fetchFiles = async () => {
     setIsLoading(true);
     try {
-      const token = authService.getToken();
+      const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:3001/api/google/files', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -60,7 +59,7 @@ export function GoogleDrivePage() {
 
     setIsLoading(true);
     try {
-      const token = authService.getToken();
+      const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:3001/api/google/files/upload', {
         method: 'POST',
         headers: {
@@ -86,7 +85,7 @@ export function GoogleDrivePage() {
 
   const handleDownload = async (fileId: string, fileName: string) => {
     try {
-      const token = authService.getToken();
+      const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:3001/api/google/files/${fileId}/download`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -120,7 +119,7 @@ export function GoogleDrivePage() {
     }
 
     try {
-      const token = authService.getToken();
+      const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:3001/api/google/files/${fileId}`, {
         method: 'DELETE',
         headers: {
@@ -142,7 +141,7 @@ export function GoogleDrivePage() {
 
   const handleShare = async (fileId: string) => {
     try {
-      const token = authService.getToken();
+      const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:3001/api/google/files/${fileId}/share`, {
         method: 'POST',
         headers: {
@@ -166,7 +165,7 @@ export function GoogleDrivePage() {
 
   const handleReadExcel = async (fileId: string, fileName: string) => {
     try {
-      const token = authService.getToken();
+      const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:3001/api/google/xlsx/${fileId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
