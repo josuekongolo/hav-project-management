@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
-import { Upload, Download, Trash2, Share2, FileSpreadsheet, RefreshCw } from 'lucide-react';
+import { Upload, Download, Trash2, Share2, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { googleDriveService, DriveFile } from '../services/googleDriveService';
 
@@ -93,16 +93,6 @@ export function GoogleDrivePage() {
     }
   };
 
-  const handleReadExcel = async (fileId: string, fileName: string) => {
-    try {
-      const data = await googleDriveService.readXlsxFile(fileId);
-      console.log('Excel data:', data);
-      toast.success(`Excel file "${fileName}" read successfully! Check console for data.`);
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to read Excel file');
-      console.error('Error reading Excel file:', error);
-    }
-  };
 
   const formatFileSize = (bytes?: string) => {
     if (!bytes) return 'Unknown';
@@ -115,10 +105,6 @@ export function GoogleDrivePage() {
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'Unknown';
     return new Date(dateString).toLocaleString();
-  };
-
-  const isExcelFile = (mimeType: string) => {
-    return mimeType.includes('spreadsheet') || mimeType.includes('excel');
   };
 
   return (
@@ -201,17 +187,6 @@ export function GoogleDrivePage() {
                   >
                     <Download className="h-4 w-4" />
                   </Button>
-
-                  {isExcelFile(file.mimeType) && (
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => handleReadExcel(file.id, file.name)}
-                      title="Read Excel Data"
-                    >
-                      <FileSpreadsheet className="h-4 w-4" />
-                    </Button>
-                  )}
 
                   <Button
                     size="sm"
