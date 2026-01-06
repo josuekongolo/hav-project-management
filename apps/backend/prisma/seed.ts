@@ -7,6 +7,7 @@ async function main() {
   console.log('Starting database seeding...');
 
   const password = await bcrypt.hash('Havdis1234!?', 12);
+  const mariePassword = await bcrypt.hash('Havdis123!?', 12);
 
   const users = await Promise.all([
     prisma.user.upsert({
@@ -53,9 +54,20 @@ async function main() {
         avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ben',
       },
     }),
+    prisma.user.upsert({
+      where: { email: 'marie@havdis.no' },
+      update: {},
+      create: {
+        email: 'marie@havdis.no',
+        password: mariePassword,
+        name: 'Marie',
+        role: 'MEMBER',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marie',
+      },
+    }),
   ]);
 
-  console.log('Created/Updated 4 team members');
+  console.log('Created/Updated 5 team members');
 
   const labels = await Promise.all([
     prisma.label.upsert({
@@ -356,6 +368,7 @@ The {{company}} Team`,
   console.log('  Email: Josue@havdis.no   | Password: Havdis1234!?');
   console.log('  Email: Lalit@havdis.no   | Password: Havdis1234!?');
   console.log('  Email: Ben@havdis.no     | Password: Havdis1234!?');
+  console.log('  Email: Marie@havdis.no   | Password: Havdis123!?');
 }
 
 main()
