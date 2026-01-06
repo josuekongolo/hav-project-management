@@ -47,8 +47,7 @@ class GoogleDriveService {
     }
 
     const scopes = [
-      'https://www.googleapis.com/auth/drive.file',
-      'https://www.googleapis.com/auth/drive.readonly',
+      'https://www.googleapis.com/auth/drive',
     ];
 
     return this.oauth2Client.generateAuthUrl({
