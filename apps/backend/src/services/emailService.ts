@@ -56,9 +56,13 @@ class EmailService {
       if (this.useResend && this.resend) {
         // Use Resend API
         const recipients = Array.isArray(to) ? to : [to];
+        const fromAddress = process.env.SMTP_FROM || 'onboarding@resend.dev';
+
+        console.log(`[EmailService] Sending via Resend from: ${fromAddress}`);
+        console.log(`[EmailService] SMTP_FROM env variable: ${process.env.SMTP_FROM}`);
 
         const result = await this.resend.emails.send({
-          from: process.env.SMTP_FROM || 'onboarding@resend.dev',
+          from: fromAddress,
           to: recipients,
           cc,
           bcc,
