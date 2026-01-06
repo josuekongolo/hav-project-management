@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, KanbanSquare, Calendar, Users, Target, Tag, UserCircle, ChevronLeft, Building2, Mail, Send, TrendingUp, Cloud, LogOut, Settings, User, Bell } from 'lucide-react';
+import { LayoutDashboard, KanbanSquare, Calendar, Users, Target, Tag, UserCircle, ChevronLeft, Building2, Mail, Send, TrendingUp, Cloud, LogOut, Settings, User } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuthStore } from '../../store/authStore';
-import { NotificationDropdown } from '../features/notifications/NotificationDropdown';
 import { ProfileModal } from '../features/profile/ProfileModal';
 
 const navigation = [
@@ -134,11 +133,6 @@ export function Sidebar({ isOpen, onClose, isCollapsed = false, onToggleCollapse
         <div className="border-t border-gray-200">
           {!isCollapsed ? (
             <div className="p-4 space-y-3">
-              {/* Notifications */}
-              <div className="flex justify-center">
-                <NotificationDropdown />
-              </div>
-
               {/* User Info */}
               <div className="flex items-center gap-3 px-2">
                 <div className="relative flex-shrink-0">
@@ -185,11 +179,6 @@ export function Sidebar({ isOpen, onClose, isCollapsed = false, onToggleCollapse
             </div>
           ) : (
             <div className="p-2 space-y-2">
-              {/* Notifications (collapsed) */}
-              <div className="flex justify-center">
-                <NotificationDropdown />
-              </div>
-
               {/* User Avatar (collapsed) */}
               <div className="flex justify-center">
                 <div className="relative">
