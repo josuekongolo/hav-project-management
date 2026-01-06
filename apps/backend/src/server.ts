@@ -19,6 +19,7 @@ import companyRoutes from './routes/companyRoutes.js';
 import noteRoutes from './routes/noteRoutes.js';
 import callLogRoutes from './routes/callLogRoutes.js';
 import meetingRoutes from './routes/meetingRoutes.js';
+import googleDriveRoutes from './routes/googleDriveRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { emailService } from './services/emailService.js';
 
@@ -109,6 +110,7 @@ app.use('/api/companies', companyRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/call-logs', callLogRoutes);
 app.use('/api/meetings', meetingRoutes);
+app.use('/api/google', googleDriveRoutes);
 
 app.use('/api', (_req, res) => {
   res.json({ message: 'HAV Project Management API' });
