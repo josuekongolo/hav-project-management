@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Header } from './Header';
 import { Sidebar } from './Sidebar';
+import { Menu } from 'lucide-react';
 
 export function AppLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -9,15 +9,23 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
-      <div className="flex">
+      <div className="flex h-screen">
         <Sidebar
           isOpen={isMobileMenuOpen}
           onClose={() => setIsMobileMenuOpen(false)}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
-        <main className="flex-1 min-h-[calc(100vh-64px)]">
+        <main className="flex-1 overflow-auto">
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="lg:hidden fixed top-4 left-4 z-10 p-2 bg-white border border-gray-200 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50 transition-colors"
+            aria-label="Open menu"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+
           <Outlet />
         </main>
       </div>
