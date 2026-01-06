@@ -11,10 +11,11 @@ export { upload };
 /**
  * Get OAuth authorization URL
  */
-export async function getAuthUrl(req: AuthRequest, res: Response) {
+export async function getAuthUrl(_req: AuthRequest, res: Response): Promise<void> {
   try {
     if (!googleDriveService.isConfigured()) {
-      return res.status(503).json({ error: 'Google Drive not configured' });
+      res.status(503).json({ error: 'Google Drive not configured' });
+      return;
     }
 
     const authUrl = googleDriveService.getAuthUrl();
@@ -28,12 +29,13 @@ export async function getAuthUrl(req: AuthRequest, res: Response) {
 /**
  * OAuth callback - exchange code for tokens
  */
-export async function handleOAuthCallback(req: AuthRequest, res: Response) {
+export async function handleOAuthCallback(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { code } = req.query;
 
     if (!code || typeof code !== 'string') {
-      return res.status(400).json({ error: 'Authorization code required' });
+      res.status(400).json({ error: 'Authorization code required' });
+      return;
     }
 
     const tokens = await googleDriveService.getTokensFromCode(code);
@@ -52,10 +54,11 @@ export async function handleOAuthCallback(req: AuthRequest, res: Response) {
 /**
  * Upload file to Google Drive
  */
-export async function uploadFile(req: AuthRequest, res: Response) {
+export async function uploadFile(req: AuthRequest, res: Response): Promise<void> {
   try {
     if (!req.file) {
-      return res.status(400).json({ error: 'No file provided' });
+      res.status(400).json({ error: 'No file provided' });
+      return;
     }
 
     const { folderId } = req.body;
@@ -77,7 +80,7 @@ export async function uploadFile(req: AuthRequest, res: Response) {
 /**
  * Download file from Google Drive
  */
-export async function downloadFile(req: AuthRequest, res: Response) {
+export async function downloadFile(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { fileId } = req.params;
 
@@ -96,7 +99,7 @@ export async function downloadFile(req: AuthRequest, res: Response) {
 /**
  * Get file metadata
  */
-export async function getFileMetadata(req: AuthRequest, res: Response) {
+export async function getFileMetadata(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { fileId } = req.params;
     const metadata = await googleDriveService.getFileMetadata(fileId);
@@ -110,7 +113,7 @@ export async function getFileMetadata(req: AuthRequest, res: Response) {
 /**
  * List files in Google Drive
  */
-export async function listFiles(req: AuthRequest, res: Response) {
+export async function listFiles(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { folderId, pageSize } = req.query;
 
@@ -129,7 +132,7 @@ export async function listFiles(req: AuthRequest, res: Response) {
 /**
  * Read XLSX file from Google Drive
  */
-export async function readXlsxFile(req: AuthRequest, res: Response) {
+export async function readXlsxFile(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { fileId } = req.params;
     const data = await googleDriveService.readXlsxFile(fileId);
@@ -143,12 +146,13 @@ export async function readXlsxFile(req: AuthRequest, res: Response) {
 /**
  * Upload XLSX file to Google Drive
  */
-export async function uploadXlsxFile(req: AuthRequest, res: Response) {
+export async function uploadXlsxFile(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { fileName, data, sheetName, folderId } = req.body;
 
     if (!fileName || !data) {
-      return res.status(400).json({ error: 'fileName and data are required' });
+      res.status(400).json({ error: 'fileName and data are required' });
+      return;
     }
 
     const result = await googleDriveService.uploadXlsxFile(
@@ -168,7 +172,7 @@ export async function uploadXlsxFile(req: AuthRequest, res: Response) {
 /**
  * Delete file from Google Drive
  */
-export async function deleteFile(req: AuthRequest, res: Response) {
+export async function deleteFile(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { fileId } = req.params;
     await googleDriveService.deleteFile(fileId);
@@ -182,7 +186,7 @@ export async function deleteFile(req: AuthRequest, res: Response) {
 /**
  * Share file (make publicly accessible)
  */
-export async function shareFile(req: AuthRequest, res: Response) {
+export async function shareFile(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { fileId } = req.params;
     const { role } = req.body;
