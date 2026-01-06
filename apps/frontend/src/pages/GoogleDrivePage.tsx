@@ -4,16 +4,7 @@ import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Upload, Download, Trash2, Share2, FileSpreadsheet, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-interface DriveFile {
-  id: string;
-  name: string;
-  mimeType: string;
-  size?: string;
-  createdTime?: string;
-  modifiedTime?: string;
-  webViewLink?: string;
-}
+import { googleDriveService, DriveFile } from '../services/googleDriveService';
 
 export function GoogleDrivePage() {
   const [files, setFiles] = useState<DriveFile[]>([]);
@@ -23,18 +14,7 @@ export function GoogleDrivePage() {
   const fetchFiles = async () => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3001/api/google/files', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch files');
-      }
-
-      const data = await response.json();
+      const data = await googleDriveService.listFiles();
       setFiles(data.files || []);
     } catch (error: any) {
       toast.error(error.message || 'Failed to fetch files from Google Drive');
@@ -54,24 +34,9 @@ export function GoogleDrivePage() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('file', uploadFile);
-
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3001/api/google/files/upload', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to upload file');
-      }
-
+      await googleDriveService.uploadFile(uploadFile);
       toast.success('File uploaded successfully!');
       setUploadFile(null);
       fetchFiles();
@@ -85,18 +50,7 @@ export function GoogleDrivePage() {
 
   const handleDownload = async (fileId: string, fileName: string) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/google/files/${fileId}/download`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to download file');
-      }
-
-      const blob = await response.blob();
+      const blob = await googleDriveService.downloadFile(fileId);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -119,18 +73,7 @@ export function GoogleDrivePage() {
     }
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/google/files/${fileId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete file');
-      }
-
+      await googleDriveService.deleteFile(fileId);
       toast.success('File deleted successfully!');
       fetchFiles();
     } catch (error: any) {
@@ -141,20 +84,7 @@ export function GoogleDrivePage() {
 
   const handleShare = async (fileId: string) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/google/files/${fileId}/share`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ role: 'reader' }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to share file');
-      }
-
+      await googleDriveService.shareFile(fileId, 'reader');
       toast.success('File shared successfully! Anyone with the link can view it.');
       fetchFiles();
     } catch (error: any) {
@@ -165,18 +95,7 @@ export function GoogleDrivePage() {
 
   const handleReadExcel = async (fileId: string, fileName: string) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/google/xlsx/${fileId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to read Excel file');
-      }
-
-      const data = await response.json();
+      const data = await googleDriveService.readXlsxFile(fileId);
       console.log('Excel data:', data);
       toast.success(`Excel file "${fileName}" read successfully! Check console for data.`);
     } catch (error: any) {
