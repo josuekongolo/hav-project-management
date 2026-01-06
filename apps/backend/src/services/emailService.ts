@@ -67,7 +67,8 @@ class EmailService {
           html: html || text,
         });
 
-        console.log(`[EmailService] Email sent successfully via Resend. ID: ${result.data?.id}`);
+        const emailId = result.data?.id || result.id || 'unknown';
+        console.log(`[EmailService] Email sent successfully via Resend. ID: ${emailId}`);
       } else if (this.transporter) {
         // Use SMTP
         const info = await this.transporter.sendMail({
