@@ -90,6 +90,9 @@ class GoogleDriveService {
 
     if (folderId) {
       fileMetadata.parents = [folderId];
+      console.log(`[GoogleDrive] Uploading to folder: ${folderId}`);
+    } else {
+      console.log(`[GoogleDrive] Uploading to My Drive root (no parent specified)`);
     }
 
     const media = {
@@ -97,14 +100,41 @@ class GoogleDriveService {
       body: Readable.from(fileBuffer),
     };
 
-    const response = await this.drive.files.create({
-      requestBody: fileMetadata,
-      media: media,
-      fields: 'id, name, webViewLink, webContentLink',
-    });
+    try {
+      const response = await this.drive.files.create({
+        requestBody: fileMetadata,
+        media: media,
+        fields: 'id, name, webViewLink, webContentLink',
+      });
 
-    console.log(`[GoogleDrive] File uploaded: ${fileName} (ID: ${response.data.id})`);
-    return response.data;
+      console.log(`[GoogleDrive] File uploaded: ${fileName} (ID: ${response.data.id})`);
+      return response.data;
+    } catch (error: any) {
+      console.error(`[GoogleDrive] Upload failed:`, {
+        error: error.message,
+        code: error.code,
+        errors: error.errors,
+        folderId,
+        fileName
+      });
+
+      // If permission denied and we tried to upload to a specific folder, try root instead
+      if (error.code === 403 && folderId) {
+        console.log(`[GoogleDrive] Retrying upload to My Drive root instead of folder ${folderId}`);
+        delete fileMetadata.parents;
+
+        const retryResponse = await this.drive.files.create({
+          requestBody: fileMetadata,
+          media: { mimeType, body: Readable.from(fileBuffer) },
+          fields: 'id, name, webViewLink, webContentLink',
+        });
+
+        console.log(`[GoogleDrive] File uploaded to root: ${fileName} (ID: ${retryResponse.data.id})`);
+        return retryResponse.data;
+      }
+
+      throw error;
+    }
   }
 
   /**

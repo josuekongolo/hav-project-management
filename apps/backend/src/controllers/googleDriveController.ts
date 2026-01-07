@@ -65,6 +65,12 @@ export async function uploadFile(req: AuthRequest, res: Response): Promise<void>
     const rootFolderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
     const folderId = req.body.folderId || rootFolderId;
 
+    console.log('[GoogleDrive] Uploading file:', {
+      filename: req.file.originalname,
+      folderId: folderId,
+      hasRootFolder: !!rootFolderId
+    });
+
     const result = await googleDriveService.uploadFile(
       req.file.originalname,
       req.file.mimetype,
@@ -72,9 +78,10 @@ export async function uploadFile(req: AuthRequest, res: Response): Promise<void>
       folderId
     );
 
+    console.log('[GoogleDrive] File uploaded successfully:', result.id);
     res.json({ file: result });
   } catch (error) {
-    console.error('Error uploading file:', error);
+    console.error('[GoogleDrive] Error uploading file:', error);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to upload file' });
   }
 }
