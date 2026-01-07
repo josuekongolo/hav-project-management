@@ -15,6 +15,24 @@ import { KanbanColumn } from './KanbanColumn';
 import { TaskCard } from './TaskCard';
 import { Spinner, TaskCardSkeleton } from '../../ui';
 
+// Hook to detect mobile screen size
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 640 : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return isMobile;
+}
+
 interface KanbanBoardProps {
   onTaskClick: (task: Task) => void;
   onAddTask: (status: TaskStatus) => void;
@@ -34,6 +52,7 @@ const COLUMNS = [
 export function KanbanBoard({ onTaskClick, onAddTask, milestoneFilter, labelFilter, assigneeFilter, searchQuery }: KanbanBoardProps) {
   const { tasks, isLoading, fetchTasks, moveTask } = useTaskStore();
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const isMobile = useIsMobile();
 
   // Memoize filtered tasks to avoid recalculating on every render
   const filteredTasks = useMemo(() => {
@@ -71,6 +90,7 @@ export function KanbanBoard({ onTaskClick, onAddTask, milestoneFilter, labelFilt
     return result;
   }, [tasks, milestoneFilter, labelFilter, assigneeFilter, searchQuery]);
 
+  // Only enable drag and drop on non-mobile devices
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -152,6 +172,29 @@ export function KanbanBoard({ onTaskClick, onAddTask, milestoneFilter, labelFilt
     );
   }
 
+  const boardContent = (
+    <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 h-full overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
+      {COLUMNS.map((column) => (
+        <div key={column.status} className="bg-gray-50 rounded-lg p-3 md:p-4 flex flex-col min-h-0 w-[80vw] max-w-[80vw] md:w-auto md:max-w-none flex-shrink-0 overflow-hidden">
+          <KanbanColumn
+            status={column.status}
+            title={column.title}
+            tasks={getTasksByStatus(column.status)}
+            color={column.color}
+            onTaskClick={onTaskClick}
+            onAddTask={() => onAddTask(column.status)}
+          />
+        </div>
+      ))}
+    </div>
+  );
+
+  // On mobile, render without drag and drop
+  if (isMobile) {
+    return boardContent;
+  }
+
+  // On desktop, wrap with DndContext for drag and drop
   return (
     <DndContext
       sensors={sensors}
@@ -159,20 +202,7 @@ export function KanbanBoard({ onTaskClick, onAddTask, milestoneFilter, labelFilt
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 h-full overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
-        {COLUMNS.map((column) => (
-          <div key={column.status} className="bg-gray-50 rounded-lg p-3 md:p-4 flex flex-col min-h-0 w-[80vw] max-w-[80vw] md:w-auto md:max-w-none flex-shrink-0 overflow-hidden">
-            <KanbanColumn
-              status={column.status}
-              title={column.title}
-              tasks={getTasksByStatus(column.status)}
-              color={column.color}
-              onTaskClick={onTaskClick}
-              onAddTask={() => onAddTask(column.status)}
-            />
-          </div>
-        ))}
-      </div>
+      {boardContent}
 
       <DragOverlay>
         {activeTask ? (

@@ -83,41 +83,56 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
         <h3 className="font-medium text-gray-900 text-sm line-clamp-1 sm:line-clamp-2 flex-1 min-w-0 break-words">{task.title}</h3>
         <div className="flex items-center gap-1 flex-shrink-0">
           {/* Mobile move button */}
-          <div className="relative md:hidden">
+          <div className="relative sm:hidden">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setShowMoveMenu(!showMoveMenu);
               }}
-              className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+              className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors active:bg-blue-100"
               title="Move task"
             >
-              <MoveRight className="h-3.5 w-3.5" />
+              <MoveRight className="h-5 w-5" />
             </button>
             {showMoveMenu && (
               <>
                 <div
-                  className="fixed inset-0 z-40"
+                  className="fixed inset-0 z-40 bg-black/20"
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowMoveMenu(false);
                   }}
                 />
-                <div className="absolute right-0 top-8 z-50 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[140px]">
+                <div className="fixed left-4 right-4 bottom-4 z-50 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 sm:absolute sm:left-auto sm:right-0 sm:bottom-auto sm:top-10 sm:min-w-[160px]">
+                  <div className="px-4 py-2 border-b border-gray-100 sm:hidden">
+                    <p className="text-sm font-medium text-gray-900">Move to</p>
+                  </div>
                   {statusOptions.map((option) => (
                     <button
                       key={option.status}
                       onClick={(e) => handleMove(e, option.status)}
                       disabled={task.status === option.status}
                       className={clsx(
-                        'w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center gap-2',
-                        task.status === option.status && 'opacity-50 cursor-not-allowed'
+                        'w-full text-left px-4 py-3 sm:py-2 text-base sm:text-sm hover:bg-gray-50 active:bg-gray-100 transition-colors flex items-center gap-3',
+                        task.status === option.status && 'opacity-50 cursor-not-allowed bg-gray-50'
                       )}
                     >
-                      <span className={clsx('w-2 h-2 rounded-full', option.color)} />
-                      {option.label}
+                      <span className={clsx('w-3 h-3 sm:w-2 sm:h-2 rounded-full flex-shrink-0', option.color)} />
+                      <span>{option.label}</span>
+                      {task.status === option.status && (
+                        <span className="ml-auto text-xs text-gray-400">Current</span>
+                      )}
                     </button>
                   ))}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowMoveMenu(false);
+                    }}
+                    className="w-full text-center px-4 py-3 text-base font-medium text-gray-500 hover:bg-gray-50 active:bg-gray-100 border-t border-gray-100 mt-2 sm:hidden"
+                  >
+                    Cancel
+                  </button>
                 </div>
               </>
             )}
@@ -125,10 +140,10 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
           <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+            className="p-2 sm:p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
             title="Delete task"
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <Trash2 className="h-5 w-5 sm:h-3.5 sm:w-3.5" />
           </button>
           <PriorityBadge priority={task.priority} size="sm" />
         </div>
