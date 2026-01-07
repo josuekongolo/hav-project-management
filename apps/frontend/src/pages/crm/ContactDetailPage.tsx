@@ -194,12 +194,21 @@ export function ContactDetailPage() {
                   </div>
                 </div>
               )}
-              {selectedContact.company && (
+              {(selectedContact.companyRel || selectedContact.company) && (
                 <div className="flex items-start gap-3">
                   <Building2 className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Company</p>
-                    <p className="text-sm text-gray-900 break-words">{selectedContact.company}</p>
+                    {selectedContact.companyRel ? (
+                      <Link
+                        to={`/crm/companies/${selectedContact.companyRel.id}`}
+                        className="text-sm text-primary-600 hover:underline py-1 inline-block"
+                      >
+                        {selectedContact.companyRel.name}
+                      </Link>
+                    ) : (
+                      <p className="text-sm text-gray-900 break-words">{selectedContact.company}</p>
+                    )}
                   </div>
                 </div>
               )}

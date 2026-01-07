@@ -95,10 +95,10 @@ export function ContactList({
           </div>
 
           <div className="space-y-2 mb-3">
-            {contact.company && (
+            {(contact.companyRel?.name || contact.company) && (
               <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Building2 className="h-4 w-4" />
-                <span className="truncate">{contact.company}</span>
+                <Building2 className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">{contact.companyRel?.name || contact.company}</span>
               </div>
             )}
             {contact.phone && (
