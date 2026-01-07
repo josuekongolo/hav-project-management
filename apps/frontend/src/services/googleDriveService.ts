@@ -32,9 +32,12 @@ export const googleDriveService = {
     return response.data;
   },
 
-  async uploadFile(file: File): Promise<UploadFileResponse> {
+  async uploadFile(file: File, folderId?: string): Promise<UploadFileResponse> {
     const formData = new FormData();
     formData.append('file', file);
+    if (folderId) {
+      formData.append('folderId', folderId);
+    }
 
     const response = await api.post<UploadFileResponse>('/google/files/upload', formData, {
       headers: {

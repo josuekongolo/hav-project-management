@@ -61,8 +61,9 @@ export async function uploadFile(req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
-    // Use the configured folder ID from environment
-    const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+    // Use folderId from request body if provided, otherwise use env var
+    const rootFolderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+    const folderId = req.body.folderId || rootFolderId;
 
     const result = await googleDriveService.uploadFile(
       req.file.originalname,

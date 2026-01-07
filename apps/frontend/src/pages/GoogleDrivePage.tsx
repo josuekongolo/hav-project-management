@@ -75,8 +75,9 @@ export function GoogleDrivePage() {
 
     setIsLoading(true);
     try {
-      await googleDriveService.uploadFile(uploadFile);
-      toast.success('File uploaded successfully!');
+      await googleDriveService.uploadFile(uploadFile, currentFolderId);
+      const folderName = currentFolder ? currentFolder.name : 'root folder';
+      toast.success(`File uploaded successfully to ${folderName}!`);
       setUploadFile(null);
       fetchFiles();
     } catch (error: any) {
@@ -179,7 +180,14 @@ export function GoogleDrivePage() {
 
       {/* Upload Section */}
       <Card className="mb-6">
-        <h2 className="text-lg font-semibold mb-4">Upload File</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Upload File</h2>
+          {currentFolder && (
+            <span className="text-sm text-gray-600">
+              Uploading to: <span className="font-medium">{currentFolder.name}</span>
+            </span>
+          )}
+        </div>
         <div className="flex items-center gap-4">
           <Input
             type="file"
@@ -191,7 +199,7 @@ export function GoogleDrivePage() {
             disabled={!uploadFile || isLoading}
           >
             <Upload className="h-4 w-4 mr-2" />
-            Upload to Drive
+            Upload
           </Button>
         </div>
         {uploadFile && (
