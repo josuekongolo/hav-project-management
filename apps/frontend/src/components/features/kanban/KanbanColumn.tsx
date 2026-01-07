@@ -50,7 +50,7 @@ export const KanbanColumn = memo(function KanbanColumn({ status, title, tasks, c
       >
         <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
           {tasks.map((task, index) => (
-            <div key={task.id} className="animate-slide-up" style={{ animationDelay: `${index * 30}ms` }}>
+            <div key={task.id} className="animate-slide-up w-full min-w-0 overflow-hidden" style={{ animationDelay: `${index * 30}ms` }}>
               <TaskCard task={task} onClick={() => onTaskClick(task)} />
             </div>
           ))}

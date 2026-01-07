@@ -135,7 +135,12 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
       </div>
 
       {task.description && (
-        <p className="text-xs text-gray-600 line-clamp-1 sm:line-clamp-2 mb-2 sm:mb-3 break-all w-full overflow-hidden">{task.description}</p>
+        <p
+          className="text-xs text-gray-600 line-clamp-1 sm:line-clamp-2 mb-2 sm:mb-3 w-full overflow-hidden"
+          style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+        >
+          {task.description}
+        </p>
       )}
 
       {task.labels.length > 0 && (
