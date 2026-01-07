@@ -70,47 +70,53 @@ export function KanbanPage() {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-3">
-          <Select
-            value={selectedMilestoneId}
-            onChange={(e) => setSelectedMilestoneId(e.target.value)}
-            options={[
-              { value: '', label: 'All Milestones' },
-              ...milestones.map((m) => ({ value: m.id, label: m.name })),
-            ]}
-          />
-          <Select
-            value={selectedLabelId}
-            onChange={(e) => setSelectedLabelId(e.target.value)}
-            options={[
-              { value: '', label: 'All Labels' },
-              ...labels.map((l) => ({ value: l.id, label: l.name })),
-            ]}
-          />
-          <Select
-            value={selectedAssigneeId}
-            onChange={(e) => setSelectedAssigneeId(e.target.value)}
-            options={[
-              { value: '', label: 'All Assignees' },
-              ...users.map((u) => ({ value: u.id, label: u.name })),
-            ]}
-          />
+        <div className="flex gap-3 overflow-x-auto">
+          <div className="flex-shrink-0">
+            <Select
+              value={selectedMilestoneId}
+              onChange={(e) => setSelectedMilestoneId(e.target.value)}
+              options={[
+                { value: '', label: 'All Milestones' },
+                ...milestones.map((m) => ({ value: m.id, label: m.name })),
+              ]}
+            />
+          </div>
+          <div className="flex-shrink-0">
+            <Select
+              value={selectedLabelId}
+              onChange={(e) => setSelectedLabelId(e.target.value)}
+              options={[
+                { value: '', label: 'All Labels' },
+                ...labels.map((l) => ({ value: l.id, label: l.name })),
+              ]}
+            />
+          </div>
+          <div className="flex-shrink-0">
+            <Select
+              value={selectedAssigneeId}
+              onChange={(e) => setSelectedAssigneeId(e.target.value)}
+              options={[
+                { value: '', label: 'All Assignees' },
+                ...users.map((u) => ({ value: u.id, label: u.name })),
+              ]}
+            />
+          </div>
           {(selectedMilestoneId || selectedLabelId || selectedAssigneeId || searchQuery) && (
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                setSelectedMilestoneId('');
-                setSelectedLabelId('');
-                setSelectedAssigneeId('');
-                setSearchQuery('');
-              }}
-              title="Clear all filters"
-              className="justify-center sm:justify-start"
-            >
-              <X className="h-4 w-4 mr-2 sm:mr-0" />
-              <span className="sm:hidden">Clear Filters</span>
-            </Button>
+            <div className="flex-shrink-0">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setSelectedMilestoneId('');
+                  setSelectedLabelId('');
+                  setSelectedAssigneeId('');
+                  setSearchQuery('');
+                }}
+                title="Clear all filters"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           )}
         </div>
       </div>
