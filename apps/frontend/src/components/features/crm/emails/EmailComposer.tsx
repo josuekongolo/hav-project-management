@@ -13,9 +13,22 @@ interface EmailComposerProps {
   onSaveDraft?: (data: SendEmailData) => Promise<void>;
   onCancel: () => void;
   initialContactId?: string;
+  initialTo?: string;
+  initialCc?: string;
+  initialSubject?: string;
+  initialBody?: string;
 }
 
-export function EmailComposer({ onSend, onSaveDraft, onCancel, initialContactId }: EmailComposerProps) {
+export function EmailComposer({
+  onSend,
+  onSaveDraft,
+  onCancel,
+  initialContactId,
+  initialTo,
+  initialCc,
+  initialSubject,
+  initialBody
+}: EmailComposerProps) {
   const { templates, fetchTemplates } = useEmailTemplateStore();
   const { contacts, fetchContacts } = useContactStore();
 
@@ -26,11 +39,11 @@ export function EmailComposer({ onSend, onSaveDraft, onCancel, initialContactId 
 
   const [formData, setFormData] = useState({
     contactId: initialContactId || '',
-    to: '',
-    cc: '',
+    to: initialTo || '',
+    cc: initialCc || '',
     bcc: '',
-    subject: '',
-    body: '',
+    subject: initialSubject || '',
+    body: initialBody || '',
   });
 
   const [variables, setVariables] = useState<{ [key: string]: string }>({});
