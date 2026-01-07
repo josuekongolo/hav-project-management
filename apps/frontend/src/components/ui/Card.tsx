@@ -15,9 +15,9 @@ export function Card({ children, className, padding = 'md', hover = false }: Car
         'bg-white rounded-lg shadow animate-fade-in',
         {
           'p-0': padding === 'none',
-          'p-4': padding === 'sm',
-          'p-6': padding === 'md',
-          'p-8': padding === 'lg',
+          'p-3 sm:p-4': padding === 'sm',
+          'p-4 sm:p-6': padding === 'md',
+          'p-6 sm:p-8': padding === 'lg',
           'hover:shadow-md transition-all duration-200': hover,
         },
         className
@@ -50,14 +50,14 @@ export function StatCard({ title, value, icon, color = 'primary', trend }: StatC
 
   return (
     <Card hover>
-      <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-gray-500">{title}</p>
-          <p className={clsx('text-3xl font-bold mt-2', colorClasses[color])}>{value}</p>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs sm:text-sm font-medium text-gray-500 truncate">{title}</p>
+          <p className={clsx('text-xl sm:text-2xl md:text-3xl font-bold mt-1 sm:mt-2', colorClasses[color])}>{value}</p>
           {trend && (
             <p
               className={clsx(
-                'text-sm mt-2',
+                'text-xs sm:text-sm mt-1 sm:mt-2',
                 trend.isPositive ? 'text-green-600' : 'text-red-600'
               )}
             >
@@ -65,7 +65,7 @@ export function StatCard({ title, value, icon, color = 'primary', trend }: StatC
             </p>
           )}
         </div>
-        {icon && <div className={clsx('text-4xl', colorClasses[color])}>{icon}</div>}
+        {icon && <div className={clsx('text-2xl sm:text-3xl md:text-4xl flex-shrink-0', colorClasses[color])}>{icon}</div>}
       </div>
     </Card>
   );

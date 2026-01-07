@@ -47,14 +47,14 @@ export function Dashboard() {
 
   return (
     <div className="p-4 md:p-6 lg:p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
           Welcome back, {user?.name?.split(' ')[0]}! 👋
         </h1>
-        <p className="text-gray-600 mt-2 text-lg">Here's what's happening with your team today.</p>
+        <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">Here's what's happening with your team today.</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
         <StatCard
           title="Total Tasks"
           value={stats?.totalTasks.toString() || '0'}
@@ -81,12 +81,12 @@ export function Dashboard() {
         />
       </div>
 
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <Card>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Quick Actions</h2>
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Quick Actions</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             <button
               onClick={() => navigate('/kanban')}
               className="text-left p-4 rounded-lg border border-gray-200 hover:border-primary-500 hover:bg-primary-50 transition-colors"
@@ -112,17 +112,17 @@ export function Dashboard() {
         </Card>
       </div>
 
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-gray-900">Team Overview</h2>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Users className="h-5 w-5" />
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 mb-3 sm:mb-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Team Overview</h2>
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+            <Users className="h-4 w-4 sm:h-5 sm:w-5" />
             <span>{stats?.totalUsers || 0} members</span>
-            <span className="mx-2">•</span>
-            <span>{stats?.completionRate || 0}% completion rate</span>
+            <span className="mx-1 sm:mx-2">•</span>
+            <span>{stats?.completionRate || 0}% completion</span>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
           {teamMembers.map((member) => (
             <Card key={member.id}>
               <div className="flex items-start gap-3 mb-4">
@@ -183,9 +183,9 @@ export function Dashboard() {
         </div>
       </div>
 
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-gray-900">Recent Activity</h2>
+      <div className="mb-6 sm:mb-8">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Recent Activity</h2>
           <TrendingUp className="h-5 w-5 text-primary-500" />
         </div>
         <Card>
