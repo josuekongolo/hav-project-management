@@ -32,7 +32,7 @@ export function TimeLogForm({ onSubmit, onCancel }: TimeLogFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <Input
         label="Hours"
         type="number"
@@ -54,13 +54,14 @@ export function TimeLogForm({ onSubmit, onCancel }: TimeLogFormProps) {
         rows={2}
       />
 
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
         <Button
           type="button"
           variant="secondary"
           size="sm"
           onClick={onCancel}
           disabled={isSubmitting}
+          className="w-full sm:w-auto"
         >
           Cancel
         </Button>
@@ -69,6 +70,7 @@ export function TimeLogForm({ onSubmit, onCancel }: TimeLogFormProps) {
           size="sm"
           disabled={!hours || isSubmitting}
           isLoading={isSubmitting}
+          className="w-full sm:w-auto"
         >
           Log Time
         </Button>

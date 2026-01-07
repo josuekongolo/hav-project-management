@@ -91,7 +91,7 @@ export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
           label="Company Name"
@@ -197,11 +197,11 @@ export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
         </div>
       )}
 
-      <div className="flex justify-end gap-3">
-        <Button type="button" variant="secondary" onClick={onCancel}>
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2">
+        <Button type="button" variant="secondary" onClick={onCancel} className="w-full sm:w-auto">
           Cancel
         </Button>
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
           {isLoading ? 'Saving...' : company ? 'Update Company' : 'Create Company'}
         </Button>
       </div>

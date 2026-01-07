@@ -101,7 +101,7 @@ export function TaskForm({ task, initialStatus, onSubmit, onCancel, isLoading }:
   ];
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
       <Input
         label="Title"
         name="title"
@@ -118,10 +118,10 @@ export function TaskForm({ task, initialStatus, onSubmit, onCancel, isLoading }:
         value={formData.description}
         onChange={handleChange}
         placeholder="Add a description..."
-        rows={4}
+        rows={3}
       />
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Select
           label="Status"
           name="status"
@@ -192,10 +192,10 @@ export function TaskForm({ task, initialStatus, onSubmit, onCancel, isLoading }:
                 key={user.id}
                 type="button"
                 onClick={() => toggleAssignee(user.id)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all border-2 ${
+                className={`px-3 py-2 sm:py-1.5 rounded-lg text-sm font-medium transition-all border-2 min-h-[40px] sm:min-h-0 ${
                   formData.assigneeIds.includes(user.id)
                     ? 'bg-primary-50 border-primary-500 text-primary-700'
-                    : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-gray-300'
+                    : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-gray-300 active:bg-gray-100'
                 }`}
               >
                 {user.name}
@@ -217,10 +217,10 @@ export function TaskForm({ task, initialStatus, onSubmit, onCancel, isLoading }:
                 key={label.id}
                 type="button"
                 onClick={() => toggleLabel(label.id)}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                className={`px-3 py-2 sm:py-1.5 rounded-full text-sm font-medium transition-all min-h-[40px] sm:min-h-0 ${
                   formData.labels.includes(label.id)
                     ? 'ring-2 ring-offset-2'
-                    : 'opacity-60 hover:opacity-100'
+                    : 'opacity-60 hover:opacity-100 active:opacity-100'
                 }`}
                 style={{
                   backgroundColor: `${label.color}20`,
@@ -237,12 +237,12 @@ export function TaskForm({ task, initialStatus, onSubmit, onCancel, isLoading }:
         </div>
       )}
 
-      <div className="flex gap-3 pt-4 border-t">
-        <Button type="submit" className="flex-1" isLoading={isLoading}>
-          {task ? 'Update Task' : 'Create Task'}
-        </Button>
-        <Button type="button" variant="secondary" onClick={onCancel} disabled={isLoading}>
+      <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t">
+        <Button type="button" variant="secondary" onClick={onCancel} disabled={isLoading} className="w-full sm:w-auto">
           Cancel
+        </Button>
+        <Button type="submit" className="w-full sm:flex-1" isLoading={isLoading}>
+          {task ? 'Update Task' : 'Create Task'}
         </Button>
       </div>
     </form>

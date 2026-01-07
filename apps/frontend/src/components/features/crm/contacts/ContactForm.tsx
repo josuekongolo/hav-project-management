@@ -74,7 +74,7 @@ export function ContactForm({ contact, onSubmit, onCancel }: ContactFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
           label="First Name"
@@ -187,11 +187,11 @@ export function ContactForm({ contact, onSubmit, onCancel }: ContactFormProps) {
         placeholder="Additional notes about this contact..."
       />
 
-      <div className="flex justify-end gap-3">
-        <Button type="button" variant="secondary" onClick={onCancel}>
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2">
+        <Button type="button" variant="secondary" onClick={onCancel} className="w-full sm:w-auto">
           Cancel
         </Button>
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
           {isLoading ? 'Saving...' : contact ? 'Update Contact' : 'Create Contact'}
         </Button>
       </div>

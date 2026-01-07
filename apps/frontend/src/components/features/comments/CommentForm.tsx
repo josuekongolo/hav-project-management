@@ -35,16 +35,16 @@ export function CommentForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2">
+    <form onSubmit={handleSubmit} className="space-y-3">
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder={placeholder}
         rows={3}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+        className="w-full px-3 py-3 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none min-h-[100px]"
         disabled={isSubmitting}
       />
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
         {onCancel && (
           <Button
             type="button"
@@ -52,6 +52,7 @@ export function CommentForm({
             size="sm"
             onClick={onCancel}
             disabled={isSubmitting}
+            className="w-full sm:w-auto"
           >
             Cancel
           </Button>
@@ -61,6 +62,7 @@ export function CommentForm({
           size="sm"
           disabled={!content.trim() || isSubmitting}
           isLoading={isSubmitting}
+          className="w-full sm:w-auto"
         >
           {submitLabel}
         </Button>

@@ -59,7 +59,7 @@ export function LabelForm({ label, onSubmit, onCancel, isLoading }: LabelFormPro
   };
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 sm:space-y-5">
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
           Label Name *
@@ -83,7 +83,7 @@ export function LabelForm({ label, onSubmit, onCancel, isLoading }: LabelFormPro
               key={color}
               type="button"
               onClick={() => setValue('color', color)}
-              className={`w-full h-10 rounded-lg transition-all ${
+              className={`w-full h-11 sm:h-10 rounded-lg transition-all ${
                 selectedColor === color ? 'ring-2 ring-offset-2 ring-gray-900' : ''
               }`}
               style={{ backgroundColor: color }}
@@ -117,11 +117,11 @@ export function LabelForm({ label, onSubmit, onCancel, isLoading }: LabelFormPro
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4">
-        <Button type="button" variant="secondary" onClick={onCancel} disabled={isLoading}>
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4">
+        <Button type="button" variant="secondary" onClick={onCancel} disabled={isLoading} className="w-full sm:w-auto">
           Cancel
         </Button>
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
           {isLoading ? 'Saving...' : label ? 'Update Label' : 'Create Label'}
         </Button>
       </div>

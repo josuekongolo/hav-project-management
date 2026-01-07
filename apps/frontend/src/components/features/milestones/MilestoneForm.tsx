@@ -67,7 +67,7 @@ export function MilestoneForm({ milestone, onSubmit, onCancel, isLoading }: Mile
   };
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 sm:space-y-5">
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
           Name *
@@ -95,7 +95,7 @@ export function MilestoneForm({ milestone, onSubmit, onCancel, isLoading }: Mile
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
             Start Date *
@@ -137,11 +137,11 @@ export function MilestoneForm({ milestone, onSubmit, onCancel, isLoading }: Mile
         )}
       </div>
 
-      <div className="flex justify-end gap-3 pt-4">
-        <Button type="button" variant="secondary" onClick={onCancel} disabled={isLoading}>
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4">
+        <Button type="button" variant="secondary" onClick={onCancel} disabled={isLoading} className="w-full sm:w-auto">
           Cancel
         </Button>
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
           {isLoading ? 'Saving...' : milestone ? 'Update Milestone' : 'Create Milestone'}
         </Button>
       </div>
