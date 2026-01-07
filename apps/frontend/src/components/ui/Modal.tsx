@@ -36,7 +36,7 @@ export function Modal({
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
+          <div className="flex min-h-full items-center justify-center p-2 sm:p-4">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -48,29 +48,30 @@ export function Modal({
             >
               <Dialog.Panel
                 className={clsx(
-                  'w-full transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all',
+                  'w-full transform overflow-hidden rounded-lg sm:rounded-2xl bg-white p-4 sm:p-6 shadow-xl transition-all',
                   {
                     'max-w-sm': size === 'sm',
                     'max-w-md': size === 'md',
                     'max-w-lg': size === 'lg',
                     'max-w-2xl': size === 'xl',
-                    'max-w-full mx-4': size === 'full',
+                    'max-w-full mx-2 sm:mx-4': size === 'full',
                   }
                 )}
               >
                 {(title || showCloseButton) && (
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-4 sm:mb-6">
                     {title && (
-                      <Dialog.Title className="text-xl font-semibold text-gray-900">
+                      <Dialog.Title className="text-lg sm:text-xl font-semibold text-gray-900 pr-2">
                         {title}
                       </Dialog.Title>
                     )}
                     {showCloseButton && (
                       <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                        className="text-gray-400 hover:text-gray-600 transition-colors p-1 flex-shrink-0"
+                        aria-label="Close modal"
                       >
-                        <X className="h-5 w-5" />
+                        <X className="h-5 w-5 sm:h-6 sm:w-6" />
                       </button>
                     )}
                   </div>
