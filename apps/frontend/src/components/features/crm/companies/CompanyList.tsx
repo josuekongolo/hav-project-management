@@ -55,9 +55,9 @@ export function CompanyList({ companies, onDeleteCompany }: CompanyListProps) {
                     onDeleteCompany(company.id);
                   }
                 }}
-                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-50 rounded"
+                className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-2 sm:p-1 hover:bg-red-50 rounded flex-shrink-0"
               >
-                <Trash2 className="h-4 w-4 text-red-600" />
+                <Trash2 className="h-5 w-5 sm:h-4 sm:w-4 text-red-600" />
               </button>
             </div>
 

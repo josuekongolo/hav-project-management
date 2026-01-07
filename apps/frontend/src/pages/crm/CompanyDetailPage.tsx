@@ -101,38 +101,38 @@ export function CompanyDetailPage() {
           Back to Companies
         </Button>
 
-        <div className="flex items-start justify-between">
-          <div className="flex items-start gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div className="flex items-start gap-3 sm:gap-4">
             {selectedCompany.logo ? (
               <img
                 src={selectedCompany.logo}
                 alt={selectedCompany.name}
-                className="h-16 w-16 rounded-full object-cover"
+                className="h-12 w-12 sm:h-16 sm:w-16 rounded-full object-cover flex-shrink-0"
               />
             ) : (
-              <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
-                <Building2 className="h-8 w-8 text-blue-600" />
+              <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <Building2 className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
               </div>
             )}
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">{selectedCompany.name}</h1>
+            <div className="min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">{selectedCompany.name}</h1>
               {selectedCompany.industry && (
-                <p className="text-gray-600 mt-1">{selectedCompany.industry}</p>
+                <p className="text-gray-600 mt-1 truncate">{selectedCompany.industry}</p>
               )}
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => setIsEditModalOpen(true)}>
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
+          <div className="grid grid-cols-3 sm:flex gap-2">
+            <Button variant="secondary" onClick={() => setIsEditModalOpen(true)} className="w-full sm:w-auto">
+              <Edit className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Edit</span>
             </Button>
-            <Button variant="secondary" onClick={() => setIsCallDialogOpen(true)}>
-              <PhoneCall className="h-4 w-4 mr-2" />
-              Log Call
+            <Button variant="secondary" onClick={() => setIsCallDialogOpen(true)} className="w-full sm:w-auto">
+              <PhoneCall className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Log Call</span>
             </Button>
-            <Button variant="secondary" onClick={() => setIsMeetingDialogOpen(true)}>
-              <Calendar className="h-4 w-4 mr-2" />
-              Schedule Meeting
+            <Button variant="secondary" onClick={() => setIsMeetingDialogOpen(true)} className="w-full sm:w-auto">
+              <Calendar className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Meeting</span>
             </Button>
           </div>
         </div>
@@ -144,15 +144,15 @@ export function CompanyDetailPage() {
           {/* Company Details */}
           <Card>
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Company Information</h2>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {selectedCompany.email && (
                 <div className="flex items-start gap-3">
-                  <Mail className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
+                  <Mail className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Email</p>
                     <a
                       href={`mailto:${selectedCompany.email}`}
-                      className="text-sm text-primary-600 hover:underline"
+                      className="text-sm text-primary-600 hover:underline break-all py-1 inline-block"
                     >
                       {selectedCompany.email}
                     </a>
@@ -161,12 +161,12 @@ export function CompanyDetailPage() {
               )}
               {selectedCompany.phone && (
                 <div className="flex items-start gap-3">
-                  <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
+                  <Phone className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Phone</p>
                     <a
                       href={`tel:${selectedCompany.phone}`}
-                      className="text-sm text-primary-600 hover:underline"
+                      className="text-sm text-primary-600 hover:underline py-1 inline-block"
                     >
                       {selectedCompany.phone}
                     </a>
@@ -175,14 +175,14 @@ export function CompanyDetailPage() {
               )}
               {selectedCompany.website && (
                 <div className="flex items-start gap-3">
-                  <Globe className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
+                  <Globe className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Website</p>
                     <a
                       href={selectedCompany.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-primary-600 hover:underline"
+                      className="text-sm text-primary-600 hover:underline break-all py-1 inline-block"
                     >
                       {selectedCompany.website}
                     </a>
@@ -191,10 +191,10 @@ export function CompanyDetailPage() {
               )}
               {(selectedCompany.address || selectedCompany.city || selectedCompany.country) && (
                 <div className="flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
+                  <MapPin className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Location</p>
-                    <p className="text-sm text-gray-900">
+                    <p className="text-sm text-gray-900 break-words">
                       {[selectedCompany.address, selectedCompany.city, selectedCompany.country]
                         .filter(Boolean)
                         .join(', ')}
@@ -204,8 +204,8 @@ export function CompanyDetailPage() {
               )}
               {selectedCompany.employees && (
                 <div className="flex items-start gap-3">
-                  <Users className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
+                  <Users className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Employees</p>
                     <p className="text-sm text-gray-900">
                       {selectedCompany.employees.toLocaleString()} employees
@@ -215,8 +215,8 @@ export function CompanyDetailPage() {
               )}
               {selectedCompany.revenue && (
                 <div className="flex items-start gap-3">
-                  <DollarSign className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
+                  <DollarSign className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Revenue</p>
                     <p className="text-sm text-gray-900">
                       ${(selectedCompany.revenue / 1000000).toFixed(1)}M annually
@@ -260,22 +260,22 @@ export function CompanyDetailPage() {
         {/* Right Column - Related Data */}
         <div className="lg:col-span-2 space-y-6">
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <Card className="bg-gradient-to-br from-purple-50 to-purple-100">
-              <div className="flex items-center gap-3">
-                <User className="h-8 w-8 text-purple-600" />
-                <div>
-                  <p className="text-sm font-medium text-purple-600">Contacts</p>
-                  <p className="text-2xl font-bold text-purple-900">{companyContacts.length}</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <User className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-purple-600">Contacts</p>
+                  <p className="text-xl sm:text-2xl font-bold text-purple-900">{companyContacts.length}</p>
                 </div>
               </div>
             </Card>
             <Card className="bg-gradient-to-br from-green-50 to-green-100">
-              <div className="flex items-center gap-3">
-                <TrendingUp className="h-8 w-8 text-green-600" />
-                <div>
-                  <p className="text-sm font-medium text-green-600">Deals</p>
-                  <p className="text-2xl font-bold text-green-900">{companyDeals.length}</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-green-600">Deals</p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-900">{companyDeals.length}</p>
                 </div>
               </div>
             </Card>
@@ -298,15 +298,15 @@ export function CompanyDetailPage() {
                   <Link
                     key={contact.id}
                     to={`/crm/contacts/${contact.id}`}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors gap-1 sm:gap-2"
                   >
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate">
                         {contact.firstName} {contact.lastName}
                       </p>
-                      {contact.email && <p className="text-sm text-gray-600">{contact.email}</p>}
+                      {contact.email && <p className="text-sm text-gray-600 truncate">{contact.email}</p>}
                     </div>
-                    <div className="text-sm text-gray-600">{contact.status}</div>
+                    <div className="text-sm text-gray-600 flex-shrink-0">{contact.status}</div>
                   </Link>
                 ))}
               </div>
@@ -327,13 +327,13 @@ export function CompanyDetailPage() {
                   <Link
                     key={deal.id}
                     to={`/crm/deals/${deal.id}`}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors gap-2"
                   >
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">{deal.title}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate">{deal.title}</p>
                       <p className="text-sm text-gray-600">{deal.stage.replace('_', ' ')}</p>
                     </div>
-                    <div className="text-right">
+                    <div className="flex justify-between sm:block sm:text-right">
                       <p className="font-semibold text-gray-900">${deal.value.toLocaleString()}</p>
                       <p className="text-sm text-gray-600">{deal.probability}% probability</p>
                     </div>

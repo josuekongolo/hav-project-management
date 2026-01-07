@@ -60,7 +60,7 @@ export function ContactList({
                   onToggleSelection(contact);
                 }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500 cursor-pointer"
+                className="w-6 h-6 sm:w-5 sm:h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500 cursor-pointer"
               />
             </div>
           )}
@@ -88,9 +88,9 @@ export function ContactList({
                   onDeleteContact(contact.id);
                 }
               }}
-              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-50 rounded"
+              className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-2 sm:p-1 hover:bg-red-50 rounded flex-shrink-0"
             >
-              <Trash2 className="h-4 w-4 text-red-600" />
+              <Trash2 className="h-5 w-5 sm:h-4 sm:w-4 text-red-600" />
             </button>
           </div>
 

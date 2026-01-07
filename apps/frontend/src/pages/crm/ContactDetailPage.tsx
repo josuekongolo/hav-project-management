@@ -118,12 +118,12 @@ export function ContactDetailPage() {
           Back to Contacts
         </Button>
 
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
               {selectedContact.firstName} {selectedContact.lastName}
             </h1>
-            <div className="flex items-center gap-2 mt-2">
+            <div className="flex flex-wrap items-center gap-2 mt-2">
               <span
                 className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                   statusColors[selectedContact.status]
@@ -138,22 +138,22 @@ export function ContactDetailPage() {
               )}
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => setIsEditModalOpen(true)}>
+          <div className="grid grid-cols-2 sm:flex gap-2">
+            <Button variant="secondary" onClick={() => setIsEditModalOpen(true)} className="w-full sm:w-auto">
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </Button>
-            <Button>
+            <Button className="w-full sm:w-auto">
               <Mail className="h-4 w-4 mr-2" />
-              Send Email
+              Email
             </Button>
-            <Button variant="secondary" onClick={() => setIsCallDialogOpen(true)}>
+            <Button variant="secondary" onClick={() => setIsCallDialogOpen(true)} className="w-full sm:w-auto">
               <PhoneCall className="h-4 w-4 mr-2" />
-              Log Call
+              Call
             </Button>
-            <Button variant="secondary" onClick={() => setIsMeetingDialogOpen(true)}>
+            <Button variant="secondary" onClick={() => setIsMeetingDialogOpen(true)} className="w-full sm:w-auto">
               <Calendar className="h-4 w-4 mr-2" />
-              Schedule Meeting
+              Meeting
             </Button>
           </div>
         </div>
@@ -165,15 +165,15 @@ export function ContactDetailPage() {
           {/* Contact Details */}
           <Card>
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h2>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {selectedContact.email && (
                 <div className="flex items-start gap-3">
-                  <Mail className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
+                  <Mail className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Email</p>
                     <a
                       href={`mailto:${selectedContact.email}`}
-                      className="text-sm text-primary-600 hover:underline"
+                      className="text-sm text-primary-600 hover:underline break-all py-1 inline-block"
                     >
                       {selectedContact.email}
                     </a>
@@ -182,12 +182,12 @@ export function ContactDetailPage() {
               )}
               {selectedContact.phone && (
                 <div className="flex items-start gap-3">
-                  <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
+                  <Phone className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Phone</p>
                     <a
                       href={`tel:${selectedContact.phone}`}
-                      className="text-sm text-primary-600 hover:underline"
+                      className="text-sm text-primary-600 hover:underline py-1 inline-block"
                     >
                       {selectedContact.phone}
                     </a>
@@ -196,23 +196,23 @@ export function ContactDetailPage() {
               )}
               {selectedContact.company && (
                 <div className="flex items-start gap-3">
-                  <Building2 className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
+                  <Building2 className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Company</p>
-                    <p className="text-sm text-gray-900">{selectedContact.company}</p>
+                    <p className="text-sm text-gray-900 break-words">{selectedContact.company}</p>
                   </div>
                 </div>
               )}
               {selectedContact.website && (
                 <div className="flex items-start gap-3">
-                  <Globe className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
+                  <Globe className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Website</p>
                     <a
                       href={selectedContact.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-primary-600 hover:underline"
+                      className="text-sm text-primary-600 hover:underline break-all py-1 inline-block"
                     >
                       {selectedContact.website}
                     </a>
@@ -221,10 +221,10 @@ export function ContactDetailPage() {
               )}
               {(selectedContact.address || selectedContact.city || selectedContact.country) && (
                 <div className="flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
+                  <MapPin className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Location</p>
-                    <p className="text-sm text-gray-900">
+                    <p className="text-sm text-gray-900 break-words">
                       {[selectedContact.address, selectedContact.city, selectedContact.country]
                         .filter(Boolean)
                         .join(', ')}
@@ -272,40 +272,40 @@ export function ContactDetailPage() {
         {/* Right Column - Activities & Related Data */}
         <div className="lg:col-span-2 space-y-6">
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             <Card className="bg-gradient-to-br from-blue-50 to-blue-100">
-              <div className="flex items-center gap-3">
-                <DollarSign className="h-8 w-8 text-blue-600" />
-                <div>
-                  <p className="text-sm font-medium text-blue-600">Deals</p>
-                  <p className="text-2xl font-bold text-blue-900">{contactDeals.length}</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-blue-600">Deals</p>
+                  <p className="text-xl sm:text-2xl font-bold text-blue-900">{contactDeals.length}</p>
                 </div>
               </div>
             </Card>
             <Card className="bg-gradient-to-br from-purple-50 to-purple-100">
-              <div className="flex items-center gap-3">
-                <Mail className="h-8 w-8 text-purple-600" />
-                <div>
-                  <p className="text-sm font-medium text-purple-600">Emails</p>
-                  <p className="text-2xl font-bold text-purple-900">{contactEmails.length}</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Mail className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-purple-600">Emails</p>
+                  <p className="text-xl sm:text-2xl font-bold text-purple-900">{contactEmails.length}</p>
                 </div>
               </div>
             </Card>
             <Card className="bg-gradient-to-br from-green-50 to-green-100">
-              <div className="flex items-center gap-3">
-                <Target className="h-8 w-8 text-green-600" />
-                <div>
-                  <p className="text-sm font-medium text-green-600">Tasks</p>
-                  <p className="text-2xl font-bold text-green-900">{contactTasks.length}</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Target className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-green-600">Tasks</p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-900">{contactTasks.length}</p>
                 </div>
               </div>
             </Card>
             <Card className="bg-gradient-to-br from-orange-50 to-orange-100">
-              <div className="flex items-center gap-3">
-                <Clock className="h-8 w-8 text-orange-600" />
-                <div>
-                  <p className="text-sm font-medium text-orange-600">Activities</p>
-                  <p className="text-2xl font-bold text-orange-900">{contactActivities.length}</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-orange-600 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-orange-600">Activities</p>
+                  <p className="text-xl sm:text-2xl font-bold text-orange-900">{contactActivities.length}</p>
                 </div>
               </div>
             </Card>
@@ -327,13 +327,13 @@ export function ContactDetailPage() {
                 {contactDeals.map((deal) => (
                   <div
                     key={deal.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors gap-2"
                   >
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">{deal.title}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate">{deal.title}</p>
                       <p className="text-sm text-gray-600">{deal.stage.replace('_', ' ')}</p>
                     </div>
-                    <div className="text-right">
+                    <div className="flex justify-between sm:block sm:text-right">
                       <p className="font-semibold text-gray-900">${deal.value.toLocaleString()}</p>
                       <p className="text-sm text-gray-600">{deal.probability}% probability</p>
                     </div>
@@ -356,15 +356,15 @@ export function ContactDetailPage() {
                 {contactTasks.map((task: any) => (
                   <div
                     key={task.id}
-                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                   >
                     <CheckCircle
-                      className={`h-5 w-5 ${
+                      className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
                         task.status === 'DONE' ? 'text-green-600' : 'text-gray-400'
                       }`}
                     />
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">{task.title}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate">{task.title}</p>
                       <p className="text-sm text-gray-600">{task.status}</p>
                     </div>
                   </div>

@@ -57,13 +57,13 @@ export function EmailTemplateList({
                 <p className="text-sm text-gray-500 truncate">{template.subject}</p>
               </div>
             </div>
-            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
               <button
                 onClick={() => onTemplateClick(template)}
-                className="p-1 hover:bg-blue-50 rounded"
+                className="p-2 sm:p-1 hover:bg-blue-50 rounded"
                 title="Edit template"
               >
-                <Edit className="h-4 w-4 text-blue-600" />
+                <Edit className="h-5 w-5 sm:h-4 sm:w-4 text-blue-600" />
               </button>
               <button
                 onClick={(e) => {
@@ -72,10 +72,10 @@ export function EmailTemplateList({
                     onDeleteTemplate(template.id);
                   }
                 }}
-                className="p-1 hover:bg-red-50 rounded"
+                className="p-2 sm:p-1 hover:bg-red-50 rounded"
                 title="Delete template"
               >
-                <Trash2 className="h-4 w-4 text-red-600" />
+                <Trash2 className="h-5 w-5 sm:h-4 sm:w-4 text-red-600" />
               </button>
             </div>
           </div>

@@ -89,13 +89,13 @@ export function DealPipeline({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 pb-4">
+      <div className="flex md:grid md:grid-cols-3 xl:grid-cols-6 gap-4 pb-4 overflow-x-auto md:overflow-x-visible -mx-4 px-4 md:mx-0 md:px-0">
         {stages.map((stage) => {
           const stageDeals = dealsByStage[stage.value] || [];
           const stageValue = calculateStageValue(stageDeals);
 
           return (
-            <div key={stage.value} className="flex flex-col">
+            <div key={stage.value} className="flex flex-col w-[75vw] max-w-[75vw] md:w-auto md:max-w-none flex-shrink-0">
               <div className={`rounded-lg ${stage.color} p-3 mb-3`}>
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="font-semibold text-gray-900">{stage.label}</h3>
@@ -121,7 +121,7 @@ export function DealPipeline({
                 strategy={verticalListSortingStrategy}
               >
                 <div
-                  className="min-h-[200px] max-h-[500px] overflow-y-auto space-y-3 flex-1"
+                  className="min-h-[200px] max-h-[calc(100vh-350px)] sm:max-h-[calc(100vh-300px)] md:max-h-[500px] overflow-y-auto overflow-x-hidden space-y-3 flex-1"
                   data-stage={stage.value}
                 >
                   {stageDeals.map((deal) => (

@@ -101,22 +101,22 @@ export function NotesList({ noteableType, noteableId }: NotesListProps) {
       </div>
 
       {isAddingNote && (
-        <div className="border rounded-lg p-4 bg-gray-50">
+        <div className="border rounded-lg p-3 sm:p-4 bg-gray-50">
           <textarea
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            className="w-full px-3 py-3 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none min-h-[120px]"
             rows={4}
             placeholder="Write your note here..."
             value={newNoteContent}
             onChange={(e) => setNewNoteContent(e.target.value)}
           />
-          <div className="flex gap-2 mt-3">
-            <Button onClick={handleAddNote} size="sm">
-              <Save className="h-4 w-4 mr-2" />
-              Save Note
-            </Button>
-            <Button onClick={() => { setIsAddingNote(false); setNewNoteContent(''); }} variant="secondary" size="sm">
+          <div className="flex flex-col-reverse sm:flex-row gap-2 mt-3">
+            <Button onClick={() => { setIsAddingNote(false); setNewNoteContent(''); }} variant="secondary" size="sm" className="w-full sm:w-auto">
               <X className="h-4 w-4 mr-2" />
               Cancel
+            </Button>
+            <Button onClick={handleAddNote} size="sm" className="w-full sm:w-auto">
+              <Save className="h-4 w-4 mr-2" />
+              Save Note
             </Button>
           </div>
         </div>
@@ -130,52 +130,52 @@ export function NotesList({ noteableType, noteableId }: NotesListProps) {
 
       <div className="space-y-3">
         {notes.map((note) => (
-          <div key={note.id} className="border rounded-lg p-4 bg-white hover:shadow-sm transition-shadow">
+          <div key={note.id} className="border rounded-lg p-3 sm:p-4 bg-white hover:shadow-sm transition-shadow">
             {editingNoteId === note.id ? (
               <>
                 <textarea
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full px-3 py-3 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none min-h-[120px]"
                   rows={4}
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
                 />
-                <div className="flex gap-2 mt-3">
-                  <Button onClick={() => handleSaveEdit(note.id)} size="sm">
-                    <Save className="h-4 w-4 mr-2" />
-                    Save
-                  </Button>
-                  <Button onClick={handleCancelEdit} variant="secondary" size="sm">
+                <div className="flex flex-col-reverse sm:flex-row gap-2 mt-3">
+                  <Button onClick={handleCancelEdit} variant="secondary" size="sm" className="w-full sm:w-auto">
                     <X className="h-4 w-4 mr-2" />
                     Cancel
+                  </Button>
+                  <Button onClick={() => handleSaveEdit(note.id)} size="sm" className="w-full sm:w-auto">
+                    <Save className="h-4 w-4 mr-2" />
+                    Save
                   </Button>
                 </div>
               </>
             ) : (
               <>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-2">
                       <span className="font-medium text-sm">{note.author.name}</span>
                       <span className="text-xs text-gray-500">
                         {formatDistanceToNow(new Date(note.createdAt), { addSuffix: true })}
                       </span>
                     </div>
-                    <p className="text-gray-700 whitespace-pre-wrap">{note.content}</p>
+                    <p className="text-gray-700 whitespace-pre-wrap text-sm sm:text-base">{note.content}</p>
                   </div>
-                  <div className="flex gap-1 ml-4">
+                  <div className="flex gap-1 flex-shrink-0">
                     <button
                       onClick={() => handleStartEdit(note)}
-                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                      className="p-2.5 sm:p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
                       title="Edit note"
                     >
-                      <Edit2 className="h-4 w-4" />
+                      <Edit2 className="h-5 w-5 sm:h-4 sm:w-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(note.id)}
-                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                      className="p-2.5 sm:p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                       title="Delete note"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-5 w-5 sm:h-4 sm:w-4" />
                     </button>
                   </div>
                 </div>

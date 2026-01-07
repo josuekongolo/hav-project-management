@@ -105,10 +105,10 @@ export function DealDetailPage() {
           Back to Deals
         </Button>
 
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">{selectedDeal.title}</h1>
-            <div className="flex items-center gap-2 mt-2">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">{selectedDeal.title}</h1>
+            <div className="flex flex-wrap items-center gap-2 mt-2">
               <span
                 className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                   stageColors[selectedDeal.stage]
@@ -121,18 +121,18 @@ export function DealDetailPage() {
               )}
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => setIsEditModalOpen(true)}>
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
+          <div className="grid grid-cols-3 sm:flex gap-2">
+            <Button variant="secondary" onClick={() => setIsEditModalOpen(true)} className="w-full sm:w-auto">
+              <Edit className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Edit</span>
             </Button>
-            <Button variant="secondary" onClick={() => setIsCallDialogOpen(true)}>
-              <PhoneCall className="h-4 w-4 mr-2" />
-              Log Call
+            <Button variant="secondary" onClick={() => setIsCallDialogOpen(true)} className="w-full sm:w-auto">
+              <PhoneCall className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Log Call</span>
             </Button>
-            <Button variant="secondary" onClick={() => setIsMeetingDialogOpen(true)}>
-              <Calendar className="h-4 w-4 mr-2" />
-              Schedule Meeting
+            <Button variant="secondary" onClick={() => setIsMeetingDialogOpen(true)} className="w-full sm:w-auto">
+              <Calendar className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Meeting</span>
             </Button>
           </div>
         </div>
@@ -144,10 +144,10 @@ export function DealDetailPage() {
           {/* Deal Details */}
           <Card>
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Deal Information</h2>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <DollarSign className="h-5 w-5 text-gray-400 mt-0.5" />
-                <div>
+                <DollarSign className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                <div className="min-w-0 flex-1">
                   <p className="text-sm text-gray-500">Value</p>
                   <p className="text-xl font-bold text-green-600">
                     ${selectedDeal.value.toLocaleString()}
@@ -156,17 +156,17 @@ export function DealDetailPage() {
               </div>
 
               <div className="flex items-start gap-3">
-                <TrendingUp className="h-5 w-5 text-gray-400 mt-0.5" />
-                <div>
+                <TrendingUp className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                <div className="min-w-0 flex-1">
                   <p className="text-sm text-gray-500">Probability</p>
                   <div className="flex items-center gap-2">
-                    <div className="w-32 bg-gray-200 rounded-full h-2">
+                    <div className="flex-1 max-w-[120px] sm:max-w-[128px] bg-gray-200 rounded-full h-2">
                       <div
                         className="bg-primary-600 h-2 rounded-full"
                         style={{ width: `${selectedDeal.probability}%` }}
                       />
                     </div>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm font-medium text-gray-900 flex-shrink-0">
                       {selectedDeal.probability}%
                     </span>
                   </div>
@@ -175,17 +175,17 @@ export function DealDetailPage() {
 
               {selectedDeal.contact && (
                 <div className="flex items-start gap-3">
-                  <User className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
+                  <User className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Contact</p>
                     <Link
                       to={`/crm/contacts/${selectedDeal.contact.id}`}
-                      className="text-sm text-primary-600 hover:underline"
+                      className="text-sm text-primary-600 hover:underline py-1 inline-block"
                     >
                       {selectedDeal.contact.firstName} {selectedDeal.contact.lastName}
                     </Link>
                     {selectedDeal.contact.email && (
-                      <p className="text-sm text-gray-600">{selectedDeal.contact.email}</p>
+                      <p className="text-sm text-gray-600 truncate">{selectedDeal.contact.email}</p>
                     )}
                   </div>
                 </div>
@@ -193,12 +193,12 @@ export function DealDetailPage() {
 
               {selectedDeal.companyRel && (
                 <div className="flex items-start gap-3">
-                  <Building2 className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
+                  <Building2 className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Company</p>
                     <Link
                       to={`/crm/companies/${selectedDeal.companyRel.id}`}
-                      className="text-sm text-primary-600 hover:underline"
+                      className="text-sm text-primary-600 hover:underline py-1 inline-block truncate block"
                     >
                       {selectedDeal.companyRel.name}
                     </Link>
@@ -208,8 +208,8 @@ export function DealDetailPage() {
 
               {selectedDeal.expectedCloseDate && (
                 <div className="flex items-start gap-3">
-                  <Calendar className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
+                  <Calendar className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Expected Close Date</p>
                     <p className="text-sm text-gray-900">
                       {format(new Date(selectedDeal.expectedCloseDate), 'MMM d, yyyy')}
@@ -253,22 +253,22 @@ export function DealDetailPage() {
         {/* Right Column - Activities & Related Data */}
         <div className="lg:col-span-2 space-y-6">
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <Card className="bg-gradient-to-br from-green-50 to-green-100">
-              <div className="flex items-center gap-3">
-                <Target className="h-8 w-8 text-green-600" />
-                <div>
-                  <p className="text-sm font-medium text-green-600">Tasks</p>
-                  <p className="text-2xl font-bold text-green-900">{dealTasks.length}</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Target className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-green-600">Tasks</p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-900">{dealTasks.length}</p>
                 </div>
               </div>
             </Card>
             <Card className="bg-gradient-to-br from-orange-50 to-orange-100">
-              <div className="flex items-center gap-3">
-                <TrendingUp className="h-8 w-8 text-orange-600" />
-                <div>
-                  <p className="text-sm font-medium text-orange-600">Activities</p>
-                  <p className="text-2xl font-bold text-orange-900">{dealActivities.length}</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-orange-600 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-orange-600">Activities</p>
+                  <p className="text-xl sm:text-2xl font-bold text-orange-900">{dealActivities.length}</p>
                 </div>
               </div>
             </Card>
@@ -287,11 +287,11 @@ export function DealDetailPage() {
                 {dealTasks.map((task: any) => (
                   <div
                     key={task.id}
-                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                   >
-                    <Target className="h-5 w-5 text-gray-400" />
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">{task.title}</p>
+                    <Target className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate">{task.title}</p>
                       <p className="text-sm text-gray-600">{task.status}</p>
                     </div>
                   </div>

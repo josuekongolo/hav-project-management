@@ -133,7 +133,7 @@ export function EmailTemplatesPage() {
 
       {/* Filter */}
       <Card className="mb-6">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
           <label className="text-sm font-medium text-gray-700">Filter by category:</label>
           <Select
             value={categoryFilter}
@@ -146,7 +146,7 @@ export function EmailTemplatesPage() {
               { value: EmailTemplateCategory.INVOICE, label: 'Invoice' },
               { value: EmailTemplateCategory.GENERAL, label: 'General' },
             ]}
-            className="w-64"
+            className="w-full sm:w-64"
           />
         </div>
       </Card>

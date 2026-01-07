@@ -98,7 +98,7 @@ export function MeetingDialog({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Title *
@@ -111,7 +111,7 @@ export function MeetingDialog({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Start Time *
@@ -167,7 +167,7 @@ export function MeetingDialog({
               Description
             </label>
             <textarea
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full px-3 py-3 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none min-h-[80px]"
               rows={3}
               value={formData.description || ''}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -180,7 +180,7 @@ export function MeetingDialog({
               Notes
             </label>
             <textarea
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full px-3 py-3 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none min-h-[100px]"
               rows={4}
               value={formData.notes || ''}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -188,12 +188,12 @@ export function MeetingDialog({
             />
           </div>
 
-          <div className="flex gap-3 pt-4">
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Scheduling...' : 'Schedule Meeting'}
-            </Button>
-            <Button type="button" variant="secondary" onClick={handleClose}>
+          <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
+            <Button type="button" variant="secondary" onClick={handleClose} className="w-full sm:w-auto">
               Cancel
+            </Button>
+            <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
+              {isLoading ? 'Scheduling...' : 'Schedule Meeting'}
             </Button>
           </div>
         </form>
