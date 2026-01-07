@@ -150,12 +150,12 @@ export function GoogleDrivePage() {
   return (
     <div className="p-4 md:p-6 lg:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Google Drive</h1>
-          <p className="text-gray-600 mt-1">Manage your files in Google Drive</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Google Drive</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your files in Google Drive</p>
         </div>
-        <Button onClick={fetchFiles} variant="secondary" disabled={isLoading}>
+        <Button onClick={fetchFiles} variant="secondary" disabled={isLoading} className="w-full sm:w-auto justify-center">
           <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
           Refresh
         </Button>

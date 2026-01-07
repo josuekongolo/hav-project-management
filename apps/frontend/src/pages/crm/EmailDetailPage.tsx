@@ -142,40 +142,42 @@ export function EmailDetailPage() {
   return (
     <div className="p-4 md:p-6 lg:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <Button variant="secondary" onClick={handleBack}>
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <Button variant="secondary" onClick={handleBack} className="w-full sm:w-auto">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Emails
           </Button>
-          <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
-            <Mail className="h-5 w-5 text-primary-600" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{selectedEmail.subject}</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <Badge className={statusColors[selectedEmail.status]}>
-                <StatusIcon className="h-3 w-3 mr-1" />
-                {selectedEmail.status}
-              </Badge>
-              {selectedEmail.template && (
-                <Badge className="bg-blue-50 text-blue-700">
-                  Template: {selectedEmail.template.name}
+          <div className="flex items-center gap-4 flex-1 min-w-0">
+            <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+              <Mail className="h-5 w-5 text-primary-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{selectedEmail.subject}</h1>
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                <Badge className={statusColors[selectedEmail.status]}>
+                  <StatusIcon className="h-3 w-3 mr-1" />
+                  {selectedEmail.status}
                 </Badge>
-              )}
+                {selectedEmail.template && (
+                  <Badge className="bg-blue-50 text-blue-700">
+                    Template: {selectedEmail.template.name}
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="secondary" onClick={handleReply}>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button variant="secondary" onClick={handleReply} className="w-full sm:w-auto justify-center">
             <Reply className="h-4 w-4 mr-2" />
             Reply
           </Button>
-          <Button variant="secondary" onClick={handleReplyAll}>
+          <Button variant="secondary" onClick={handleReplyAll} className="w-full sm:w-auto justify-center">
             <ReplyAll className="h-4 w-4 mr-2" />
             Reply All
           </Button>
-          <Button variant="secondary" onClick={handleDelete}>
+          <Button variant="secondary" onClick={handleDelete} className="w-full sm:w-auto justify-center">
             <Trash2 className="h-4 w-4 mr-2" />
             Delete
           </Button>

@@ -80,12 +80,12 @@ export function EmailTemplatesPage() {
   return (
     <div className="p-4 md:p-6 lg:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Email Templates</h1>
-          <p className="text-gray-600 mt-1">Create and manage reusable email templates</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Email Templates</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Create and manage reusable email templates</p>
         </div>
-        <Button onClick={handleCreateTemplate}>
+        <Button onClick={handleCreateTemplate} className="w-full sm:w-auto justify-center">
           <FilePlus className="h-4 w-4 mr-2" />
           New Template
         </Button>

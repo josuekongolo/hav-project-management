@@ -74,16 +74,16 @@ export function CompaniesPage() {
   return (
     <div className="p-4 md:p-6 lg:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Companies</h1>
-          <p className="text-gray-600 mt-1">Manage your company relationships</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Companies</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your company relationships</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => setIsFiltersVisible(!isFiltersVisible)}>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button variant="secondary" onClick={() => setIsFiltersVisible(!isFiltersVisible)} className="w-full sm:w-auto justify-center">
             {isFiltersVisible ? 'Hide Filters' : 'Show Filters'}
           </Button>
-          <Button onClick={handleCreateCompany}>
+          <Button onClick={handleCreateCompany} className="w-full sm:w-auto justify-center">
             <FilePlus className="h-4 w-4 mr-2" />
             New Company
           </Button>

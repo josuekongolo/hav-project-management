@@ -150,28 +150,28 @@ export function ContactsPage() {
   return (
     <div className="p-4 md:p-6 lg:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Contacts</h1>
-          <p className="text-gray-600 mt-1">Manage your customer relationships</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Contacts</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your customer relationships</p>
           {selectedContacts.length > 0 && (
             <p className="text-sm text-primary-600 mt-1">
               {selectedContacts.length} contact{selectedContacts.length !== 1 ? 's' : ''} selected
             </p>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           {selectedContacts.length > 0 && (
-            <Button variant="secondary" onClick={handleBulkEmail}>
+            <Button variant="secondary" onClick={handleBulkEmail} className="w-full sm:w-auto justify-center">
               <Mail className="h-4 w-4 mr-2" />
-              Send Email ({selectedContacts.length})
+              <span className="hidden xs:inline">Send Email </span>({selectedContacts.length})
             </Button>
           )}
-          <Button variant="secondary" onClick={handleExportCSV}>
+          <Button variant="secondary" onClick={handleExportCSV} className="w-full sm:w-auto justify-center">
             <Download className="h-4 w-4 mr-2" />
             Export CSV
           </Button>
-          <Button onClick={handleCreateContact}>
+          <Button onClick={handleCreateContact} className="w-full sm:w-auto justify-center">
             <UserPlus className="h-4 w-4 mr-2" />
             New Contact
           </Button>
