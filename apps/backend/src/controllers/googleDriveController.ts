@@ -116,17 +116,28 @@ export async function getFileMetadata(req: AuthRequest, res: Response): Promise<
  */
 export async function listFiles(req: AuthRequest, res: Response): Promise<void> {
   try {
-    const { pageSize } = req.query;
+    const { pageSize, folderId: queryFolderId } = req.query;
 
-    // Use the configured folder ID from environment
-    const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+    // Use folderId from query param, fallback to env var root folder
+    const rootFolderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+    const folderIdToUse = (queryFolderId as string) || rootFolderId;
 
     const files = await googleDriveService.listFiles(
-      folderId,
+      folderIdToUse,
       pageSize ? parseInt(String(pageSize)) : undefined
     );
 
-    res.json({ files });
+    // If navigating into a subfolder, get folder metadata for breadcrumb
+    let currentFolder = null;
+    if (folderIdToUse && folderIdToUse !== rootFolderId) {
+      currentFolder = await googleDriveService.getFileMetadata(folderIdToUse);
+    }
+
+    res.json({
+      files,
+      currentFolder,
+      rootFolderId
+    });
   } catch (error) {
     console.error('Error listing files:', error);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to list files' });

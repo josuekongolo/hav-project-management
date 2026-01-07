@@ -152,8 +152,8 @@ class GoogleDriveService {
     const response = await this.drive.files.list({
       q: query,
       pageSize,
-      fields: 'files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink)',
-      orderBy: 'modifiedTime desc',
+      fields: 'files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, parents)',
+      orderBy: 'folder,modifiedTime desc',
     });
 
     return response.data.files || [];

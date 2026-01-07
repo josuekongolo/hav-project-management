@@ -8,6 +8,13 @@ export interface DriveFile {
   createdTime?: string;
   modifiedTime?: string;
   webViewLink?: string;
+  parents?: string[];
+}
+
+export interface ListFilesResponse {
+  files: DriveFile[];
+  currentFolder?: DriveFile | null;
+  rootFolderId?: string;
 }
 
 export interface UploadFileResponse {
@@ -19,8 +26,9 @@ export interface XlsxData {
 }
 
 export const googleDriveService = {
-  async listFiles(): Promise<{ files: DriveFile[] }> {
-    const response = await api.get<{ files: DriveFile[] }>('/google/files');
+  async listFiles(folderId?: string): Promise<ListFilesResponse> {
+    const params = folderId ? { folderId } : {};
+    const response = await api.get<ListFilesResponse>('/google/files', { params });
     return response.data;
   },
 
