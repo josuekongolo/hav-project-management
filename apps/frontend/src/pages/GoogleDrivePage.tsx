@@ -234,11 +234,12 @@ export function GoogleDrivePage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {files.map((file) => (
-              <Card
+              <div
                 key={file.id}
-                className={`hover:shadow-md transition-shadow ${isFolder(file) ? 'cursor-pointer' : ''}`}
+                className={isFolder(file) ? 'cursor-pointer' : ''}
                 onClick={() => isFolder(file) ? handleFolderClick(file.id) : undefined}
               >
+                <Card className="hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     {/* Folder/File Icon */}
@@ -307,6 +308,7 @@ export function GoogleDrivePage() {
                   </div>
                 )}
               </Card>
+              </div>
             ))}
           </div>
         )}
