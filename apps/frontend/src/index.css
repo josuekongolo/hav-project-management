@@ -22,3 +22,74 @@
     animation-delay: 4s;
   }
 }
+
+/* Mobile-friendly date and time inputs */
+@layer components {
+  /* Date input styling */
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="time"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    position: relative;
+    background-color: white;
+  }
+
+  /* Ensure date inputs have proper height on mobile */
+  @media (max-width: 640px) {
+    input[type="date"],
+    input[type="datetime-local"],
+    input[type="time"] {
+      min-height: 48px;
+      font-size: 16px;
+      padding-right: 12px;
+    }
+
+    /* Style the calendar picker button for webkit browsers */
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
+      background: transparent;
+      cursor: pointer;
+      padding: 8px;
+      margin: 0;
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      opacity: 0.6;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator:hover,
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+    input[type="time"]::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+    }
+
+    /* Firefox date input styling */
+    input[type="date"]::-moz-calendar-picker-indicator,
+    input[type="datetime-local"]::-moz-calendar-picker-indicator {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  /* Desktop date inputs */
+  @media (min-width: 641px) {
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      opacity: 0.6;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator:hover,
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+    input[type="time"]::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+    }
+  }
+}
