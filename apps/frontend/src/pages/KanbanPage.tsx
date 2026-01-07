@@ -45,11 +45,12 @@ export function KanbanPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Kanban Board</h1>
-            <p className="text-gray-600 mt-1">Drag and drop tasks to update their status</p>
+            <p className="text-sm sm:text-base text-gray-600 mt-1">Drag and drop tasks to update their status</p>
           </div>
           <Button
             onClick={() => handleAddTask()}
             size="sm"
+            className="w-full sm:w-auto justify-center"
           >
             <Plus className="h-4 w-4 mr-2" />
             New Task
