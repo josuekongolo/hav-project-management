@@ -74,7 +74,7 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
       {...listeners}
       onClick={onClick}
       className={clsx(
-        'bg-white rounded-lg p-2.5 sm:p-3 shadow-sm border border-gray-200 w-full',
+        'bg-white rounded-lg p-2.5 sm:p-3 shadow-sm border border-gray-200 w-full max-w-full overflow-hidden',
         'hover:shadow-md hover:border-primary-300 transition-all cursor-pointer',
         isDragging && 'opacity-50 shadow-lg'
       )}
@@ -135,7 +135,7 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
       </div>
 
       {task.description && (
-        <p className="text-xs text-gray-600 line-clamp-1 sm:line-clamp-2 mb-2 sm:mb-3 break-words overflow-hidden">{task.description}</p>
+        <p className="text-xs text-gray-600 line-clamp-1 sm:line-clamp-2 mb-2 sm:mb-3 break-all w-full overflow-hidden">{task.description}</p>
       )}
 
       {task.labels.length > 0 && (
