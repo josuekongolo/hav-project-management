@@ -137,4 +137,23 @@ export const contactService = {
     const response = await api.get<{ tasks: any[] }>(`/contacts/${id}/tasks`);
     return response.data;
   },
+
+  async searchContacts(query: string): Promise<{ contacts: Array<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string | null;
+    companyRel: { id: string; name: string } | null;
+  }> }> {
+    const response = await api.get<{ contacts: Array<{
+      id: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+      phone: string | null;
+      companyRel: { id: string; name: string } | null;
+    }> }>(`/contacts/search?q=${encodeURIComponent(query)}`);
+    return response.data;
+  },
 };

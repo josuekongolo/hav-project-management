@@ -31,6 +31,14 @@ interface ContactState {
   createContact: (data: CreateContactData) => Promise<Contact>;
   updateContact: (id: string, data: UpdateContactData) => Promise<Contact>;
   deleteContact: (id: string) => Promise<void>;
+  searchContacts: (query: string) => Promise<Array<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string | null;
+    companyRel: { id: string; name: string } | null;
+  }>>;
   setFilters: (filters: ContactFilters) => void;
   clearFilters: () => void;
   setSelectedContact: (contact: Contact | null) => void;
@@ -179,6 +187,16 @@ export const useContactStore = create<ContactState>()(
       clearFilters: () => {
         set({ filters: {} });
         get().fetchContacts();
+      },
+
+      searchContacts: async (query: string) => {
+        try {
+          const { contacts } = await contactService.searchContacts(query);
+          return contacts;
+        } catch (error: any) {
+          console.error('Failed to search contacts:', error);
+          return [];
+        }
       },
 
       setSelectedContact: (contact: Contact | null) => {

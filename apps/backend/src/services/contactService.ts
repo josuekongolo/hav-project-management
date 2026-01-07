@@ -425,6 +425,37 @@ export async function exportContactsToCSV(filters: ContactFilters = {}): Promise
   return [header, ...rows].join('\n');
 }
 
+export async function searchContacts(query: string) {
+  const contacts = await prisma.contact.findMany({
+    where: {
+      OR: [
+        { firstName: { contains: query, mode: 'insensitive' } },
+        { lastName: { contains: query, mode: 'insensitive' } },
+        { email: { contains: query, mode: 'insensitive' } },
+      ],
+    },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      phone: true,
+      companyRel: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+    take: 10,
+    orderBy: {
+      firstName: 'asc',
+    },
+  });
+
+  return contacts;
+}
+
 function escapeCSV(value: string): string {
   // Escape double quotes and wrap in quotes if contains comma, newline, or quotes
   if (value.includes(',') || value.includes('\n') || value.includes('"')) {

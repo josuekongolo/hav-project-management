@@ -30,6 +30,22 @@ export async function getContactById(req: AuthRequest, res: Response) {
   res.json({ contact });
 }
 
+export async function searchContacts(req: AuthRequest, res: Response) {
+  try {
+    const { q } = req.query;
+
+    if (!q || typeof q !== 'string') {
+      res.status(400).json({ error: 'Query parameter "q" is required' });
+      return;
+    }
+
+    const contacts = await contactService.searchContacts(q);
+    res.json({ contacts });
+  } catch (error) {
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to search contacts' });
+  }
+}
+
 export async function createContact(req: AuthRequest, res: Response) {
   const userId = req.userId!;
   const contact = await contactService.createContact(req.body, userId);

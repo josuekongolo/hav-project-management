@@ -1,8 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Company, CreateCompanyData, UpdateCompanyData } from '../../../../services/companyService';
+import { CreateContactData, UpdateContactData as UpdateContactDataType } from '../../../../services/contactService';
 import { Button } from '../../../ui/Button';
 import { Input } from '../../../ui/Input';
 import { Textarea } from '../../../ui/Textarea';
+import { Modal } from '../../../ui/Modal';
+import { ContactForm } from '../contacts/ContactForm';
+import { useContactStore } from '../../../../store/contactStore';
+import toast from 'react-hot-toast';
 
 interface CompanyFormProps {
   company?: Company | null;
@@ -11,7 +16,9 @@ interface CompanyFormProps {
 }
 
 export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
+  const { createContact } = useContactStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [isContactFormOpen, setIsContactFormOpen] = useState(false);
   const [formData, setFormData] = useState<CreateCompanyData>({
     name: '',
     industry: '',
@@ -46,6 +53,21 @@ export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
     }
   }, [company]);
 
+  const handleCreateContact = async (data: CreateContactData | UpdateContactDataType) => {
+    try {
+      // We're only creating contacts, not updating, so cast to CreateContactData
+      const createData = data as CreateContactData;
+      // If editing an existing company, set the companyId
+      const contactData = company ? { ...createData, companyId: company.id } : createData;
+      await createContact(contactData);
+      setIsContactFormOpen(false);
+      toast.success('Contact created and associated with company successfully');
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to create contact');
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -58,6 +80,11 @@ export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
         }
       });
       await onSubmit(cleanedData);
+
+      // If we have selected contacts and we're creating a new company,
+      // we'll need to update those contacts with the company ID
+      // This would require getting the created company ID back from onSubmit
+      // For now, we'll handle this when editing existing companies only
     } finally {
       setIsLoading(false);
     }
@@ -150,6 +177,26 @@ export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
         />
       </div>
 
+      {/* Contact Management - Only show when editing an existing company */}
+      {company && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Contacts
+          </label>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => setIsContactFormOpen(true)}
+            className="w-full"
+          >
+            Add New Contact
+          </Button>
+          <p className="text-xs text-gray-500 mt-1">
+            Create contacts associated with this company. You can fill in additional details later on the contact page.
+          </p>
+        </div>
+      )}
+
       <div className="flex justify-end gap-3">
         <Button type="button" variant="secondary" onClick={onCancel}>
           Cancel
@@ -158,6 +205,18 @@ export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
           {isLoading ? 'Saving...' : company ? 'Update Company' : 'Create Company'}
         </Button>
       </div>
+
+      {/* Contact Creation Modal */}
+      <Modal
+        isOpen={isContactFormOpen}
+        onClose={() => setIsContactFormOpen(false)}
+        title="New Contact"
+      >
+        <ContactForm
+          onSubmit={handleCreateContact}
+          onCancel={() => setIsContactFormOpen(false)}
+        />
+      </Modal>
     </form>
   );
 }
