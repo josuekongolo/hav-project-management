@@ -3,6 +3,7 @@ import { Mail, Trash2, Clock, CheckCircle, XCircle, Eye, MousePointer } from 'lu
 import { Card } from '../../../ui/Card';
 import { Badge } from '../../../ui/Badge';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 interface EmailHistoryProps {
   emails: Email[];
@@ -30,6 +31,8 @@ const statusIcons: Record<EmailStatus, any> = {
 };
 
 export function EmailHistory({ emails, onDeleteEmail }: EmailHistoryProps) {
+  const navigate = useNavigate();
+
   if (emails.length === 0) {
     return (
       <div className="text-center py-12">
@@ -45,14 +48,15 @@ export function EmailHistory({ emails, onDeleteEmail }: EmailHistoryProps) {
       {emails.map((email) => {
         const StatusIcon = statusIcons[email.status];
         return (
-          <Card key={email.id} className="hover:shadow-md transition-shadow">
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-start gap-3 flex-1 min-w-0">
-                <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-                  <Mail className="h-5 w-5 text-primary-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 truncate">{email.subject}</h3>
+          <div key={email.id} className="cursor-pointer" onClick={() => navigate(`/crm/emails/${email.id}`)}>
+            <Card className="hover:shadow-md transition-shadow h-full">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+                    <Mail className="h-5 w-5 text-primary-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 truncate">{email.subject}</h3>
                   <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
                     <span>To: {email.to.join(', ')}</span>
                     {email.contact && (
@@ -67,7 +71,8 @@ export function EmailHistory({ emails, onDeleteEmail }: EmailHistoryProps) {
                 </div>
               </div>
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   if (confirm('Are you sure you want to delete this email?')) {
                     onDeleteEmail(email.id);
                   }
@@ -125,7 +130,8 @@ export function EmailHistory({ emails, onDeleteEmail }: EmailHistoryProps) {
                 )}
               </div>
             )}
-          </Card>
+            </Card>
+          </div>
         );
       })}
     </div>
