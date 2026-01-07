@@ -70,7 +70,7 @@ export function KanbanPage() {
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
+        <div className="flex flex-wrap gap-3">
           <Select
             value={selectedMilestoneId}
             onChange={(e) => setSelectedMilestoneId(e.target.value)}
@@ -106,7 +106,7 @@ export function KanbanPage() {
                 setSearchQuery('');
               }}
               title="Clear all filters"
-              className="col-span-2 sm:col-span-1 justify-center sm:justify-start"
+              className="justify-center sm:justify-start"
             >
               <X className="h-4 w-4 mr-2 sm:mr-0" />
               <span className="sm:hidden">Clear Filters</span>
