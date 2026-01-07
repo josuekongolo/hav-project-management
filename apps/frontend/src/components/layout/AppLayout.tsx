@@ -60,7 +60,9 @@ export function AppLayout() {
             </button>
           )}
 
-          <Outlet />
+          <div className="lg:pt-0 pt-16">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
