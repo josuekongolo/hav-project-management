@@ -1,9 +1,9 @@
 import { memo, useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Task } from '../../../services/taskService';
+import { Task, TaskStatus } from '../../../services/taskService';
 import { PriorityBadge, Avatar, Badge } from '../../ui';
-import { Calendar, Trash2 } from 'lucide-react';
+import { Calendar, Trash2, MoveRight } from 'lucide-react';
 import { format } from 'date-fns';
 import clsx from 'clsx';
 import { useTaskStore } from '../../../store/taskStore';
@@ -18,8 +18,9 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
   });
-  const { deleteTask } = useTaskStore();
+  const { deleteTask, moveTask } = useTaskStore();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showMoveMenu, setShowMoveMenu] = useState(false);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -44,6 +45,27 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
     }
   };
 
+  const handleMove = async (e: React.MouseEvent, newStatus: TaskStatus) => {
+    e.stopPropagation();
+    setShowMoveMenu(false);
+
+    if (task.status === newStatus) return;
+
+    try {
+      await moveTask(task.id, newStatus, 0);
+      toast.success('Task moved successfully');
+    } catch (error) {
+      toast.error('Failed to move task');
+    }
+  };
+
+  const statusOptions = [
+    { status: TaskStatus.TODO, label: 'To Do', color: 'bg-gray-100 text-gray-700' },
+    { status: TaskStatus.IN_PROGRESS, label: 'In Progress', color: 'bg-blue-100 text-blue-700' },
+    { status: TaskStatus.IN_REVIEW, label: 'In Review', color: 'bg-yellow-100 text-yellow-700' },
+    { status: TaskStatus.DONE, label: 'Done', color: 'bg-green-100 text-green-700' },
+  ];
+
   return (
     <div
       ref={setNodeRef}
@@ -52,14 +74,54 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
       {...listeners}
       onClick={onClick}
       className={clsx(
-        'bg-white rounded-lg p-2.5 sm:p-3 shadow-sm border border-gray-200',
+        'bg-white rounded-lg p-2.5 sm:p-3 shadow-sm border border-gray-200 w-full',
         'hover:shadow-md hover:border-primary-300 transition-all cursor-pointer',
         isDragging && 'opacity-50 shadow-lg'
       )}
     >
-      <div className="flex items-start justify-between gap-2 mb-1.5 sm:mb-2">
-        <h3 className="font-medium text-gray-900 text-sm line-clamp-1 sm:line-clamp-2 flex-1">{task.title}</h3>
+      <div className="flex items-start justify-between gap-2 mb-1.5 sm:mb-2 min-w-0">
+        <h3 className="font-medium text-gray-900 text-sm line-clamp-1 sm:line-clamp-2 flex-1 min-w-0 break-words">{task.title}</h3>
         <div className="flex items-center gap-1 flex-shrink-0">
+          {/* Mobile move button */}
+          <div className="relative md:hidden">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMoveMenu(!showMoveMenu);
+              }}
+              className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+              title="Move task"
+            >
+              <MoveRight className="h-3.5 w-3.5" />
+            </button>
+            {showMoveMenu && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMoveMenu(false);
+                  }}
+                />
+                <div className="absolute right-0 top-8 z-50 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[140px]">
+                  {statusOptions.map((option) => (
+                    <button
+                      key={option.status}
+                      onClick={(e) => handleMove(e, option.status)}
+                      disabled={task.status === option.status}
+                      className={clsx(
+                        'w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center gap-2',
+                        task.status === option.status && 'opacity-50 cursor-not-allowed'
+                      )}
+                    >
+                      <span className={clsx('w-2 h-2 rounded-full', option.color)} />
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
           <button
             onClick={handleDelete}
             disabled={isDeleting}
@@ -73,7 +135,7 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
       </div>
 
       {task.description && (
-        <p className="text-xs text-gray-600 line-clamp-1 sm:line-clamp-2 mb-2 sm:mb-3">{task.description}</p>
+        <p className="text-xs text-gray-600 line-clamp-1 sm:line-clamp-2 mb-2 sm:mb-3 break-words overflow-hidden">{task.description}</p>
       )}
 
       {task.labels.length > 0 && (

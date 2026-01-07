@@ -20,14 +20,14 @@ export function AppLayout() {
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMobileMenuOpen(true)}
-            className="lg:hidden fixed top-3 left-3 z-50 p-2.5 bg-white border border-gray-300 rounded-lg shadow-md text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors"
+            className="lg:hidden fixed top-2 left-2 z-50 p-2.5 bg-white border border-gray-300 rounded-lg shadow-lg text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors backdrop-blur-sm bg-opacity-95"
             aria-label="Open menu"
           >
             <Menu className="h-5 w-5" />
           </button>
 
           {/* Add padding to content on mobile to avoid hamburger overlap */}
-          <div className="lg:pt-0 pt-14">
+          <div className="lg:pl-0 pl-14">
             <Outlet />
           </div>
         </main>
