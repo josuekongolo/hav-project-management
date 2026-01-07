@@ -134,7 +134,7 @@ export function KanbanBoard({ onTaskClick, onAddTask, milestoneFilter, labelFilt
     return (
       <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 h-full overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
         {COLUMNS.map((column) => (
-          <div key={column.status} className="bg-gray-50 rounded-lg p-4 flex flex-col min-h-0 min-w-[85vw] md:min-w-0 flex-shrink-0">
+          <div key={column.status} className="bg-gray-50 rounded-lg p-4 flex flex-col min-h-0 w-[80vw] max-w-[80vw] md:w-auto md:max-w-none flex-shrink-0 overflow-hidden">
             <div className="mb-3 pb-3 border-b-2 border-gray-200">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-gray-300" />
@@ -161,7 +161,7 @@ export function KanbanBoard({ onTaskClick, onAddTask, milestoneFilter, labelFilt
     >
       <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 h-full overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
         {COLUMNS.map((column) => (
-          <div key={column.status} className="bg-gray-50 rounded-lg p-3 md:p-4 flex flex-col min-h-0 min-w-[85vw] md:min-w-0 flex-shrink-0 overflow-hidden">
+          <div key={column.status} className="bg-gray-50 rounded-lg p-3 md:p-4 flex flex-col min-h-0 w-[80vw] max-w-[80vw] md:w-auto md:max-w-none flex-shrink-0 overflow-hidden">
             <KanbanColumn
               status={column.status}
               title={column.title}

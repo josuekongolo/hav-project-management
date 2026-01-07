@@ -23,18 +23,18 @@ export const KanbanColumn = memo(function KanbanColumn({ status, title, tasks, c
   const taskIds = useMemo(() => tasks.map((task) => task.id), [tasks]);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full w-full overflow-hidden">
       <div className={clsx('flex items-center justify-between mb-3 pb-3 border-b-2', `border-${color}-500`)}>
-        <div className="flex items-center gap-2">
-          <div className={clsx('w-3 h-3 rounded-full', `bg-${color}-500`)} />
-          <h3 className="text-sm sm:text-base font-semibold text-gray-900">{title}</h3>
-          <span className="text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className={clsx('w-3 h-3 rounded-full flex-shrink-0', `bg-${color}-500`)} />
+          <h3 className="text-sm sm:text-base font-semibold text-gray-900 truncate">{title}</h3>
+          <span className="text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full flex-shrink-0">
             {tasks.length}
           </span>
         </div>
         <button
           onClick={onAddTask}
-          className="p-1.5 sm:p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+          className="p-1.5 sm:p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors flex-shrink-0"
           title="Add task"
         >
           <Plus className="h-4 w-4" />
@@ -44,7 +44,7 @@ export const KanbanColumn = memo(function KanbanColumn({ status, title, tasks, c
       <div
         ref={setNodeRef}
         className={clsx(
-          'flex-1 space-y-3 min-h-[200px] max-h-[calc(100vh-380px)] sm:max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-280px)] p-2 rounded-lg transition-colors overflow-y-auto',
+          'flex-1 space-y-3 min-h-[200px] max-h-[calc(100vh-380px)] sm:max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-280px)] p-2 rounded-lg transition-colors overflow-y-auto overflow-x-hidden',
           isOver && 'bg-primary-50 ring-2 ring-primary-300'
         )}
       >
