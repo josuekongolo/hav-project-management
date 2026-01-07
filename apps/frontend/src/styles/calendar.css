@@ -88,3 +88,248 @@
   border-radius: 8px;
   overflow: hidden;
 }
+
+/* Mobile styles */
+@media (max-width: 767px) {
+  /* Toolbar - stack vertically on mobile */
+  .rbc-toolbar {
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 12px;
+  }
+
+  .rbc-toolbar-label {
+    font-size: 1rem;
+    order: -1;
+    width: 100%;
+    text-align: center;
+    padding: 4px 0;
+  }
+
+  /* Navigation buttons */
+  .rbc-btn-group {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .rbc-toolbar button {
+    font-size: 0.75rem;
+    padding: 8px 12px;
+    min-height: 36px;
+    touch-action: manipulation;
+  }
+
+  /* Today/Back/Next buttons */
+  .rbc-toolbar .rbc-btn-group:first-child {
+    order: 1;
+  }
+
+  /* View buttons (Month, Day, Agenda) */
+  .rbc-toolbar .rbc-btn-group:last-child {
+    order: 2;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .rbc-toolbar .rbc-btn-group:last-child button {
+    flex: 1;
+    max-width: 100px;
+  }
+
+  /* Header days - smaller on mobile */
+  .rbc-header {
+    padding: 8px 2px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  /* Show abbreviated day names on mobile */
+  .rbc-header span {
+    font-size: 0.7rem;
+  }
+
+  /* Date cells in month view */
+  .rbc-date-cell {
+    padding: 2px 4px;
+    font-size: 0.75rem;
+  }
+
+  .rbc-date-cell > a {
+    font-size: 0.75rem;
+    padding: 2px 4px;
+  }
+
+  /* Events in month view - smaller */
+  .rbc-event {
+    padding: 1px 3px;
+    font-size: 0.65rem;
+    line-height: 1.2;
+    margin-bottom: 1px;
+  }
+
+  .rbc-event-content {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Show more link */
+  .rbc-show-more {
+    font-size: 0.65rem;
+    padding: 1px 3px;
+    color: #3b82f6;
+  }
+
+  /* Month row - ensure events fit */
+  .rbc-row-segment {
+    padding: 0 1px;
+  }
+
+  /* Day view adjustments */
+  .rbc-time-header-content {
+    min-height: auto;
+  }
+
+  .rbc-time-slot {
+    min-height: 30px;
+  }
+
+  .rbc-timeslot-group {
+    min-height: 50px;
+  }
+
+  .rbc-time-gutter {
+    font-size: 0.65rem;
+    width: 50px;
+  }
+
+  .rbc-label {
+    font-size: 0.65rem;
+    padding: 0 4px;
+  }
+
+  /* Agenda view - better spacing */
+  .rbc-agenda-view table {
+    font-size: 0.8rem;
+  }
+
+  .rbc-agenda-date-cell {
+    padding: 8px 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .rbc-agenda-time-cell {
+    padding: 8px 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .rbc-agenda-event-cell {
+    padding: 8px 6px;
+    font-size: 0.8rem;
+  }
+
+  /* Popup overlay */
+  .rbc-overlay {
+    max-width: 90vw;
+    z-index: 100;
+  }
+
+  .rbc-overlay-header {
+    font-size: 0.8rem;
+    padding: 6px 8px;
+  }
+
+  /* Current time indicator */
+  .rbc-current-time-indicator {
+    height: 2px;
+  }
+
+  /* Row content */
+  .rbc-row-content {
+    min-height: 40px;
+  }
+
+  /* Month cells - ensure minimum tap target */
+  .rbc-day-bg {
+    min-height: 60px;
+  }
+}
+
+/* Small mobile (< 480px) */
+@media (max-width: 479px) {
+  .rbc-toolbar button {
+    font-size: 0.7rem;
+    padding: 6px 8px;
+  }
+
+  .rbc-toolbar-label {
+    font-size: 0.9rem;
+  }
+
+  .rbc-header {
+    padding: 6px 1px;
+    font-size: 0.65rem;
+  }
+
+  .rbc-date-cell {
+    padding: 1px 2px;
+    font-size: 0.7rem;
+  }
+
+  .rbc-event {
+    font-size: 0.6rem;
+    padding: 1px 2px;
+  }
+
+  /* Agenda view more compact */
+  .rbc-agenda-date-cell,
+  .rbc-agenda-time-cell {
+    padding: 6px 4px;
+    font-size: 0.7rem;
+  }
+
+  .rbc-agenda-event-cell {
+    padding: 6px 4px;
+    font-size: 0.75rem;
+  }
+
+  .rbc-time-gutter {
+    width: 40px;
+    font-size: 0.6rem;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  .rbc-event {
+    padding: 4px 6px;
+    min-height: 24px;
+  }
+
+  .rbc-toolbar button {
+    min-height: 40px;
+    min-width: 44px;
+  }
+
+  .rbc-day-bg {
+    cursor: pointer;
+  }
+
+  /* Larger tap targets for date cells */
+  .rbc-date-cell > a {
+    display: inline-block;
+    min-width: 24px;
+    min-height: 24px;
+    line-height: 24px;
+    text-align: center;
+    border-radius: 50%;
+  }
+
+  .rbc-date-cell > a:active {
+    background-color: #dbeafe;
+  }
+}

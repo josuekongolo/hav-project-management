@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Calendar, dateFnsLocalizer, Event } from 'react-big-calendar';
+import { Calendar, dateFnsLocalizer, Event, View } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { useTaskStore } from '../store/taskStore';
@@ -8,6 +8,19 @@ import { TaskModal } from '../components/features/tasks/TaskModal';
 import { toast } from 'react-hot-toast';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import '../styles/calendar.css';
+
+// Hook to detect mobile screen
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return isMobile;
+}
 
 const locales = {
   'en-US': enUS,
@@ -29,10 +42,19 @@ export function CalendarPage() {
   const { tasks, fetchTasks, updateTask } = useTaskStore();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const isMobile = useIsMobile();
+  const [currentView, setCurrentView] = useState<View>(isMobile ? 'agenda' : 'month');
 
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
+
+  // Update view when screen size changes
+  useEffect(() => {
+    if (isMobile && currentView === 'week') {
+      setCurrentView('agenda');
+    }
+  }, [isMobile, currentView]);
 
   const events: CalendarEvent[] = useMemo(() => {
     return tasks
@@ -111,14 +133,19 @@ export function CalendarPage() {
     };
   };
 
+  // Available views based on screen size
+  const availableViews: View[] = isMobile
+    ? ['month', 'day', 'agenda']
+    : ['month', 'week', 'day', 'agenda'];
+
   return (
-    <div className="p-6 h-[calc(100vh-64px)] flex flex-col">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Calendar</h1>
-        <p className="text-gray-600 mt-1">View and schedule tasks by due date</p>
+    <div className="p-4 md:p-6 h-[calc(100vh-64px)] flex flex-col">
+      <div className="mb-4 md:mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Calendar</h1>
+        <p className="text-sm md:text-base text-gray-600 mt-1">View and schedule tasks by due date</p>
       </div>
 
-      <div className="flex-1 bg-white rounded-lg shadow p-4 min-h-0">
+      <div className="flex-1 bg-white rounded-lg shadow p-2 sm:p-4 min-h-0 overflow-hidden">
         <Calendar
           localizer={localizer}
           events={events}
@@ -129,9 +156,12 @@ export function CalendarPage() {
           onSelectSlot={handleSelectSlot}
           eventPropGetter={eventStyleGetter}
           selectable
-          views={['month', 'week', 'day', 'agenda']}
-          defaultView="month"
+          views={availableViews}
+          view={currentView}
+          onView={(view) => setCurrentView(view)}
+          defaultView={isMobile ? 'agenda' : 'month'}
           popup
+          tooltipAccessor={(event) => event.task.title}
         />
       </div>
 
