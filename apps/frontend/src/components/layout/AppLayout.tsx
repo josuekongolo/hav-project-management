@@ -1,11 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Menu } from 'lucide-react';
+import clsx from 'clsx';
 
 export function AppLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [showHamburger, setShowHamburger] = useState(true);
+  const lastScrollY = useRef(0);
+  const mainRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const mainElement = mainRef.current;
+    if (!mainElement) return;
+
+    const handleScroll = () => {
+      const currentScrollY = mainElement.scrollTop;
+
+      if (currentScrollY < 10) {
+        // Always show at top
+        setShowHamburger(true);
+      } else if (currentScrollY > lastScrollY.current) {
+        // Scrolling down - hide
+        setShowHamburger(false);
+      } else {
+        // Scrolling up - show
+        setShowHamburger(true);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    mainElement.addEventListener('scroll', handleScroll, { passive: true });
+    return () => mainElement.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -16,20 +45,22 @@ export function AppLayout() {
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
-        <main className="flex-1 overflow-auto">
+        <main ref={mainRef} className="flex-1 overflow-auto">
           {/* Mobile menu button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="lg:hidden fixed top-2 left-2 z-50 p-2.5 bg-white border border-gray-300 rounded-lg shadow-lg text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors backdrop-blur-sm bg-opacity-95"
-            aria-label="Open menu"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
+          {!isMobileMenuOpen && (
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className={clsx(
+                'lg:hidden fixed top-4 left-4 z-50 p-2.5 bg-white border border-gray-300 rounded-lg shadow-lg text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-all backdrop-blur-sm bg-opacity-95',
+                showHamburger ? 'translate-y-0 opacity-100' : '-translate-y-20 opacity-0'
+              )}
+              aria-label="Open menu"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          )}
 
-          {/* Add padding to content on mobile to avoid hamburger overlap */}
-          <div className="lg:pl-0 pl-14">
-            <Outlet />
-          </div>
+          <Outlet />
         </main>
       </div>
     </div>
