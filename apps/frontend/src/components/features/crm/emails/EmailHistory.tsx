@@ -66,19 +66,17 @@ export function EmailHistory({ emails, onDeleteEmail }: EmailHistoryProps) {
                   </div>
                 </div>
               </div>
-              {(email.status === EmailStatus.DRAFT || email.status === EmailStatus.FAILED) && (
-                <button
-                  onClick={() => {
-                    if (confirm('Are you sure you want to delete this email?')) {
-                      onDeleteEmail(email.id);
-                    }
-                  }}
-                  className="p-1 hover:bg-red-50 rounded"
-                  title="Delete email"
-                >
-                  <Trash2 className="h-4 w-4 text-red-600" />
-                </button>
-              )}
+              <button
+                onClick={() => {
+                  if (confirm('Are you sure you want to delete this email?')) {
+                    onDeleteEmail(email.id);
+                  }
+                }}
+                className="p-1 hover:bg-red-50 rounded"
+                title="Delete email"
+              >
+                <Trash2 className="h-4 w-4 text-red-600" />
+              </button>
             </div>
 
             <div className="mb-3">

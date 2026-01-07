@@ -293,11 +293,6 @@ export async function deleteEmail(id: string) {
     throw new Error('Email not found');
   }
 
-  // Only allow deleting drafts or failed emails
-  if (email.status !== 'DRAFT' && email.status !== 'FAILED') {
-    throw new Error('Only draft or failed emails can be deleted');
-  }
-
   await prisma.email.delete({
     where: { id },
   });
