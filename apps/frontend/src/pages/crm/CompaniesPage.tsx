@@ -1,15 +1,32 @@
 import { useEffect, useState } from 'react';
 import { useCompanyStore } from '../../store/companyStore';
 import { CompanyList } from '../../components/features/crm/companies/CompanyList';
-import { CompanyFilters } from '../../components/features/crm/companies/CompanyFilters';
 import { CompanyForm } from '../../components/features/crm/companies/CompanyForm';
 import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { Select } from '../../components/ui/Select';
 import { Modal } from '../../components/ui/Modal';
 import { Card } from '../../components/ui/Card';
 import { Company, CreateCompanyData, UpdateCompanyData } from '../../services/companyService';
-import { FilePlus, Building2, Users, DollarSign, TrendingUp, Upload } from 'lucide-react';
+import { FilePlus, Building2, Users, DollarSign, TrendingUp, Upload, Search, Filter, X } from 'lucide-react';
 import { BulkImportDialog } from '../../components/features/import';
 import toast from 'react-hot-toast';
+
+// Common industries for the dropdown
+const INDUSTRIES = [
+  'Technology',
+  'Healthcare',
+  'Finance',
+  'Manufacturing',
+  'Retail',
+  'Education',
+  'Real Estate',
+  'Consulting',
+  'Media',
+  'Transportation',
+  'Energy',
+  'Other',
+];
 
 export function CompaniesPage() {
   const {
@@ -21,16 +38,53 @@ export function CompaniesPage() {
     updateCompany,
     deleteCompany,
     setFilters,
+    clearFilters,
   } = useCompanyStore();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
-  const [isFiltersVisible, setIsFiltersVisible] = useState(false);
+  const [isAdvancedFiltersVisible, setIsAdvancedFiltersVisible] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
+
+  // Local filter state for controlled inputs
+  const [searchQuery, setSearchQuery] = useState('');
+  const [industryFilter, setIndustryFilter] = useState('');
 
   useEffect(() => {
     fetchCompanies();
   }, [fetchCompanies]);
+
+  // Refetch when filters change
+  useEffect(() => {
+    fetchCompanies();
+  }, [filters, fetchCompanies]);
+
+  // Update filters when local state changes
+  useEffect(() => {
+    const newFilters = { ...filters };
+
+    if (searchQuery) {
+      newFilters.search = searchQuery;
+    } else {
+      delete newFilters.search;
+    }
+
+    if (industryFilter) {
+      newFilters.industry = industryFilter;
+    } else {
+      delete newFilters.industry;
+    }
+
+    setFilters(newFilters);
+  }, [searchQuery, industryFilter]);
+
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setIndustryFilter('');
+    clearFilters();
+  };
+
+  const hasActiveFilters = searchQuery || industryFilter || filters.minEmployees || filters.maxEmployees || filters.minRevenue || filters.maxRevenue;
 
   const handleCreateCompany = () => {
     setSelectedCompany(null);
@@ -82,9 +136,6 @@ export function CompaniesPage() {
           <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your company relationships</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
-          <Button variant="secondary" onClick={() => setIsFiltersVisible(!isFiltersVisible)} className="w-full sm:w-auto justify-center">
-            {isFiltersVisible ? 'Hide Filters' : 'Show Filters'}
-          </Button>
           <Button variant="secondary" onClick={() => setIsImportOpen(true)} className="w-full sm:w-auto justify-center">
             <Upload className="h-4 w-4 mr-2" />
             Import CSV
@@ -141,12 +192,125 @@ export function CompaniesPage() {
         </Card>
       </div>
 
-      {/* Filters */}
-      {isFiltersVisible && (
-        <div className="mb-6">
-          <CompanyFilters filters={filters} onFiltersChange={setFilters} />
+      {/* Search and Filters */}
+      <Card className="mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="relative md:col-span-2">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Input
+              placeholder="Search companies by name, industry, email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Select
+            value={industryFilter}
+            onChange={(e) => setIndustryFilter(e.target.value)}
+            options={[
+              { value: '', label: 'All Industries' },
+              ...INDUSTRIES.map((industry) => ({ value: industry, label: industry })),
+            ]}
+          />
         </div>
-      )}
+
+        {/* Advanced Filters Toggle */}
+        <div className="mt-4 pt-4 border-t">
+          <button
+            onClick={() => setIsAdvancedFiltersVisible(!isAdvancedFiltersVisible)}
+            className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+          >
+            <Filter className="h-4 w-4" />
+            {isAdvancedFiltersVisible ? 'Hide Advanced Filters' : 'Show Advanced Filters'}
+          </button>
+
+          {isAdvancedFiltersVisible && (
+            <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Min Employees
+                </label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={filters.minEmployees || ''}
+                  onChange={(e) =>
+                    setFilters({
+                      ...filters,
+                      minEmployees: e.target.value ? parseInt(e.target.value) : undefined,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Max Employees
+                </label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="No limit"
+                  value={filters.maxEmployees || ''}
+                  onChange={(e) =>
+                    setFilters({
+                      ...filters,
+                      maxEmployees: e.target.value ? parseInt(e.target.value) : undefined,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Min Revenue ($M)
+                </label>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  placeholder="0"
+                  value={filters.minRevenue ? (filters.minRevenue / 1000000).toString() : ''}
+                  onChange={(e) =>
+                    setFilters({
+                      ...filters,
+                      minRevenue: e.target.value ? parseFloat(e.target.value) * 1000000 : undefined,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Max Revenue ($M)
+                </label>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  placeholder="No limit"
+                  value={filters.maxRevenue ? (filters.maxRevenue / 1000000).toString() : ''}
+                  onChange={(e) =>
+                    setFilters({
+                      ...filters,
+                      maxRevenue: e.target.value ? parseFloat(e.target.value) * 1000000 : undefined,
+                    })
+                  }
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Clear Filters */}
+          {hasActiveFilters && (
+            <button
+              onClick={handleClearFilters}
+              className="mt-4 flex items-center gap-1 text-sm text-red-600 hover:text-red-700"
+            >
+              <X className="h-4 w-4" />
+              Clear All Filters
+            </button>
+          )}
+        </div>
+      </Card>
 
       {/* Company List */}
       {isLoading ? (
