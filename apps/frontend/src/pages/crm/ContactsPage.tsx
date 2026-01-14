@@ -8,9 +8,10 @@ import { Select } from '../../components/ui/Select';
 import { Modal } from '../../components/ui/Modal';
 import { Card } from '../../components/ui/Card';
 import { Contact, ContactStatus } from '../../services/contactService';
-import { UserPlus, Search, Filter, Users as UsersIcon, Mail, Download } from 'lucide-react';
+import { UserPlus, Search, Filter, Users as UsersIcon, Mail, Download, Upload } from 'lucide-react';
 import { useTaskStore } from '../../store/taskStore';
 import { BulkEmailDialog } from '../../components/features/crm/emails/BulkEmailDialog';
+import { BulkImportDialog } from '../../components/features/import';
 import { api } from '../../services/api';
 import toast from 'react-hot-toast';
 
@@ -30,6 +31,7 @@ export function ContactsPage() {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isBulkEmailOpen, setIsBulkEmailOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -167,6 +169,10 @@ export function ContactsPage() {
               <span className="hidden xs:inline">Send Email </span>({selectedContacts.length})
             </Button>
           )}
+          <Button variant="secondary" onClick={() => setIsImportOpen(true)} className="w-full sm:w-auto justify-center">
+            <Upload className="h-4 w-4 mr-2" />
+            Import CSV
+          </Button>
           <Button variant="secondary" onClick={handleExportCSV} className="w-full sm:w-auto justify-center">
             <Download className="h-4 w-4 mr-2" />
             Export CSV
@@ -321,6 +327,14 @@ export function ContactsPage() {
           }}
         />
       </Modal>
+
+      {/* Bulk Import Dialog */}
+      <BulkImportDialog
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        entityType="contacts"
+        onImportComplete={() => fetchContacts()}
+      />
     </div>
   );
 }

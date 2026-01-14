@@ -7,7 +7,8 @@ import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { Card } from '../../components/ui/Card';
 import { Company, CreateCompanyData, UpdateCompanyData } from '../../services/companyService';
-import { FilePlus, Building2, Users, DollarSign, TrendingUp } from 'lucide-react';
+import { FilePlus, Building2, Users, DollarSign, TrendingUp, Upload } from 'lucide-react';
+import { BulkImportDialog } from '../../components/features/import';
 import toast from 'react-hot-toast';
 
 export function CompaniesPage() {
@@ -25,6 +26,7 @@ export function CompaniesPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [isFiltersVisible, setIsFiltersVisible] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
 
   useEffect(() => {
     fetchCompanies();
@@ -82,6 +84,10 @@ export function CompaniesPage() {
         <div className="flex flex-col sm:flex-row gap-2">
           <Button variant="secondary" onClick={() => setIsFiltersVisible(!isFiltersVisible)} className="w-full sm:w-auto justify-center">
             {isFiltersVisible ? 'Hide Filters' : 'Show Filters'}
+          </Button>
+          <Button variant="secondary" onClick={() => setIsImportOpen(true)} className="w-full sm:w-auto justify-center">
+            <Upload className="h-4 w-4 mr-2" />
+            Import CSV
           </Button>
           <Button onClick={handleCreateCompany} className="w-full sm:w-auto justify-center">
             <FilePlus className="h-4 w-4 mr-2" />
@@ -169,6 +175,14 @@ export function CompaniesPage() {
           }}
         />
       </Modal>
+
+      {/* Bulk Import Dialog */}
+      <BulkImportDialog
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        entityType="companies"
+        onImportComplete={() => fetchCompanies()}
+      />
     </div>
   );
 }

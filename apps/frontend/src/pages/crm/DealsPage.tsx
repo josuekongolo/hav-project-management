@@ -6,7 +6,8 @@ import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { Card } from '../../components/ui/Card';
 import { Deal, DealStage } from '../../services/dealService';
-import { FilePlus, TrendingUp, DollarSign, CheckCircle, XCircle } from 'lucide-react';
+import { FilePlus, TrendingUp, DollarSign, CheckCircle, XCircle, Upload } from 'lucide-react';
+import { BulkImportDialog } from '../../components/features/import';
 import toast from 'react-hot-toast';
 
 export function DealsPage() {
@@ -25,6 +26,7 @@ export function DealsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
   const [initialStage, setInitialStage] = useState<DealStage | undefined>(undefined);
+  const [isImportOpen, setIsImportOpen] = useState(false);
 
   useEffect(() => {
     fetchDeals();
@@ -89,10 +91,16 @@ export function DealsPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Sales Pipeline</h1>
           <p className="text-sm sm:text-base text-gray-600 mt-1">Track and manage your deals</p>
         </div>
-        <Button onClick={() => handleCreateDeal()} className="w-full sm:w-auto justify-center">
-          <FilePlus className="h-4 w-4 mr-2" />
-          New Deal
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button variant="secondary" onClick={() => setIsImportOpen(true)} className="w-full sm:w-auto justify-center">
+            <Upload className="h-4 w-4 mr-2" />
+            Import CSV
+          </Button>
+          <Button onClick={() => handleCreateDeal()} className="w-full sm:w-auto justify-center">
+            <FilePlus className="h-4 w-4 mr-2" />
+            New Deal
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -186,6 +194,17 @@ export function DealsPage() {
           }}
         />
       </Modal>
+
+      {/* Bulk Import Dialog */}
+      <BulkImportDialog
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        entityType="deals"
+        onImportComplete={() => {
+          fetchDeals();
+          fetchStats();
+        }}
+      />
     </div>
   );
 }
