@@ -237,7 +237,7 @@ export async function importContacts(
 export async function importCompanies(
   rows: Record<string, string>[],
   mapping: ColumnMapping,
-  userId: string
+  _userId: string
 ): Promise<ImportResult> {
   const result: ImportResult = { imported: 0, failed: 0, errors: [] };
 
