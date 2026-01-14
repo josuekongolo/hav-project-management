@@ -22,7 +22,11 @@ const upload = multer({
   },
 });
 
-// All import routes require authentication
+// Public routes (no auth required)
+// Download CSV templates - just column headers, no sensitive data
+router.get('/template/:entity', importController.downloadTemplate);
+
+// Protected routes require authentication
 router.use(authMiddleware);
 
 // Preview CSV file (upload and parse headers + first rows)
@@ -32,9 +36,6 @@ router.post('/preview', upload.single('file'), importController.previewImport);
 router.post('/contacts', importController.importContacts);
 router.post('/companies', importController.importCompanies);
 router.post('/deals', importController.importDeals);
-
-// Download CSV templates
-router.get('/template/:entity', importController.downloadTemplate);
 
 // Get entity field definitions for column mapping UI
 router.get('/fields/:entity', importController.getEntityFields);
