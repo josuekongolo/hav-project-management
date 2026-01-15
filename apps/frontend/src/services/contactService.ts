@@ -88,16 +88,32 @@ export interface ContactFilters {
   assignedToId?: string;
   search?: string;
   companyId?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginationInfo {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface GetContactsResponse {
+  contacts: Contact[];
+  pagination: PaginationInfo;
 }
 
 export const contactService = {
-  async getContacts(filters?: ContactFilters): Promise<{ contacts: Contact[] }> {
+  async getContacts(filters?: ContactFilters): Promise<GetContactsResponse> {
     const params = new URLSearchParams();
     if (filters?.status) params.append('status', filters.status);
     if (filters?.assignedToId) params.append('assignedToId', filters.assignedToId);
     if (filters?.search) params.append('search', filters.search);
+    if (filters?.page) params.append('page', filters.page.toString());
+    if (filters?.limit) params.append('limit', filters.limit.toString());
 
-    const response = await api.get<{ contacts: Contact[] }>(
+    const response = await api.get<GetContactsResponse>(
       `/contacts${params.toString() ? `?${params.toString()}` : ''}`
     );
     return response.data;

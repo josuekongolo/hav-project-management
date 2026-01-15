@@ -30,8 +30,18 @@ export interface BulkEmailData {
   customVariables?: { [contactId: string]: { [key: string]: string } };
 }
 
-export async function getEmails(contactId?: string, senderId?: string) {
+export interface PaginationParams {
+  page?: number;
+  limit?: number;
+  status?: string;
+  engagement?: 'opened' | 'clicked';
+}
+
+export async function getEmails(contactId?: string, senderId?: string, pagination?: PaginationParams) {
   const where: any = {};
+  const page = pagination?.page || 1;
+  const limit = pagination?.limit || 25;
+  const skip = (page - 1) * limit;
 
   if (contactId) {
     where.contactId = contactId;
@@ -41,38 +51,67 @@ export async function getEmails(contactId?: string, senderId?: string) {
     where.senderId = senderId;
   }
 
-  const emails = await prisma.email.findMany({
-    where,
-    include: {
-      contact: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          email: true,
-        },
-      },
-      sender: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-      template: {
-        select: {
-          id: true,
-          name: true,
-          category: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
+  if (pagination?.status) {
+    if (pagination.status === 'SENT_ALL') {
+      where.status = { in: ['SENT', 'OPENED', 'CLICKED'] };
+    } else {
+      where.status = pagination.status;
+    }
+  }
 
-  return emails;
+  if (pagination?.engagement) {
+    if (pagination.engagement === 'opened') {
+      where.openedAt = { not: null };
+    } else if (pagination.engagement === 'clicked') {
+      where.clickedAt = { not: null };
+    }
+  }
+
+  const [emails, total] = await Promise.all([
+    prisma.email.findMany({
+      where,
+      include: {
+        contact: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        template: {
+          select: {
+            id: true,
+            name: true,
+            category: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip,
+      take: limit,
+    }),
+    prisma.email.count({ where }),
+  ]);
+
+  return {
+    emails,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 }
 
 export async function getEmailById(id: string) {

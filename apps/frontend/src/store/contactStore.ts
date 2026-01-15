@@ -7,6 +7,7 @@ import {
   CreateContactData,
   UpdateContactData,
   ContactFilters,
+  PaginationInfo,
 } from '../services/contactService';
 
 interface ContactState {
@@ -15,6 +16,7 @@ interface ContactState {
   contactActivities: any[];
   contactEmails: any[];
   contactTasks: any[];
+  pagination: PaginationInfo | null;
   isLoading: boolean;
   isLoadingActivities: boolean;
   isLoadingEmails: boolean;
@@ -23,7 +25,7 @@ interface ContactState {
   filters: ContactFilters;
 
   // Actions
-  fetchContacts: () => Promise<void>;
+  fetchContacts: (filters?: ContactFilters) => Promise<void>;
   fetchContactById: (id: string) => Promise<void>;
   fetchContactActivities: (id: string) => Promise<void>;
   fetchContactEmails: (id: string) => Promise<void>;
@@ -52,6 +54,7 @@ export const useContactStore = create<ContactState>()(
       contactActivities: [],
       contactEmails: [],
       contactTasks: [],
+      pagination: null,
       isLoading: false,
       isLoadingActivities: false,
       isLoadingEmails: false,
@@ -59,11 +62,12 @@ export const useContactStore = create<ContactState>()(
       error: null,
       filters: {},
 
-      fetchContacts: async () => {
+      fetchContacts: async (filters?: ContactFilters) => {
         set({ isLoading: true, error: null });
         try {
-          const { contacts } = await contactService.getContacts(get().filters);
-          set({ contacts, isLoading: false });
+          const mergedFilters = { ...get().filters, ...filters };
+          const { contacts, pagination } = await contactService.getContacts(mergedFilters);
+          set({ contacts, pagination, isLoading: false });
         } catch (error: any) {
           set({
             error: error.response?.data?.error || 'Failed to fetch contacts',
@@ -181,12 +185,10 @@ export const useContactStore = create<ContactState>()(
 
       setFilters: (filters: ContactFilters) => {
         set({ filters });
-        get().fetchContacts();
       },
 
       clearFilters: () => {
         set({ filters: {} });
-        get().fetchContacts();
       },
 
       searchContacts: async (query: string) => {

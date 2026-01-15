@@ -6,16 +6,19 @@ import {
   SendEmailData,
   SendEmailWithTemplateData,
   BulkEmailData,
+  PaginationInfo,
+  GetEmailsParams,
 } from '../services/emailService';
 
 interface EmailState {
   emails: Email[];
   selectedEmail: Email | null;
+  pagination: PaginationInfo | null;
   isLoading: boolean;
   error: string | null;
 
   // Actions
-  fetchEmails: (contactId?: string, senderId?: string) => Promise<void>;
+  fetchEmails: (params?: GetEmailsParams) => Promise<void>;
   fetchEmailById: (id: string) => Promise<void>;
   sendEmail: (data: SendEmailData) => Promise<Email>;
   sendEmailWithTemplate: (data: SendEmailWithTemplateData) => Promise<Email>;
@@ -31,14 +34,15 @@ export const useEmailStore = create<EmailState>()(
     (set, get) => ({
       emails: [],
       selectedEmail: null,
+      pagination: null,
       isLoading: false,
       error: null,
 
-      fetchEmails: async (contactId?: string, senderId?: string) => {
+      fetchEmails: async (params?: GetEmailsParams) => {
         set({ isLoading: true, error: null });
         try {
-          const { emails } = await emailService.getEmails(contactId, senderId);
-          set({ emails, isLoading: false });
+          const { emails, pagination } = await emailService.getEmails(params);
+          set({ emails, pagination, isLoading: false });
         } catch (error: any) {
           set({
             error: error.response?.data?.error || 'Failed to fetch emails',

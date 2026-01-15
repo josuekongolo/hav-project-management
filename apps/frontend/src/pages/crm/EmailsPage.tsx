@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useEmailStore } from '../../store/emailStore';
 import { EmailComposer } from '../../components/features/crm/emails/EmailComposer';
 import { EmailHistory } from '../../components/features/crm/emails/EmailHistory';
@@ -6,38 +6,43 @@ import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { Card } from '../../components/ui/Card';
 import { Select } from '../../components/ui/Select';
+import { Pagination } from '../../components/ui/Pagination';
 import { FilePlus, Mail, Clock, CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import { EmailStatus } from '../../services/emailService';
 import toast from 'react-hot-toast';
 
+const ITEMS_PER_PAGE = 25;
+
 export function EmailsPage() {
-  const { emails, isLoading, fetchEmails, sendEmail, sendEmailWithTemplate, saveDraft, deleteEmail, bulkDeleteEmails } =
+  const { emails, pagination, isLoading, fetchEmails, sendEmail, sendEmailWithTemplate, saveDraft, deleteEmail, bulkDeleteEmails } =
     useEmailStore();
 
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isSelectionMode, setIsSelectionMode] = useState(false);
 
-  // Filter emails by status
-  const filteredEmails = useMemo(() => {
-    if (!statusFilter) return emails;
-
-    if (statusFilter === 'SENT_ALL') {
-      // Include SENT, OPENED, CLICKED
-      return emails.filter(e =>
-        e.status === EmailStatus.SENT ||
-        e.status === EmailStatus.OPENED ||
-        e.status === EmailStatus.CLICKED
-      );
-    }
-
-    return emails.filter(e => e.status === statusFilter);
-  }, [emails, statusFilter]);
-
   useEffect(() => {
-    fetchEmails();
-  }, [fetchEmails]);
+    fetchEmails({
+      page: currentPage,
+      limit: ITEMS_PER_PAGE,
+      status: statusFilter || undefined,
+    });
+  }, [fetchEmails, currentPage, statusFilter]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setSelectedIds([]);
+    setIsSelectionMode(false);
+  };
+
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value);
+    setCurrentPage(1); // Reset to first page when filter changes
+    setSelectedIds([]);
+    setIsSelectionMode(false);
+  };
 
   const handleSendEmail = async (data: any, useTemplate: boolean) => {
     try {
@@ -48,6 +53,8 @@ export function EmailsPage() {
       }
       toast.success('Email sent successfully');
       setIsComposerOpen(false);
+      // Refresh current page
+      fetchEmails({ page: currentPage, limit: ITEMS_PER_PAGE, status: statusFilter || undefined });
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Failed to send email');
     }
@@ -58,6 +65,7 @@ export function EmailsPage() {
       await saveDraft(data);
       toast.success('Draft saved successfully');
       setIsComposerOpen(false);
+      fetchEmails({ page: currentPage, limit: ITEMS_PER_PAGE, status: statusFilter || undefined });
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Failed to save draft');
     }
@@ -67,6 +75,7 @@ export function EmailsPage() {
     try {
       await deleteEmail(id);
       toast.success('Email deleted successfully');
+      fetchEmails({ page: currentPage, limit: ITEMS_PER_PAGE, status: statusFilter || undefined });
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Failed to delete email');
     }
@@ -82,16 +91,17 @@ export function EmailsPage() {
       toast.success(`${result.deleted} emails deleted successfully`);
       setSelectedIds([]);
       setIsSelectionMode(false);
+      fetchEmails({ page: currentPage, limit: ITEMS_PER_PAGE, status: statusFilter || undefined });
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Failed to delete emails');
     }
   };
 
   const handleSelectAll = () => {
-    if (selectedIds.length === filteredEmails.length) {
+    if (selectedIds.length === emails.length) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(filteredEmails.map(e => e.id));
+      setSelectedIds(emails.map(e => e.id));
     }
   };
 
@@ -104,14 +114,6 @@ export function EmailsPage() {
   const exitSelectionMode = () => {
     setIsSelectionMode(false);
     setSelectedIds([]);
-  };
-
-  // Calculate stats
-  const stats = {
-    total: emails.length,
-    sent: emails.filter((e) => e.status === EmailStatus.SENT || e.status === EmailStatus.OPENED || e.status === EmailStatus.CLICKED).length,
-    drafts: emails.filter((e) => e.status === EmailStatus.DRAFT).length,
-    failed: emails.filter((e) => e.status === EmailStatus.FAILED).length,
   };
 
   return (
@@ -134,7 +136,7 @@ export function EmailsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-blue-600">Total Emails</p>
-              <p className="text-2xl font-bold text-blue-900">{stats.total}</p>
+              <p className="text-2xl font-bold text-blue-900">{pagination?.total || 0}</p>
             </div>
             <Mail className="h-8 w-8 text-blue-600 opacity-50" />
           </div>
@@ -142,8 +144,8 @@ export function EmailsPage() {
         <Card className="bg-gradient-to-br from-green-50 to-green-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-green-600">Sent</p>
-              <p className="text-2xl font-bold text-green-900">{stats.sent}</p>
+              <p className="text-sm font-medium text-green-600">This Page</p>
+              <p className="text-2xl font-bold text-green-900">{emails.length}</p>
             </div>
             <CheckCircle className="h-8 w-8 text-green-600 opacity-50" />
           </div>
@@ -151,19 +153,19 @@ export function EmailsPage() {
         <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-yellow-600">Drafts</p>
-              <p className="text-2xl font-bold text-yellow-900">{stats.drafts}</p>
+              <p className="text-sm font-medium text-yellow-600">Current Page</p>
+              <p className="text-2xl font-bold text-yellow-900">{currentPage}</p>
             </div>
             <Clock className="h-8 w-8 text-yellow-600 opacity-50" />
           </div>
         </Card>
-        <Card className="bg-gradient-to-br from-red-50 to-red-100">
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-red-600">Failed</p>
-              <p className="text-2xl font-bold text-red-900">{stats.failed}</p>
+              <p className="text-sm font-medium text-purple-600">Total Pages</p>
+              <p className="text-2xl font-bold text-purple-900">{pagination?.totalPages || 1}</p>
             </div>
-            <XCircle className="h-8 w-8 text-red-600 opacity-50" />
+            <XCircle className="h-8 w-8 text-purple-600 opacity-50" />
           </div>
         </Card>
       </div>
@@ -175,7 +177,7 @@ export function EmailsPage() {
             <div className="w-full sm:w-48">
               <Select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={(e) => handleStatusFilterChange(e.target.value)}
                 options={[
                   { value: '', label: 'All Emails' },
                   { value: 'SENT_ALL', label: 'Sent (all)' },
@@ -188,9 +190,6 @@ export function EmailsPage() {
                 ]}
               />
             </div>
-            <span className="text-sm text-gray-500">
-              {filteredEmails.length} email{filteredEmails.length !== 1 ? 's' : ''}
-            </span>
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -198,7 +197,7 @@ export function EmailsPage() {
               <Button
                 variant="secondary"
                 onClick={() => setIsSelectionMode(true)}
-                disabled={filteredEmails.length === 0}
+                disabled={emails.length === 0}
                 className="w-full sm:w-auto justify-center"
               >
                 Select Emails
@@ -210,7 +209,7 @@ export function EmailsPage() {
                   onClick={handleSelectAll}
                   className="w-full sm:w-auto justify-center"
                 >
-                  {selectedIds.length === filteredEmails.length ? 'Deselect All' : 'Select All'}
+                  {selectedIds.length === emails.length ? 'Deselect All' : 'Select All'}
                 </Button>
                 <Button
                   variant="secondary"
@@ -240,13 +239,28 @@ export function EmailsPage() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
         </div>
       ) : (
-        <EmailHistory
-          emails={filteredEmails}
-          onDeleteEmail={handleDeleteEmail}
-          isSelectionMode={isSelectionMode}
-          selectedIds={selectedIds}
-          onToggleSelection={handleToggleSelection}
-        />
+        <>
+          <EmailHistory
+            emails={emails}
+            onDeleteEmail={handleDeleteEmail}
+            isSelectionMode={isSelectionMode}
+            selectedIds={selectedIds}
+            onToggleSelection={handleToggleSelection}
+          />
+
+          {/* Pagination */}
+          {pagination && pagination.totalPages > 0 && (
+            <div className="mt-6">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={pagination.totalPages}
+                totalItems={pagination.total}
+                itemsPerPage={ITEMS_PER_PAGE}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
       )}
 
       {/* Email Composer Modal */}

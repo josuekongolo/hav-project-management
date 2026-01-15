@@ -31,10 +31,16 @@ export interface DealFilters {
   stage?: DealStage;
   ownerId?: string;
   contactId?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
 }
 
 export async function getDeals(filters?: DealFilters) {
   const where: any = {};
+  const page = filters?.page || 1;
+  const limit = filters?.limit || 100; // Higher default for pipeline view
+  const skip = (page - 1) * limit;
 
   if (filters?.stage) {
     where.stage = filters.stage;
@@ -48,47 +54,70 @@ export async function getDeals(filters?: DealFilters) {
     where.contactId = filters.contactId;
   }
 
-  const deals = await prisma.deal.findMany({
-    where,
-    include: {
-      contact: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          email: true,
-          company: true,
-        },
-      },
-      owner: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          avatar: true,
-        },
-      },
-      companyRel: {
-        select: {
-          id: true,
-          name: true,
-          industry: true,
-          logo: true,
-        },
-      },
-      _count: {
-        select: {
-          tasks: true,
-        },
-      },
-    },
-    orderBy: [
-      { stage: 'asc' },
-      { createdAt: 'desc' },
-    ],
-  });
+  if (filters?.search) {
+    where.OR = [
+      { title: { contains: filters.search, mode: 'insensitive' } },
+      { contact: { firstName: { contains: filters.search, mode: 'insensitive' } } },
+      { contact: { lastName: { contains: filters.search, mode: 'insensitive' } } },
+      { contact: { email: { contains: filters.search, mode: 'insensitive' } } },
+      { companyRel: { name: { contains: filters.search, mode: 'insensitive' } } },
+    ];
+  }
 
-  return deals;
+  const [deals, total] = await Promise.all([
+    prisma.deal.findMany({
+      where,
+      include: {
+        contact: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            company: true,
+          },
+        },
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar: true,
+          },
+        },
+        companyRel: {
+          select: {
+            id: true,
+            name: true,
+            industry: true,
+            logo: true,
+          },
+        },
+        _count: {
+          select: {
+            tasks: true,
+          },
+        },
+      },
+      orderBy: [
+        { stage: 'asc' },
+        { createdAt: 'desc' },
+      ],
+      skip,
+      take: limit,
+    }),
+    prisma.deal.count({ where }),
+  ]);
+
+  return {
+    deals,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 }
 
 export async function getDealById(id: string) {

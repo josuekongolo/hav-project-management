@@ -7,24 +7,26 @@ import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { Modal } from '../../components/ui/Modal';
 import { Card } from '../../components/ui/Card';
+import { Pagination } from '../../components/ui/Pagination';
 import { Contact, ContactStatus } from '../../services/contactService';
-import { UserPlus, Search, Filter, Users as UsersIcon, Mail, Download, Upload } from 'lucide-react';
+import { UserPlus, Search, Users as UsersIcon, Mail, Download, Upload } from 'lucide-react';
 import { useTaskStore } from '../../store/taskStore';
 import { BulkEmailDialog } from '../../components/features/crm/emails/BulkEmailDialog';
 import { BulkImportDialog } from '../../components/features/import';
 import { api } from '../../services/api';
 import toast from 'react-hot-toast';
 
+const ITEMS_PER_PAGE = 25;
+
 export function ContactsPage() {
   const {
     contacts,
+    pagination,
     isLoading,
     fetchContacts,
     createContact,
     updateContact,
     deleteContact,
-    setFilters,
-    clearFilters,
   } = useContactStore();
 
   const { users, fetchUsers } = useTaskStore();
@@ -37,24 +39,31 @@ export function ContactsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [assigneeFilter, setAssigneeFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    fetchContacts();
     fetchUsers();
-  }, [fetchContacts, fetchUsers]);
+  }, [fetchUsers]);
 
   useEffect(() => {
-    const filters: any = {};
-    if (searchQuery) filters.search = searchQuery;
-    if (statusFilter) filters.status = statusFilter;
-    if (assigneeFilter) filters.assignedToId = assigneeFilter;
+    fetchContacts({
+      page: currentPage,
+      limit: ITEMS_PER_PAGE,
+      search: searchQuery || undefined,
+      status: statusFilter as ContactStatus || undefined,
+      assignedToId: assigneeFilter || undefined,
+    });
+  }, [fetchContacts, currentPage, searchQuery, statusFilter, assigneeFilter]);
 
-    if (Object.keys(filters).length > 0) {
-      setFilters(filters);
-    } else {
-      clearFilters();
-    }
-  }, [searchQuery, statusFilter, assigneeFilter, setFilters, clearFilters]);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setSelectedContacts([]);
+  };
+
+  const handleFilterChange = () => {
+    setCurrentPage(1);
+    setSelectedContacts([]);
+  };
 
   const handleCreateContact = () => {
     setSelectedContact(null);
@@ -77,6 +86,13 @@ export function ContactsPage() {
       }
       setIsFormOpen(false);
       setSelectedContact(null);
+      fetchContacts({
+        page: currentPage,
+        limit: ITEMS_PER_PAGE,
+        search: searchQuery || undefined,
+        status: statusFilter as ContactStatus || undefined,
+        assignedToId: assigneeFilter || undefined,
+      });
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Failed to save contact');
     }
@@ -86,6 +102,13 @@ export function ContactsPage() {
     try {
       await deleteContact(id);
       toast.success('Contact deleted successfully');
+      fetchContacts({
+        page: currentPage,
+        limit: ITEMS_PER_PAGE,
+        search: searchQuery || undefined,
+        status: statusFilter as ContactStatus || undefined,
+        assignedToId: assigneeFilter || undefined,
+      });
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Failed to delete contact');
     }
@@ -134,19 +157,11 @@ export function ContactsPage() {
   };
 
   const selectAllContacts = () => {
-    if (selectedContacts.length === contacts.length) {
+    if (selectedContacts.length === contacts.length && contacts.length > 0) {
       setSelectedContacts([]);
     } else {
       setSelectedContacts(contacts);
     }
-  };
-
-  // Calculate stats
-  const stats = {
-    total: contacts.length,
-    leads: contacts.filter((c) => c.status === ContactStatus.LEAD).length,
-    customers: contacts.filter((c) => c.status === ContactStatus.CUSTOMER).length,
-    qualified: contacts.filter((c) => c.status === ContactStatus.QUALIFIED).length,
   };
 
   return (
@@ -190,7 +205,7 @@ export function ContactsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-blue-600">Total Contacts</p>
-              <p className="text-2xl font-bold text-blue-900">{stats.total}</p>
+              <p className="text-2xl font-bold text-blue-900">{pagination?.total || 0}</p>
             </div>
             <UsersIcon className="h-8 w-8 text-blue-600 opacity-50" />
           </div>
@@ -198,8 +213,8 @@ export function ContactsPage() {
         <Card className="bg-gradient-to-br from-gray-50 to-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Leads</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.leads}</p>
+              <p className="text-sm font-medium text-gray-600">This Page</p>
+              <p className="text-2xl font-bold text-gray-900">{contacts.length}</p>
             </div>
             <UsersIcon className="h-8 w-8 text-gray-600 opacity-50" />
           </div>
@@ -207,8 +222,8 @@ export function ContactsPage() {
         <Card className="bg-gradient-to-br from-cyan-50 to-cyan-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-cyan-600">Qualified</p>
-              <p className="text-2xl font-bold text-cyan-900">{stats.qualified}</p>
+              <p className="text-sm font-medium text-cyan-600">Current Page</p>
+              <p className="text-2xl font-bold text-cyan-900">{currentPage}</p>
             </div>
             <UsersIcon className="h-8 w-8 text-cyan-600 opacity-50" />
           </div>
@@ -216,8 +231,8 @@ export function ContactsPage() {
         <Card className="bg-gradient-to-br from-green-50 to-green-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-green-600">Customers</p>
-              <p className="text-2xl font-bold text-green-900">{stats.customers}</p>
+              <p className="text-sm font-medium text-green-600">Total Pages</p>
+              <p className="text-2xl font-bold text-green-900">{pagination?.totalPages || 1}</p>
             </div>
             <UsersIcon className="h-8 w-8 text-green-600 opacity-50" />
           </div>
@@ -245,13 +260,19 @@ export function ContactsPage() {
             <Input
               placeholder="Search contacts..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                handleFilterChange();
+              }}
               className="pl-10"
             />
           </div>
           <Select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              handleFilterChange();
+            }}
             options={[
               { value: '', label: 'All Statuses' },
               { value: ContactStatus.LEAD, label: 'Lead' },
@@ -266,7 +287,10 @@ export function ContactsPage() {
           />
           <Select
             value={assigneeFilter}
-            onChange={(e) => setAssigneeFilter(e.target.value)}
+            onChange={(e) => {
+              setAssigneeFilter(e.target.value);
+              handleFilterChange();
+            }}
             options={[
               { value: '', label: 'All Assignees' },
               ...users.map((user) => ({ value: user.id, label: user.name })),
@@ -281,13 +305,28 @@ export function ContactsPage() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
         </div>
       ) : (
-        <ContactList
-          contacts={contacts}
-          selectedContacts={selectedContacts}
-          onContactClick={handleEditContact}
-          onDeleteContact={handleDeleteContact}
-          onToggleSelection={toggleContactSelection}
-        />
+        <>
+          <ContactList
+            contacts={contacts}
+            selectedContacts={selectedContacts}
+            onContactClick={handleEditContact}
+            onDeleteContact={handleDeleteContact}
+            onToggleSelection={toggleContactSelection}
+          />
+
+          {/* Pagination */}
+          {pagination && pagination.totalPages > 0 && (
+            <div className="mt-6">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={pagination.totalPages}
+                totalItems={pagination.total}
+                itemsPerPage={ITEMS_PER_PAGE}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
       )}
 
       {/* Contact Form Modal */}
@@ -333,7 +372,13 @@ export function ContactsPage() {
         isOpen={isImportOpen}
         onClose={() => setIsImportOpen(false)}
         entityType="contacts"
-        onImportComplete={() => fetchContacts()}
+        onImportComplete={() => fetchContacts({
+          page: currentPage,
+          limit: ITEMS_PER_PAGE,
+          search: searchQuery || undefined,
+          status: statusFilter as ContactStatus || undefined,
+          assignedToId: assigneeFilter || undefined,
+        })}
       />
     </div>
   );

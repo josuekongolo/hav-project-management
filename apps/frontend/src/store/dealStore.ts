@@ -8,6 +8,7 @@ import {
   UpdateDealData,
   DealFilters,
   DealStats,
+  PaginationInfo,
 } from '../services/dealService';
 
 interface DealState {
@@ -16,6 +17,7 @@ interface DealState {
   dealActivities: any[];
   dealTasks: any[];
   stats: DealStats | null;
+  pagination: PaginationInfo | null;
   isLoading: boolean;
   isLoadingActivities: boolean;
   isLoadingTasks: boolean;
@@ -23,7 +25,7 @@ interface DealState {
   filters: DealFilters;
 
   // Actions
-  fetchDeals: () => Promise<void>;
+  fetchDeals: (filters?: DealFilters) => Promise<void>;
   fetchDealById: (id: string) => Promise<void>;
   fetchDealActivities: (id: string) => Promise<void>;
   fetchDealTasks: (id: string) => Promise<void>;
@@ -45,17 +47,19 @@ export const useDealStore = create<DealState>()(
       dealActivities: [],
       dealTasks: [],
       stats: null,
+      pagination: null,
       isLoading: false,
       isLoadingActivities: false,
       isLoadingTasks: false,
       error: null,
       filters: {},
 
-      fetchDeals: async () => {
+      fetchDeals: async (filters?: DealFilters) => {
         set({ isLoading: true, error: null });
         try {
-          const { deals } = await dealService.getDeals(get().filters);
-          set({ deals, isLoading: false });
+          const mergedFilters = { ...get().filters, ...filters };
+          const { deals, pagination } = await dealService.getDeals(mergedFilters);
+          set({ deals, pagination, isLoading: false });
         } catch (error: any) {
           set({
             error: error.response?.data?.error || 'Failed to fetch deals',
@@ -187,12 +191,12 @@ export const useDealStore = create<DealState>()(
 
       setFilters: (filters: DealFilters) => {
         set({ filters });
-        get().fetchDeals();
+        get().fetchDeals(filters);
       },
 
       clearFilters: () => {
         set({ filters: {} });
-        get().fetchDeals();
+        get().fetchDeals({});
       },
 
       setSelectedDeal: (deal: Deal | null) => {

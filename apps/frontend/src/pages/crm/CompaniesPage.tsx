@@ -7,10 +7,13 @@ import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { Modal } from '../../components/ui/Modal';
 import { Card } from '../../components/ui/Card';
+import { Pagination } from '../../components/ui/Pagination';
 import { Company, CreateCompanyData, UpdateCompanyData } from '../../services/companyService';
 import { FilePlus, Building2, Users, DollarSign, TrendingUp, Upload, Search, Filter, X } from 'lucide-react';
 import { BulkImportDialog } from '../../components/features/import';
 import toast from 'react-hot-toast';
+
+const ITEMS_PER_PAGE = 25;
 
 // Common industries for the dropdown
 const INDUSTRIES = [
@@ -31,14 +34,12 @@ const INDUSTRIES = [
 export function CompaniesPage() {
   const {
     companies,
+    pagination,
     isLoading,
-    filters,
     fetchCompanies,
     createCompany,
     updateCompany,
     deleteCompany,
-    setFilters,
-    clearFilters,
   } = useCompanyStore();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -49,42 +50,44 @@ export function CompaniesPage() {
   // Local filter state for controlled inputs
   const [searchQuery, setSearchQuery] = useState('');
   const [industryFilter, setIndustryFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [minEmployees, setMinEmployees] = useState<number | undefined>(undefined);
+  const [maxEmployees, setMaxEmployees] = useState<number | undefined>(undefined);
+  const [minRevenue, setMinRevenue] = useState<number | undefined>(undefined);
+  const [maxRevenue, setMaxRevenue] = useState<number | undefined>(undefined);
 
   useEffect(() => {
-    fetchCompanies();
-  }, [fetchCompanies]);
+    fetchCompanies({
+      page: currentPage,
+      limit: ITEMS_PER_PAGE,
+      search: searchQuery || undefined,
+      industry: industryFilter || undefined,
+      minEmployees,
+      maxEmployees,
+      minRevenue,
+      maxRevenue,
+    });
+  }, [fetchCompanies, currentPage, searchQuery, industryFilter, minEmployees, maxEmployees, minRevenue, maxRevenue]);
 
-  // Refetch when filters change
-  useEffect(() => {
-    fetchCompanies();
-  }, [filters, fetchCompanies]);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
-  // Update filters when local state changes
-  useEffect(() => {
-    const newFilters = { ...filters };
-
-    if (searchQuery) {
-      newFilters.search = searchQuery;
-    } else {
-      delete newFilters.search;
-    }
-
-    if (industryFilter) {
-      newFilters.industry = industryFilter;
-    } else {
-      delete newFilters.industry;
-    }
-
-    setFilters(newFilters);
-  }, [searchQuery, industryFilter]);
+  const handleFilterChange = () => {
+    setCurrentPage(1);
+  };
 
   const handleClearFilters = () => {
     setSearchQuery('');
     setIndustryFilter('');
-    clearFilters();
+    setMinEmployees(undefined);
+    setMaxEmployees(undefined);
+    setMinRevenue(undefined);
+    setMaxRevenue(undefined);
+    setCurrentPage(1);
   };
 
-  const hasActiveFilters = searchQuery || industryFilter || filters.minEmployees || filters.maxEmployees || filters.minRevenue || filters.maxRevenue;
+  const hasActiveFilters = searchQuery || industryFilter || minEmployees || maxEmployees || minRevenue || maxRevenue;
 
   const handleCreateCompany = () => {
     setSelectedCompany(null);
@@ -121,8 +124,8 @@ export function CompaniesPage() {
     }
   };
 
-  // Calculate stats
-  const totalCompanies = companies.length;
+  // Calculate stats (use pagination total for accurate count)
+  const totalCompanies = pagination?.total || 0;
   const totalContacts = companies.reduce((acc, c) => acc + (c._count?.contacts || 0), 0);
   const totalDeals = companies.reduce((acc, c) => acc + (c._count?.deals || 0), 0);
   const totalRevenue = companies.reduce((acc, c) => acc + (c.revenue || 0), 0);
@@ -200,13 +203,19 @@ export function CompaniesPage() {
             <Input
               placeholder="Search companies by name, industry, email..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                handleFilterChange();
+              }}
               className="pl-10"
             />
           </div>
           <Select
             value={industryFilter}
-            onChange={(e) => setIndustryFilter(e.target.value)}
+            onChange={(e) => {
+              setIndustryFilter(e.target.value);
+              handleFilterChange();
+            }}
             options={[
               { value: '', label: 'All Industries' },
               ...INDUSTRIES.map((industry) => ({ value: industry, label: industry })),
@@ -234,13 +243,11 @@ export function CompaniesPage() {
                   type="number"
                   min="0"
                   placeholder="0"
-                  value={filters.minEmployees || ''}
-                  onChange={(e) =>
-                    setFilters({
-                      ...filters,
-                      minEmployees: e.target.value ? parseInt(e.target.value) : undefined,
-                    })
-                  }
+                  value={minEmployees || ''}
+                  onChange={(e) => {
+                    setMinEmployees(e.target.value ? parseInt(e.target.value) : undefined);
+                    handleFilterChange();
+                  }}
                 />
               </div>
               <div>
@@ -251,13 +258,11 @@ export function CompaniesPage() {
                   type="number"
                   min="0"
                   placeholder="No limit"
-                  value={filters.maxEmployees || ''}
-                  onChange={(e) =>
-                    setFilters({
-                      ...filters,
-                      maxEmployees: e.target.value ? parseInt(e.target.value) : undefined,
-                    })
-                  }
+                  value={maxEmployees || ''}
+                  onChange={(e) => {
+                    setMaxEmployees(e.target.value ? parseInt(e.target.value) : undefined);
+                    handleFilterChange();
+                  }}
                 />
               </div>
               <div>
@@ -269,13 +274,11 @@ export function CompaniesPage() {
                   min="0"
                   step="0.1"
                   placeholder="0"
-                  value={filters.minRevenue ? (filters.minRevenue / 1000000).toString() : ''}
-                  onChange={(e) =>
-                    setFilters({
-                      ...filters,
-                      minRevenue: e.target.value ? parseFloat(e.target.value) * 1000000 : undefined,
-                    })
-                  }
+                  value={minRevenue ? (minRevenue / 1000000).toString() : ''}
+                  onChange={(e) => {
+                    setMinRevenue(e.target.value ? parseFloat(e.target.value) * 1000000 : undefined);
+                    handleFilterChange();
+                  }}
                 />
               </div>
               <div>
@@ -287,13 +290,11 @@ export function CompaniesPage() {
                   min="0"
                   step="0.1"
                   placeholder="No limit"
-                  value={filters.maxRevenue ? (filters.maxRevenue / 1000000).toString() : ''}
-                  onChange={(e) =>
-                    setFilters({
-                      ...filters,
-                      maxRevenue: e.target.value ? parseFloat(e.target.value) * 1000000 : undefined,
-                    })
-                  }
+                  value={maxRevenue ? (maxRevenue / 1000000).toString() : ''}
+                  onChange={(e) => {
+                    setMaxRevenue(e.target.value ? parseFloat(e.target.value) * 1000000 : undefined);
+                    handleFilterChange();
+                  }}
                 />
               </div>
             </div>
@@ -318,7 +319,22 @@ export function CompaniesPage() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
         </div>
       ) : (
-        <CompanyList companies={companies} onDeleteCompany={handleDeleteCompany} />
+        <>
+          <CompanyList companies={companies} onDeleteCompany={handleDeleteCompany} />
+
+          {/* Pagination */}
+          {pagination && pagination.totalPages > 0 && (
+            <div className="mt-6">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={pagination.totalPages}
+                totalItems={pagination.total}
+                itemsPerPage={ITEMS_PER_PAGE}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
       )}
 
       {/* Company Form Modal */}
@@ -345,7 +361,16 @@ export function CompaniesPage() {
         isOpen={isImportOpen}
         onClose={() => setIsImportOpen(false)}
         entityType="companies"
-        onImportComplete={() => fetchCompanies()}
+        onImportComplete={() => fetchCompanies({
+          page: currentPage,
+          limit: ITEMS_PER_PAGE,
+          search: searchQuery || undefined,
+          industry: industryFilter || undefined,
+          minEmployees,
+          maxEmployees,
+          minRevenue,
+          maxRevenue,
+        })}
       />
     </div>
   );

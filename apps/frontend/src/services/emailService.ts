@@ -77,14 +77,39 @@ export interface BulkEmailResults {
   errors: { contactId: string; error: string }[];
 }
 
-export const emailService = {
-  async getEmails(contactId?: string, senderId?: string): Promise<{ emails: Email[] }> {
-    const params = new URLSearchParams();
-    if (contactId) params.append('contactId', contactId);
-    if (senderId) params.append('senderId', senderId);
+export interface PaginationInfo {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
 
-    const response = await api.get<{ emails: Email[] }>(
-      `/emails${params.toString() ? `?${params.toString()}` : ''}`
+export interface GetEmailsParams {
+  contactId?: string;
+  senderId?: string;
+  page?: number;
+  limit?: number;
+  status?: string;
+  engagement?: 'opened' | 'clicked';
+}
+
+export interface GetEmailsResponse {
+  emails: Email[];
+  pagination: PaginationInfo;
+}
+
+export const emailService = {
+  async getEmails(params?: GetEmailsParams): Promise<GetEmailsResponse> {
+    const searchParams = new URLSearchParams();
+    if (params?.contactId) searchParams.append('contactId', params.contactId);
+    if (params?.senderId) searchParams.append('senderId', params.senderId);
+    if (params?.page) searchParams.append('page', params.page.toString());
+    if (params?.limit) searchParams.append('limit', params.limit.toString());
+    if (params?.status) searchParams.append('status', params.status);
+    if (params?.engagement) searchParams.append('engagement', params.engagement);
+
+    const response = await api.get<GetEmailsResponse>(
+      `/emails${searchParams.toString() ? `?${searchParams.toString()}` : ''}`
     );
     return response.data;
   },

@@ -77,6 +77,21 @@ export interface DealFilters {
   ownerId?: string;
   contactId?: string;
   companyId?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginationInfo {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface GetDealsResponse {
+  deals: Deal[];
+  pagination: PaginationInfo;
 }
 
 export interface DealStats {
@@ -94,13 +109,16 @@ export interface DealStats {
 }
 
 export const dealService = {
-  async getDeals(filters?: DealFilters): Promise<{ deals: Deal[] }> {
+  async getDeals(filters?: DealFilters): Promise<GetDealsResponse> {
     const params = new URLSearchParams();
     if (filters?.stage) params.append('stage', filters.stage);
     if (filters?.ownerId) params.append('ownerId', filters.ownerId);
     if (filters?.contactId) params.append('contactId', filters.contactId);
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.page) params.append('page', filters.page.toString());
+    if (filters?.limit) params.append('limit', filters.limit.toString());
 
-    const response = await api.get<{ deals: Deal[] }>(
+    const response = await api.get<GetDealsResponse>(
       `/deals${params.toString() ? `?${params.toString()}` : ''}`
     );
     return response.data;

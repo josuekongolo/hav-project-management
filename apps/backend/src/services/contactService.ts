@@ -40,10 +40,15 @@ export interface ContactFilters {
   status?: ContactStatus;
   assignedToId?: string;
   search?: string;
+  page?: number;
+  limit?: number;
 }
 
 export async function getContacts(filters?: ContactFilters) {
   const where: any = {};
+  const page = filters?.page || 1;
+  const limit = filters?.limit || 25;
+  const skip = (page - 1) * limit;
 
   if (filters?.status) {
     where.status = filters.status;
@@ -63,40 +68,53 @@ export async function getContacts(filters?: ContactFilters) {
     ];
   }
 
-  const contacts = await prisma.contact.findMany({
-    where,
-    include: {
-      assignedTo: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          avatar: true,
+  const [contacts, total] = await Promise.all([
+    prisma.contact.findMany({
+      where,
+      include: {
+        assignedTo: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar: true,
+          },
+        },
+        companyRel: {
+          select: {
+            id: true,
+            name: true,
+            industry: true,
+            logo: true,
+          },
+        },
+        _count: {
+          select: {
+            deals: true,
+            emails: true,
+            tasks: true,
+            activities: true,
+          },
         },
       },
-      companyRel: {
-        select: {
-          id: true,
-          name: true,
-          industry: true,
-          logo: true,
-        },
+      orderBy: {
+        createdAt: 'desc',
       },
-      _count: {
-        select: {
-          deals: true,
-          emails: true,
-          tasks: true,
-          activities: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
+      skip,
+      take: limit,
+    }),
+    prisma.contact.count({ where }),
+  ]);
 
-  return contacts;
+  return {
+    contacts,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 }
 
 export async function getContactById(id: string) {
@@ -384,7 +402,7 @@ export async function getContactTasks(id: string) {
 }
 
 export async function exportContactsToCSV(filters: ContactFilters = {}): Promise<string> {
-  const contacts = await getContacts(filters);
+  const { contacts } = await getContacts(filters);
 
   // CSV header
   const header = [

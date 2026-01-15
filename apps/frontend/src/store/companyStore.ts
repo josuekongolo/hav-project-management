@@ -6,17 +6,19 @@ import {
   CreateCompanyData,
   UpdateCompanyData,
   CompanyFilters,
+  PaginationInfo,
 } from '../services/companyService';
 
 interface CompanyState {
   companies: Company[];
   selectedCompany: Company | null;
+  pagination: PaginationInfo | null;
   isLoading: boolean;
   error: string | null;
   filters: CompanyFilters;
 
   // Actions
-  fetchCompanies: () => Promise<void>;
+  fetchCompanies: (filters?: CompanyFilters) => Promise<void>;
   fetchCompanyById: (id: string) => Promise<void>;
   createCompany: (data: CreateCompanyData) => Promise<Company>;
   updateCompany: (id: string, data: UpdateCompanyData) => Promise<Company>;
@@ -32,15 +34,17 @@ export const useCompanyStore = create<CompanyState>()(
     (set, get) => ({
       companies: [],
       selectedCompany: null,
+      pagination: null,
       isLoading: false,
       error: null,
       filters: {},
 
-      fetchCompanies: async () => {
+      fetchCompanies: async (filters?: CompanyFilters) => {
         set({ isLoading: true, error: null });
         try {
-          const { companies } = await companyService.getCompanies(get().filters);
-          set({ companies, isLoading: false });
+          const mergedFilters = { ...get().filters, ...filters };
+          const { companies, pagination } = await companyService.getCompanies(mergedFilters);
+          set({ companies, pagination, isLoading: false });
         } catch (error: any) {
           set({
             error: error.response?.data?.error || 'Failed to fetch companies',

@@ -39,10 +39,15 @@ export interface CompanyFilters {
   maxEmployees?: number;
   minRevenue?: number;
   maxRevenue?: number;
+  page?: number;
+  limit?: number;
 }
 
 export async function getCompanies(filters?: CompanyFilters) {
   const where: any = {};
+  const page = filters?.page || 1;
+  const limit = filters?.limit || 25;
+  const skip = (page - 1) * limit;
 
   if (filters?.industry) {
     where.industry = filters.industry;
@@ -77,25 +82,38 @@ export async function getCompanies(filters?: CompanyFilters) {
     ];
   }
 
-  const companies = await prisma.company.findMany({
-    where,
-    include: {
-      _count: {
-        select: {
-          contacts: true,
-          deals: true,
-          notes: true,
-          calls: true,
-          meetings: true,
+  const [companies, total] = await Promise.all([
+    prisma.company.findMany({
+      where,
+      include: {
+        _count: {
+          select: {
+            contacts: true,
+            deals: true,
+            notes: true,
+            calls: true,
+            meetings: true,
+          },
         },
       },
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip,
+      take: limit,
+    }),
+    prisma.company.count({ where }),
+  ]);
 
-  return companies;
+  return {
+    companies,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 }
 
 export async function getCompanyById(id: string) {

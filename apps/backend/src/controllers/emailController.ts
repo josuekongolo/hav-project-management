@@ -4,14 +4,20 @@ import * as emailHistoryService from '../services/emailHistoryService.js';
 
 export async function getEmails(req: AuthRequest, res: Response) {
   try {
-    const { contactId, senderId } = req.query;
+    const { contactId, senderId, page, limit, status, engagement } = req.query;
 
-    const emails = await emailHistoryService.getEmails(
+    const result = await emailHistoryService.getEmails(
       contactId ? String(contactId) : undefined,
-      senderId ? String(senderId) : undefined
+      senderId ? String(senderId) : undefined,
+      {
+        page: page ? parseInt(String(page)) : undefined,
+        limit: limit ? parseInt(String(limit)) : undefined,
+        status: status ? String(status) : undefined,
+        engagement: engagement as 'opened' | 'clicked' | undefined,
+      }
     );
 
-    res.json({ emails });
+    res.json(result);
   } catch (error) {
     console.error('Error fetching emails:', error);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to fetch emails' });

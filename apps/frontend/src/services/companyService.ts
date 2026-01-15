@@ -62,10 +62,24 @@ export interface CompanyFilters {
   maxEmployees?: number;
   minRevenue?: number;
   maxRevenue?: number;
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginationInfo {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface GetCompaniesResponse {
+  companies: Company[];
+  pagination: PaginationInfo;
 }
 
 export const companyService = {
-  async getCompanies(filters?: CompanyFilters): Promise<{ companies: Company[] }> {
+  async getCompanies(filters?: CompanyFilters): Promise<GetCompaniesResponse> {
     const params = new URLSearchParams();
     if (filters?.industry) params.append('industry', filters.industry);
     if (filters?.search) params.append('search', filters.search);
@@ -73,8 +87,10 @@ export const companyService = {
     if (filters?.maxEmployees) params.append('maxEmployees', filters.maxEmployees.toString());
     if (filters?.minRevenue) params.append('minRevenue', filters.minRevenue.toString());
     if (filters?.maxRevenue) params.append('maxRevenue', filters.maxRevenue.toString());
+    if (filters?.page) params.append('page', filters.page.toString());
+    if (filters?.limit) params.append('limit', filters.limit.toString());
 
-    const response = await api.get<{ companies: Company[] }>(
+    const response = await api.get<GetCompaniesResponse>(
       `/companies${params.toString() ? `?${params.toString()}` : ''}`
     );
     return response.data;

@@ -4,7 +4,7 @@ import * as companyService from '../services/companyService.js';
 
 export async function getCompanies(req: AuthRequest, res: Response) {
   try {
-    const { industry, search, minEmployees, maxEmployees, minRevenue, maxRevenue } = req.query;
+    const { industry, search, minEmployees, maxEmployees, minRevenue, maxRevenue, page, limit } = req.query;
 
     const filters: companyService.CompanyFilters = {};
 
@@ -32,8 +32,16 @@ export async function getCompanies(req: AuthRequest, res: Response) {
       filters.maxRevenue = parseFloat(maxRevenue);
     }
 
-    const companies = await companyService.getCompanies(filters);
-    res.json({ companies });
+    if (page) {
+      filters.page = parseInt(String(page));
+    }
+
+    if (limit) {
+      filters.limit = parseInt(String(limit));
+    }
+
+    const result = await companyService.getCompanies(filters);
+    res.json(result);
   } catch (error) {
     res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to get companies' });
   }

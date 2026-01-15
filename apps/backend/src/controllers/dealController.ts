@@ -4,7 +4,7 @@ import * as dealService from '../services/dealService.js';
 import { DealStage } from '@prisma/client';
 
 export async function getDeals(req: AuthRequest, res: Response) {
-  const { stage, ownerId, contactId } = req.query;
+  const { stage, ownerId, contactId, search, page, limit } = req.query;
 
   const filters: dealService.DealFilters = {};
 
@@ -20,8 +20,20 @@ export async function getDeals(req: AuthRequest, res: Response) {
     filters.contactId = contactId;
   }
 
-  const deals = await dealService.getDeals(filters);
-  res.json({ deals });
+  if (search && typeof search === 'string') {
+    filters.search = search;
+  }
+
+  if (page) {
+    filters.page = parseInt(String(page));
+  }
+
+  if (limit) {
+    filters.limit = parseInt(String(limit));
+  }
+
+  const result = await dealService.getDeals(filters);
+  res.json(result);
 }
 
 export async function getDealById(req: AuthRequest, res: Response) {

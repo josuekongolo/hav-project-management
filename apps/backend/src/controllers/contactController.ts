@@ -4,7 +4,7 @@ import * as contactService from '../services/contactService.js';
 import { ContactStatus } from '@prisma/client';
 
 export async function getContacts(req: AuthRequest, res: Response) {
-  const { status, assignedToId, search } = req.query;
+  const { status, assignedToId, search, page, limit } = req.query;
 
   const filters: contactService.ContactFilters = {};
 
@@ -20,8 +20,16 @@ export async function getContacts(req: AuthRequest, res: Response) {
     filters.search = search;
   }
 
-  const contacts = await contactService.getContacts(filters);
-  res.json({ contacts });
+  if (page) {
+    filters.page = parseInt(String(page));
+  }
+
+  if (limit) {
+    filters.limit = parseInt(String(limit));
+  }
+
+  const result = await contactService.getContacts(filters);
+  res.json(result);
 }
 
 export async function getContactById(req: AuthRequest, res: Response) {

@@ -1,49 +1,95 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useEmailStore } from '../../store/emailStore';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
-import { Inbox, Eye, MousePointer, Mail, MessageSquare, Trash2 } from 'lucide-react';
-import { EmailStatus, Email } from '../../services/emailService';
+import { Pagination } from '../../components/ui/Pagination';
+import { Inbox, Eye, MousePointer, MessageSquare, Trash2 } from 'lucide-react';
+import { Email } from '../../services/emailService';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
+const ITEMS_PER_PAGE = 25;
+
 type TabType = 'opened' | 'clicked' | 'replies';
 
 export function InboxPage() {
-  const { emails, isLoading, fetchEmails, deleteEmail, bulkDeleteEmails } = useEmailStore();
+  const { emails, pagination, isLoading, fetchEmails, deleteEmail, bulkDeleteEmails } = useEmailStore();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<TabType>('opened');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [openedCount, setOpenedCount] = useState(0);
+  const [clickedCount, setClickedCount] = useState(0);
 
   useEffect(() => {
-    fetchEmails();
-  }, [fetchEmails]);
-
-  // Filter emails based on active tab
-  const filteredEmails = useMemo(() => {
-    switch (activeTab) {
-      case 'opened':
-        return emails.filter(e => e.openedAt !== null);
-      case 'clicked':
-        return emails.filter(e => e.clickedAt !== null);
-      case 'replies':
-        // Placeholder - would need webhook integration to receive replies
-        return [];
-      default:
-        return [];
+    // Fetch emails for the active tab
+    if (activeTab !== 'replies') {
+      fetchEmails({
+        engagement: activeTab as 'opened' | 'clicked',
+        page: currentPage,
+        limit: ITEMS_PER_PAGE,
+      });
     }
-  }, [emails, activeTab]);
+  }, [fetchEmails, activeTab, currentPage]);
+
+  // Fetch counts for opened and clicked tabs (separate queries)
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        // Get opened count
+        const openedResponse = await fetch(`${import.meta.env.VITE_API_URL}/emails?engagement=opened&limit=1`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        if (openedResponse.ok) {
+          const openedData = await openedResponse.json();
+          setOpenedCount(openedData.pagination?.total || 0);
+        }
+
+        // Get clicked count
+        const clickedResponse = await fetch(`${import.meta.env.VITE_API_URL}/emails?engagement=clicked&limit=1`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        if (clickedResponse.ok) {
+          const clickedData = await clickedResponse.json();
+          setClickedCount(clickedData.pagination?.total || 0);
+        }
+      } catch (error) {
+        console.error('Failed to fetch counts:', error);
+      }
+    };
+
+    fetchCounts();
+  }, [emails]); // Refetch when emails change
+
+  // Filter emails - for opened/clicked, the server already filters
+  const filteredEmails = activeTab === 'replies' ? [] : emails;
 
   // Stats
-  const stats = useMemo(() => ({
-    opened: emails.filter(e => e.openedAt !== null).length,
-    clicked: emails.filter(e => e.clickedAt !== null).length,
+  const stats = {
+    opened: openedCount,
+    clicked: clickedCount,
     replies: 0, // Would be populated with actual reply data
-  }), [emails]);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setSelectedIds([]);
+  };
+
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    setCurrentPage(1);
+    setSelectedIds([]);
+    setIsSelectionMode(false);
+  };
 
   const handleDeleteEmail = async (id: string) => {
     try {
@@ -141,11 +187,7 @@ export function InboxPage() {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id);
-                setSelectedIds([]);
-                setIsSelectionMode(false);
-              }}
+              onClick={() => handleTabChange(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
                 activeTab === tab.id
                   ? 'border-primary-500 text-primary-600'
@@ -236,20 +278,35 @@ export function InboxPage() {
           </p>
         </Card>
       ) : (
-        <div className="space-y-3">
-          {filteredEmails.map((email) => (
-            <EmailCard
-              key={email.id}
-              email={email}
-              type={activeTab}
-              isSelectionMode={isSelectionMode}
-              isSelected={selectedIds.includes(email.id)}
-              onToggleSelection={handleToggleSelection}
-              onDelete={handleDeleteEmail}
-              onClick={() => navigate(`/crm/emails/${email.id}`)}
-            />
-          ))}
-        </div>
+        <>
+          <div className="space-y-3">
+            {filteredEmails.map((email) => (
+              <EmailCard
+                key={email.id}
+                email={email}
+                type={activeTab}
+                isSelectionMode={isSelectionMode}
+                isSelected={selectedIds.includes(email.id)}
+                onToggleSelection={handleToggleSelection}
+                onDelete={handleDeleteEmail}
+                onClick={() => navigate(`/crm/emails/${email.id}`)}
+              />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {pagination && pagination.totalPages > 0 && (
+            <div className="mt-6">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={pagination.totalPages}
+                totalItems={pagination.total}
+                itemsPerPage={ITEMS_PER_PAGE}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );
