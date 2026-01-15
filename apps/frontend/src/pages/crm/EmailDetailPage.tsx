@@ -4,8 +4,6 @@ import { useEmailStore } from '../../store/emailStore';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
-import { Modal } from '../../components/ui/Modal';
-import { EmailComposer } from '../../components/features/crm/emails/EmailComposer';
 import {
   ArrowLeft,
   Mail,
@@ -18,8 +16,6 @@ import {
   User,
   Calendar,
   FileText,
-  Reply,
-  ReplyAll
 } from 'lucide-react';
 import { EmailStatus } from '../../services/emailService';
 import { format } from 'date-fns';
@@ -48,10 +44,8 @@ const statusIcons: Record<EmailStatus, any> = {
 export function EmailDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { selectedEmail, fetchEmailById, deleteEmail, sendEmail, isLoading } = useEmailStore();
+  const { selectedEmail, fetchEmailById, deleteEmail, isLoading } = useEmailStore();
   const [showHtml, setShowHtml] = useState(true);
-  const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
-  const [replyType, setReplyType] = useState<'reply' | 'replyAll'>('reply');
 
   useEffect(() => {
     if (id) {
@@ -75,56 +69,6 @@ export function EmailDetailPage() {
 
   const handleBack = () => {
     navigate('/crm/emails');
-  };
-
-  const handleReply = () => {
-    setReplyType('reply');
-    setIsReplyModalOpen(true);
-  };
-
-  const handleReplyAll = () => {
-    setReplyType('replyAll');
-    setIsReplyModalOpen(true);
-  };
-
-  const handleSendReply = async (data: any, useTemplate: boolean) => {
-    try {
-      await sendEmail(data);
-      toast.success('Reply sent successfully');
-      setIsReplyModalOpen(false);
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to send reply');
-    }
-  };
-
-  const getReplyTo = () => {
-    if (!selectedEmail) return '';
-    // Reply to the sender's email
-    return selectedEmail.from;
-  };
-
-  const getReplyCc = () => {
-    if (!selectedEmail || replyType !== 'replyAll') return '';
-    // Reply All: include original recipients except yourself
-    const allRecipients = [
-      ...selectedEmail.to,
-      ...(selectedEmail.cc || [])
-    ];
-    return allRecipients.join(', ');
-  };
-
-  const getReplySubject = () => {
-    if (!selectedEmail) return '';
-    const subject = selectedEmail.subject;
-    return subject.startsWith('Re: ') ? subject : `Re: ${subject}`;
-  };
-
-  const getReplyBody = () => {
-    if (!selectedEmail) return '';
-    const originalDate = format(new Date(selectedEmail.sentAt || selectedEmail.createdAt), 'MMMM d, yyyy h:mm a');
-    const originalSender = selectedEmail.sender.name;
-
-    return `<br><br>---<br>On ${originalDate}, ${originalSender} wrote:<br><blockquote style="border-left: 2px solid #ccc; padding-left: 10px; margin-left: 0;">${selectedEmail.htmlBody || selectedEmail.body}</blockquote>`;
   };
 
   if (isLoading || !selectedEmail) {
@@ -164,15 +108,7 @@ export function EmailDetailPage() {
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
-          <Button variant="secondary" onClick={handleReply} className="w-full sm:w-auto justify-center">
-            <Reply className="h-4 w-4 mr-2" />
-            Reply
-          </Button>
-          <Button variant="secondary" onClick={handleReplyAll} className="w-full sm:w-auto justify-center">
-            <ReplyAll className="h-4 w-4 mr-2" />
-            Reply All
-          </Button>
-          <Button variant="secondary" onClick={handleDelete} className="w-full sm:w-auto justify-center">
+          <Button variant="secondary" onClick={handleDelete} className="w-full sm:w-auto justify-center text-red-600 hover:bg-red-50">
             <Trash2 className="h-4 w-4 mr-2" />
             Delete
           </Button>
@@ -392,22 +328,6 @@ export function EmailDetailPage() {
         </div>
       </div>
 
-      {/* Reply Modal */}
-      <Modal
-        isOpen={isReplyModalOpen}
-        onClose={() => setIsReplyModalOpen(false)}
-        title={replyType === 'reply' ? 'Reply' : 'Reply All'}
-        size="full"
-      >
-        <EmailComposer
-          onSend={handleSendReply}
-          onCancel={() => setIsReplyModalOpen(false)}
-          initialTo={getReplyTo()}
-          initialCc={getReplyCc()}
-          initialSubject={getReplySubject()}
-          initialBody={getReplyBody()}
-        />
-      </Modal>
     </div>
   );
 }
