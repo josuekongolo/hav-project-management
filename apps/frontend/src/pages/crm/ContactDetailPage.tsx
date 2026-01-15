@@ -244,10 +244,10 @@ export function ContactDetailPage() {
             </div>
           </Card>
 
-          {/* Notes */}
+          {/* About */}
           {selectedContact.notes && (
             <Card>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Notes</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">About</h2>
               <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedContact.notes}</p>
             </Card>
           )}
