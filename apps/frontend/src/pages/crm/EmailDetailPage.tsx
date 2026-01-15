@@ -159,11 +159,6 @@ export function EmailDetailPage() {
                   <StatusIcon className="h-3 w-3 mr-1" />
                   {selectedEmail.status}
                 </Badge>
-                {selectedEmail.template && (
-                  <Badge className="bg-blue-50 text-blue-700">
-                    Template: {selectedEmail.template.name}
-                  </Badge>
-                )}
               </div>
             </div>
           </div>

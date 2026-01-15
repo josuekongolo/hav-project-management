@@ -94,11 +94,6 @@ export function EmailHistory({ emails, onDeleteEmail }: EmailHistoryProps) {
                   <StatusIcon className="h-3 w-3 mr-1" />
                   {email.status}
                 </Badge>
-                {email.template && (
-                  <Badge className="bg-blue-50 text-blue-700">
-                    Template: {email.template.name}
-                  </Badge>
-                )}
               </div>
 
               <div className="text-xs text-gray-500">
