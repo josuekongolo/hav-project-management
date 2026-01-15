@@ -84,19 +84,23 @@ export function EmailComposer({
           to: contact.email,
         }));
 
-        // Auto-fill contact variables
-        if (selectedTemplate) {
-          setVariables((prev) => ({
-            ...prev,
-            firstName: contact.firstName,
-            lastName: contact.lastName,
-            email: contact.email,
-            company: contact.company || '',
-          }));
-        }
+        // Auto-fill contact variables (check both company field and companyRel)
+        const companyName = contact.company || contact.companyRel?.name || '';
+
+        // Always update variables when contact changes, regardless of template
+        setVariables((prev) => ({
+          ...prev,
+          firstName: contact.firstName,
+          lastName: contact.lastName,
+          fullName: `${contact.firstName} ${contact.lastName}`,
+          name: contact.firstName,
+          email: contact.email,
+          company: companyName,
+          companyName: companyName,
+        }));
       }
     }
-  }, [formData.contactId, contacts, selectedTemplate]);
+  }, [formData.contactId, contacts]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

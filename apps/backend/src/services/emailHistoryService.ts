@@ -225,22 +225,38 @@ export async function sendBulkEmails(data: BulkEmailData, userId: string) {
     errors: [] as { contactId: string; error: string }[],
   };
 
-  // Fetch contacts
+  // Fetch contacts with company relation
   const contacts = await prisma.contact.findMany({
     where: {
       id: { in: data.contactIds },
+    },
+    include: {
+      companyRel: {
+        select: {
+          name: true,
+        },
+      },
     },
   });
 
   // Send email to each contact
   for (const contact of contacts) {
     try {
-      // Build variables
+      // Get company name from either the company field or companyRel
+      const companyName = contact.company || contact.companyRel?.name || '';
+
+      // Build variables with all useful contact data
       const variables = {
         firstName: contact.firstName,
         lastName: contact.lastName,
+        fullName: `${contact.firstName} ${contact.lastName}`,
+        name: contact.firstName, // Alias for firstName
         email: contact.email,
-        company: contact.company || '',
+        company: companyName,
+        companyName: companyName, // Alias
+        phone: contact.phone || '',
+        city: contact.city || '',
+        country: contact.country || '',
         ...(data.customVariables?.[contact.id] || {}),
       };
 
