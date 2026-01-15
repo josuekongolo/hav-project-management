@@ -14,6 +14,7 @@ import { ContactDetailPage } from './pages/crm/ContactDetailPage';
 import { EmailTemplatesPage } from './pages/crm/EmailTemplatesPage';
 import { EmailsPage } from './pages/crm/EmailsPage';
 import { EmailDetailPage } from './pages/crm/EmailDetailPage';
+import { InboxPage } from './pages/crm/InboxPage';
 import { DealsPage } from './pages/crm/DealsPage';
 import { DealDetailPage } from './pages/crm/DealDetailPage';
 import { CompaniesPage } from './pages/crm/CompaniesPage';
@@ -96,6 +97,10 @@ export const router = createBrowserRouter([
       {
         path: 'crm/emails/:id',
         element: <EmailDetailPage />,
+      },
+      {
+        path: 'crm/inbox',
+        element: <InboxPage />,
       },
       {
         path: 'google-drive',

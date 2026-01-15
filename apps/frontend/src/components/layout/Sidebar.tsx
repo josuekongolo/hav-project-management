@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, KanbanSquare, Calendar, Users, Target, Tag, UserCircle, ChevronLeft, Building2, Mail, Send, TrendingUp, Cloud, LogOut, Settings, User } from 'lucide-react';
+import { LayoutDashboard, KanbanSquare, Calendar, Users, Target, Tag, UserCircle, ChevronLeft, Building2, Mail, Send, TrendingUp, Cloud, LogOut, Settings, User, Inbox } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuthStore } from '../../store/authStore';
 import { ProfileModal } from '../features/profile/ProfileModal';
@@ -17,6 +17,7 @@ const navigation = [
   { name: 'Companies', href: '/crm/companies', icon: Building2 },
   { name: 'Deals', href: '/crm/deals', icon: TrendingUp },
   { name: 'Emails', href: '/crm/emails', icon: Send },
+  { name: 'Inbox', href: '/crm/inbox', icon: Inbox },
   { name: 'Email Templates', href: '/crm/templates', icon: Mail },
   { name: 'Google Drive', href: '/google-drive', icon: Cloud },
 ];
