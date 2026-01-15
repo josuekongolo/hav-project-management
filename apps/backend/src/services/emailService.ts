@@ -55,7 +55,7 @@ class EmailService {
         text,
         html: html || text,
         // Reply-To helps with deliverability and lets recipients reply directly
-        reply_to: replyTo || this.fromEmail,
+        replyTo: replyTo || this.fromEmail,
         // Add headers to improve deliverability
         headers: {
           'X-Entity-Ref-ID': `hav-${Date.now()}`, // Unique ID prevents threading issues
