@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { KanbanBoard } from '../components/features/kanban/KanbanBoard';
 import { TaskModal } from '../components/features/tasks/TaskModal';
+import { BulkImportDialog } from '../components/features/import';
 import { Task, TaskStatus } from '../services/taskService';
 import { Button, Select, Input } from '../components/ui';
-import { Plus, Filter, X, Search } from 'lucide-react';
+import { Plus, Filter, X, Search, Upload } from 'lucide-react';
 import { useTaskStore } from '../store/taskStore';
 
 export function KanbanPage() {
@@ -14,7 +15,8 @@ export function KanbanPage() {
   const [selectedLabelId, setSelectedLabelId] = useState<string>('');
   const [selectedAssigneeId, setSelectedAssigneeId] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const { milestones, labels, users, fetchMilestones, fetchLabels, fetchUsers } = useTaskStore();
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  const { milestones, labels, users, fetchMilestones, fetchLabels, fetchUsers, fetchTasks } = useTaskStore();
 
   useEffect(() => {
     fetchMilestones();
@@ -47,14 +49,25 @@ export function KanbanPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Kanban Board</h1>
             <p className="text-sm sm:text-base text-gray-600 mt-1">Drag and drop tasks to update their status</p>
           </div>
-          <Button
-            onClick={() => handleAddTask()}
-            size="sm"
-            className="w-full sm:w-auto justify-center"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            New Task
-          </Button>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Button
+              variant="secondary"
+              onClick={() => setIsImportOpen(true)}
+              size="sm"
+              className="flex-1 sm:flex-none justify-center"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Import CSV
+            </Button>
+            <Button
+              onClick={() => handleAddTask()}
+              size="sm"
+              className="flex-1 sm:flex-none justify-center"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              New Task
+            </Button>
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -137,6 +150,13 @@ export function KanbanPage() {
         onClose={handleCloseModal}
         task={selectedTask}
         initialStatus={initialStatus}
+      />
+
+      <BulkImportDialog
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        entityType="tasks"
+        onImportComplete={() => fetchTasks()}
       />
     </div>
   );

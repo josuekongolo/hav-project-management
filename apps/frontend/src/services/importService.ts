@@ -1,6 +1,6 @@
 import { api } from './api';
 
-export type EntityType = 'contacts' | 'companies' | 'deals';
+export type EntityType = 'contacts' | 'companies' | 'deals' | 'tasks';
 
 export interface ParsedCSV {
   headers: string[];
@@ -74,6 +74,17 @@ export const importService = {
     return response.data;
   },
 
+  async importTasks(
+    data: Record<string, string>[],
+    mapping: ColumnMapping
+  ): Promise<ImportResult> {
+    const response = await api.post<ImportResult>('/import/tasks', {
+      data,
+      mapping,
+    });
+    return response.data;
+  },
+
   async getEntityFields(entity: EntityType): Promise<{ fields: EntityField[] }> {
     const response = await api.get<{ fields: EntityField[] }>(
       `/import/fields/${entity}`
@@ -97,6 +108,8 @@ export const importService = {
         return this.importCompanies(data, mapping);
       case 'deals':
         return this.importDeals(data, mapping);
+      case 'tasks':
+        return this.importTasks(data, mapping);
       default:
         throw new Error(`Invalid entity type: ${entity}`);
     }

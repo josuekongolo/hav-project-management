@@ -36,6 +36,7 @@ router.post('/preview', upload.single('file'), importController.previewImport);
 router.post('/contacts', importController.importContacts);
 router.post('/companies', importController.importCompanies);
 router.post('/deals', importController.importDeals);
+router.post('/tasks', importController.importTasks);
 
 // Get entity field definitions for column mapping UI
 router.get('/fields/:entity', importController.getEntityFields);

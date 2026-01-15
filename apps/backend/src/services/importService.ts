@@ -1,4 +1,4 @@
-import { PrismaClient, ContactStatus, DealStage } from '@prisma/client';
+import { PrismaClient, ContactStatus, DealStage, TaskStatus, TaskPriority } from '@prisma/client';
 import * as XLSX from 'xlsx';
 import { z } from 'zod';
 
@@ -68,6 +68,18 @@ const dealImportSchema = z.object({
   companyName: z.string().optional(),
   expectedCloseDate: z.string().optional(),
   description: z.string().optional(),
+});
+
+const taskImportSchema = z.object({
+  title: z.string().min(1, 'Task title is required'),
+  description: z.string().optional(),
+  status: z.nativeEnum(TaskStatus).optional(),
+  priority: z.nativeEnum(TaskPriority).optional(),
+  estimatedHours: z.coerce.number().min(0).optional().or(z.literal('')),
+  dueDate: z.string().optional(),
+  milestoneName: z.string().optional(),
+  assigneeEmail: z.string().email().optional().or(z.literal('')),
+  labels: z.string().optional(), // comma-separated label names
 });
 
 // ==================== CSV PARSING ====================
@@ -440,9 +452,170 @@ export async function importDeals(
   return result;
 }
 
+// ==================== TASK IMPORT ====================
+
+export async function importTasks(
+  rows: Record<string, string>[],
+  mapping: ColumnMapping,
+  userId: string
+): Promise<ImportResult> {
+  const result: ImportResult = { imported: 0, failed: 0, errors: [] };
+
+  // Get the max position for new tasks
+  const maxPositionResult = await prisma.task.aggregate({
+    _max: { position: true },
+  });
+  let currentPosition = (maxPositionResult._max.position || 0) + 1;
+
+  for (let i = 0; i < rows.length; i++) {
+    const rowIndex = i + 1;
+    const row = rows[i];
+
+    try {
+      const transformed = transformRow(row, mapping);
+
+      // Handle empty optional fields
+      if (transformed.status === '') delete transformed.status;
+      if (transformed.priority === '') delete transformed.priority;
+      if (transformed.estimatedHours === '') delete transformed.estimatedHours;
+      if (transformed.dueDate === '') delete transformed.dueDate;
+      if (transformed.assigneeEmail === '') delete transformed.assigneeEmail;
+
+      // Parse status if provided
+      if (transformed.status) {
+        const statusUpper = transformed.status.toUpperCase().replace(/\s+/g, '_');
+        if (Object.values(TaskStatus).includes(statusUpper as TaskStatus)) {
+          transformed.status = statusUpper;
+        }
+      }
+
+      // Parse priority if provided
+      if (transformed.priority) {
+        const priorityUpper = transformed.priority.toUpperCase();
+        if (Object.values(TaskPriority).includes(priorityUpper as TaskPriority)) {
+          transformed.priority = priorityUpper;
+        }
+      }
+
+      const validated = taskImportSchema.parse(transformed);
+
+      // Find milestone if provided
+      let milestoneId: string | null = null;
+      if (validated.milestoneName) {
+        const milestone = await prisma.milestone.findFirst({
+          where: { name: { equals: validated.milestoneName, mode: 'insensitive' } },
+        });
+        if (milestone) {
+          milestoneId = milestone.id;
+        }
+      }
+
+      // Find assignee if provided
+      let assigneeId: string | null = null;
+      if (validated.assigneeEmail) {
+        const assignee = await prisma.user.findUnique({
+          where: { email: validated.assigneeEmail.toLowerCase() },
+        });
+        if (assignee) {
+          assigneeId = assignee.id;
+        }
+      }
+
+      // Parse due date
+      let dueDate: Date | null = null;
+      if (validated.dueDate) {
+        const parsed = new Date(validated.dueDate);
+        if (!isNaN(parsed.getTime())) {
+          dueDate = parsed;
+        }
+      }
+
+      // Create task
+      const task = await prisma.task.create({
+        data: {
+          title: validated.title,
+          description: validated.description || null,
+          status: (validated.status as TaskStatus) || 'TODO',
+          priority: (validated.priority as TaskPriority) || 'MEDIUM',
+          position: currentPosition++,
+          estimatedHours: typeof validated.estimatedHours === 'number' ? validated.estimatedHours : null,
+          dueDate,
+          milestoneId,
+          creatorId: userId,
+        },
+      });
+
+      // Add assignee if found
+      if (assigneeId) {
+        await prisma.taskAssignee.create({
+          data: {
+            taskId: task.id,
+            userId: assigneeId,
+          },
+        });
+      }
+
+      // Handle labels (comma-separated)
+      if (validated.labels) {
+        const labelNames = validated.labels.split(',').map(l => l.trim()).filter(Boolean);
+        for (const labelName of labelNames) {
+          // Find or create label
+          let label = await prisma.label.findFirst({
+            where: { name: { equals: labelName, mode: 'insensitive' } },
+          });
+
+          if (!label) {
+            // Create label with a random color
+            const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899'];
+            label = await prisma.label.create({
+              data: {
+                name: labelName,
+                color: colors[Math.floor(Math.random() * colors.length)],
+              },
+            });
+          }
+
+          await prisma.taskLabel.create({
+            data: {
+              taskId: task.id,
+              labelId: label.id,
+            },
+          });
+        }
+      }
+
+      result.imported++;
+    } catch (error) {
+      result.failed++;
+
+      if (error instanceof z.ZodError) {
+        result.errors.push({
+          row: rowIndex,
+          data: row,
+          errors: extractZodErrors(error),
+        });
+      } else if (error instanceof Error) {
+        result.errors.push({
+          row: rowIndex,
+          data: row,
+          errors: [error.message],
+        });
+      } else {
+        result.errors.push({
+          row: rowIndex,
+          data: row,
+          errors: ['Unknown error occurred'],
+        });
+      }
+    }
+  }
+
+  return result;
+}
+
 // ==================== TEMPLATES ====================
 
-export function generateTemplate(entity: 'contacts' | 'companies' | 'deals'): string {
+export function generateTemplate(entity: 'contacts' | 'companies' | 'deals' | 'tasks'): string {
   const templates: Record<string, string[]> = {
     contacts: [
       'First Name',
@@ -480,6 +653,17 @@ export function generateTemplate(entity: 'contacts' | 'companies' | 'deals'): st
       'Company Name',
       'Expected Close Date',
       'Description',
+    ],
+    tasks: [
+      'Title',
+      'Description',
+      'Status',
+      'Priority',
+      'Estimated Hours',
+      'Due Date',
+      'Milestone',
+      'Assignee Email',
+      'Labels',
     ],
   };
 
@@ -530,5 +714,16 @@ export const ENTITY_FIELDS = {
     { key: 'companyName', label: 'Company Name', required: false },
     { key: 'expectedCloseDate', label: 'Expected Close Date', required: false },
     { key: 'description', label: 'Description', required: false },
+  ],
+  tasks: [
+    { key: 'title', label: 'Task Title', required: true },
+    { key: 'description', label: 'Description', required: false },
+    { key: 'status', label: 'Status (TODO, IN_PROGRESS, IN_REVIEW, DONE)', required: false },
+    { key: 'priority', label: 'Priority (LOW, MEDIUM, HIGH, URGENT)', required: false },
+    { key: 'estimatedHours', label: 'Estimated Hours', required: false },
+    { key: 'dueDate', label: 'Due Date', required: false },
+    { key: 'milestoneName', label: 'Milestone Name', required: false },
+    { key: 'assigneeEmail', label: 'Assignee Email', required: false },
+    { key: 'labels', label: 'Labels (comma-separated)', required: false },
   ],
 };

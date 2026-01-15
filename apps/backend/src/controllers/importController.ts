@@ -97,16 +97,40 @@ export async function importDeals(req: AuthRequest, res: Response) {
   }
 }
 
+export async function importTasks(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.userId!;
+    const { data, mapping } = req.body;
+
+    if (!data || !Array.isArray(data)) {
+      res.status(400).json({ error: 'Data array is required' });
+      return;
+    }
+
+    if (!mapping || typeof mapping !== 'object') {
+      res.status(400).json({ error: 'Column mapping is required' });
+      return;
+    }
+
+    const result = await importService.importTasks(data, mapping, userId);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to import tasks',
+    });
+  }
+}
+
 export async function downloadTemplate(req: AuthRequest, res: Response) {
   try {
     const { entity } = req.params;
 
-    if (!['contacts', 'companies', 'deals'].includes(entity)) {
+    if (!['contacts', 'companies', 'deals', 'tasks'].includes(entity)) {
       res.status(400).json({ error: 'Invalid entity type' });
       return;
     }
 
-    const csv = importService.generateTemplate(entity as 'contacts' | 'companies' | 'deals');
+    const csv = importService.generateTemplate(entity as 'contacts' | 'companies' | 'deals' | 'tasks');
 
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', `attachment; filename=${entity}_template.csv`);
@@ -122,7 +146,7 @@ export async function getEntityFields(req: AuthRequest, res: Response) {
   try {
     const { entity } = req.params;
 
-    if (!['contacts', 'companies', 'deals'].includes(entity)) {
+    if (!['contacts', 'companies', 'deals', 'tasks'].includes(entity)) {
       res.status(400).json({ error: 'Invalid entity type' });
       return;
     }

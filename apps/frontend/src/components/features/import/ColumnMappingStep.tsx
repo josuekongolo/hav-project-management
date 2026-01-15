@@ -41,6 +41,17 @@ const ENTITY_FIELDS: Record<EntityType, EntityField[]> = {
     { key: 'expectedCloseDate', label: 'Expected Close Date', required: false },
     { key: 'description', label: 'Description', required: false },
   ],
+  tasks: [
+    { key: 'title', label: 'Task Title', required: true },
+    { key: 'description', label: 'Description', required: false },
+    { key: 'status', label: 'Status (TODO, IN_PROGRESS, IN_REVIEW, DONE)', required: false },
+    { key: 'priority', label: 'Priority (LOW, MEDIUM, HIGH, URGENT)', required: false },
+    { key: 'estimatedHours', label: 'Estimated Hours', required: false },
+    { key: 'dueDate', label: 'Due Date', required: false },
+    { key: 'milestoneName', label: 'Milestone Name', required: false },
+    { key: 'assigneeEmail', label: 'Assignee Email', required: false },
+    { key: 'labels', label: 'Labels (comma-separated)', required: false },
+  ],
 };
 
 interface ColumnMappingStepProps {
