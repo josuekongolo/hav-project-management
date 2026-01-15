@@ -217,6 +217,11 @@ export async function sendEmailWithTemplate(data: SendEmailWithTemplateData, use
   );
 }
 
+// Helper function to delay execution
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export async function sendBulkEmails(data: BulkEmailData, userId: string) {
   const results = {
     total: data.contactIds.length,
@@ -239,16 +244,15 @@ export async function sendBulkEmails(data: BulkEmailData, userId: string) {
     },
   });
 
-  // Send email to each contact
-  for (const contact of contacts) {
+  // Send email to each contact with rate limiting (max 2 per second for Resend API)
+  for (let i = 0; i < contacts.length; i++) {
+    const contact = contacts[i];
+
     try {
       // Get company name from either the company field or companyRel
       const companyName = contact.company || contact.companyRel?.name || '';
 
-      console.log(`[BulkEmail] Contact: ${contact.firstName} ${contact.lastName}`);
-      console.log(`[BulkEmail] - company field: "${contact.company}"`);
-      console.log(`[BulkEmail] - companyRel: ${JSON.stringify(contact.companyRel)}`);
-      console.log(`[BulkEmail] - resolved companyName: "${companyName}"`);
+      console.log(`[BulkEmail] Sending ${i + 1}/${contacts.length}: ${contact.firstName} ${contact.lastName}`);
 
       // Build variables with all useful contact data
       const variables = {
@@ -265,8 +269,6 @@ export async function sendBulkEmails(data: BulkEmailData, userId: string) {
         ...(data.customVariables?.[contact.id] || {}),
       };
 
-      console.log(`[BulkEmail] Variables being sent:`, JSON.stringify(variables, null, 2));
-
       await sendEmailWithTemplate(
         {
           contactId: contact.id,
@@ -278,15 +280,23 @@ export async function sendBulkEmails(data: BulkEmailData, userId: string) {
       );
 
       results.sent++;
+      console.log(`[BulkEmail] ✓ Sent to ${contact.email}`);
     } catch (error) {
       results.failed++;
       results.errors.push({
         contactId: contact.id,
         error: error instanceof Error ? error.message : 'Unknown error',
       });
+      console.log(`[BulkEmail] ✗ Failed for ${contact.email}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
+    // Rate limiting: wait 600ms between emails (stays under 2/second limit)
+    if (i < contacts.length - 1) {
+      await delay(600);
     }
   }
 
+  console.log(`[BulkEmail] Complete: ${results.sent} sent, ${results.failed} failed`);
   return results;
 }
 
