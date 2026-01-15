@@ -90,15 +90,14 @@ export function NotesList({ noteableType, noteableId }: NotesListProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Notes</h3>
-        {!isAddingNote && (
+      {!isAddingNote && (
+        <div className="flex justify-end">
           <Button onClick={() => setIsAddingNote(true)} size="sm">
             <Plus className="h-4 w-4 mr-2" />
             Add Note
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       {isAddingNote && (
         <div className="border rounded-lg p-3 sm:p-4 bg-gray-50">
