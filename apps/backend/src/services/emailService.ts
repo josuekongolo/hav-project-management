@@ -7,10 +7,13 @@ interface SendEmailParams {
   subject: string;
   text: string;
   html?: string;
+  replyTo?: string;
 }
 
 class EmailService {
   private resend: Resend;
+  private fromEmail: string;
+  private fromName: string;
 
   constructor() {
     if (!process.env.RESEND_API_KEY) {
@@ -21,17 +24,22 @@ class EmailService {
       throw new Error('SMTP_FROM environment variable is required (must be verified in Resend)');
     }
 
+    this.fromEmail = process.env.SMTP_FROM;
+    // Use SMTP_FROM_NAME env var or extract name from email
+    this.fromName = process.env.SMTP_FROM_NAME || 'HAV';
+
     console.log('[EmailService] Using Resend API for email delivery');
-    console.log('[EmailService] Sender email:', process.env.SMTP_FROM);
+    console.log('[EmailService] Sender:', `${this.fromName} <${this.fromEmail}>`);
     this.resend = new Resend(process.env.RESEND_API_KEY);
   }
 
   async sendEmail(params: SendEmailParams): Promise<void> {
-    const { to, cc, bcc, subject, text, html } = params;
+    const { to, cc, bcc, subject, text, html, replyTo } = params;
 
     try {
       const recipients = Array.isArray(to) ? to : [to];
-      const fromAddress = process.env.SMTP_FROM!;
+      // Format: "Name <email@domain.com>" for better deliverability
+      const fromAddress = `${this.fromName} <${this.fromEmail}>`;
 
       console.log(`[EmailService] Sending email via Resend`);
       console.log(`[EmailService] From: ${fromAddress}`);
@@ -46,6 +54,12 @@ class EmailService {
         subject,
         text,
         html: html || text,
+        // Reply-To helps with deliverability and lets recipients reply directly
+        reply_to: replyTo || this.fromEmail,
+        // Add headers to improve deliverability
+        headers: {
+          'X-Entity-Ref-ID': `hav-${Date.now()}`, // Unique ID prevents threading issues
+        },
       });
 
       // Check for errors
