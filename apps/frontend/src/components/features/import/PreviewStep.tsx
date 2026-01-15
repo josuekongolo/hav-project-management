@@ -44,6 +44,8 @@ export function PreviewStep({
         ? ['firstName', 'lastName', 'email']
         : entityType === 'companies'
         ? ['name']
+        : entityType === 'tasks'
+        ? ['title']
         : ['title', 'value', 'contactEmail'];
 
     data.forEach((row) => {
@@ -129,6 +131,13 @@ export function PreviewStep({
         <div className="p-3 bg-blue-50 rounded-lg text-sm text-blue-800">
           <strong>Note:</strong> Deals will be linked to existing contacts by email. Make sure
           the contacts exist before importing deals.
+        </div>
+      )}
+
+      {entityType === 'tasks' && (
+        <div className="p-3 bg-blue-50 rounded-lg text-sm text-blue-800">
+          <strong>Note:</strong> Tasks can be linked to milestones by name and assignees by email.
+          Labels will be created if they don't exist.
         </div>
       )}
 
