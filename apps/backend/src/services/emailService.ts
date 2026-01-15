@@ -25,8 +25,8 @@ class EmailService {
     }
 
     this.fromEmail = process.env.SMTP_FROM;
-    // Use SMTP_FROM_NAME env var or extract name from email
-    this.fromName = process.env.SMTP_FROM_NAME || 'HAV';
+    // Use SMTP_FROM_NAME env var or default to Josue Kongolo
+    this.fromName = process.env.SMTP_FROM_NAME || 'Josue Kongolo';
 
     console.log('[EmailService] Using Resend API for email delivery');
     console.log('[EmailService] Sender:', `${this.fromName} <${this.fromEmail}>`);

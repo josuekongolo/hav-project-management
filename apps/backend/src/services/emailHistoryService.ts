@@ -245,6 +245,11 @@ export async function sendBulkEmails(data: BulkEmailData, userId: string) {
       // Get company name from either the company field or companyRel
       const companyName = contact.company || contact.companyRel?.name || '';
 
+      console.log(`[BulkEmail] Contact: ${contact.firstName} ${contact.lastName}`);
+      console.log(`[BulkEmail] - company field: "${contact.company}"`);
+      console.log(`[BulkEmail] - companyRel: ${JSON.stringify(contact.companyRel)}`);
+      console.log(`[BulkEmail] - resolved companyName: "${companyName}"`);
+
       // Build variables with all useful contact data
       const variables = {
         firstName: contact.firstName,
@@ -259,6 +264,8 @@ export async function sendBulkEmails(data: BulkEmailData, userId: string) {
         country: contact.country || '',
         ...(data.customVariables?.[contact.id] || {}),
       };
+
+      console.log(`[BulkEmail] Variables being sent:`, JSON.stringify(variables, null, 2));
 
       await sendEmailWithTemplate(
         {
