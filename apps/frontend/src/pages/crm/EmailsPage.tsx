@@ -1,19 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useEmailStore } from '../../store/emailStore';
 import { EmailComposer } from '../../components/features/crm/emails/EmailComposer';
 import { EmailHistory } from '../../components/features/crm/emails/EmailHistory';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { Card } from '../../components/ui/Card';
-import { FilePlus, Mail, Send, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Select } from '../../components/ui/Select';
+import { FilePlus, Mail, Clock, CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import { EmailStatus } from '../../services/emailService';
 import toast from 'react-hot-toast';
 
 export function EmailsPage() {
-  const { emails, isLoading, fetchEmails, sendEmail, sendEmailWithTemplate, saveDraft, deleteEmail } =
+  const { emails, isLoading, fetchEmails, sendEmail, sendEmailWithTemplate, saveDraft, deleteEmail, bulkDeleteEmails } =
     useEmailStore();
 
   const [isComposerOpen, setIsComposerOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+
+  // Filter emails by status
+  const filteredEmails = useMemo(() => {
+    if (!statusFilter) return emails;
+
+    if (statusFilter === 'SENT_ALL') {
+      // Include SENT, OPENED, CLICKED
+      return emails.filter(e =>
+        e.status === EmailStatus.SENT ||
+        e.status === EmailStatus.OPENED ||
+        e.status === EmailStatus.CLICKED
+      );
+    }
+
+    return emails.filter(e => e.status === statusFilter);
+  }, [emails, statusFilter]);
 
   useEffect(() => {
     fetchEmails();
@@ -50,6 +70,40 @@ export function EmailsPage() {
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Failed to delete email');
     }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
+
+    if (!confirm(`Are you sure you want to delete ${selectedIds.length} emails?`)) return;
+
+    try {
+      const result = await bulkDeleteEmails(selectedIds);
+      toast.success(`${result.deleted} emails deleted successfully`);
+      setSelectedIds([]);
+      setIsSelectionMode(false);
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to delete emails');
+    }
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === filteredEmails.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredEmails.map(e => e.id));
+    }
+  };
+
+  const handleToggleSelection = (id: string) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const exitSelectionMode = () => {
+    setIsSelectionMode(false);
+    setSelectedIds([]);
   };
 
   // Calculate stats
@@ -114,13 +168,85 @@ export function EmailsPage() {
         </Card>
       </div>
 
+      {/* Filter and Bulk Actions */}
+      <Card className="mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+            <div className="w-full sm:w-48">
+              <Select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                options={[
+                  { value: '', label: 'All Emails' },
+                  { value: 'SENT_ALL', label: 'Sent (all)' },
+                  { value: EmailStatus.SENT, label: 'Sent' },
+                  { value: EmailStatus.OPENED, label: 'Opened' },
+                  { value: EmailStatus.CLICKED, label: 'Clicked' },
+                  { value: EmailStatus.FAILED, label: 'Failed' },
+                  { value: EmailStatus.DRAFT, label: 'Drafts' },
+                  { value: EmailStatus.SENDING, label: 'Sending' },
+                ]}
+              />
+            </div>
+            <span className="text-sm text-gray-500">
+              {filteredEmails.length} email{filteredEmails.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            {!isSelectionMode ? (
+              <Button
+                variant="secondary"
+                onClick={() => setIsSelectionMode(true)}
+                disabled={filteredEmails.length === 0}
+                className="w-full sm:w-auto justify-center"
+              >
+                Select Emails
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="secondary"
+                  onClick={handleSelectAll}
+                  className="w-full sm:w-auto justify-center"
+                >
+                  {selectedIds.length === filteredEmails.length ? 'Deselect All' : 'Select All'}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={handleBulkDelete}
+                  disabled={selectedIds.length === 0}
+                  className="w-full sm:w-auto justify-center text-red-600 hover:bg-red-50"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete ({selectedIds.length})
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={exitSelectionMode}
+                  className="w-full sm:w-auto justify-center"
+                >
+                  Cancel
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      </Card>
+
       {/* Email History */}
       {isLoading ? (
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
         </div>
       ) : (
-        <EmailHistory emails={emails} onDeleteEmail={handleDeleteEmail} />
+        <EmailHistory
+          emails={filteredEmails}
+          onDeleteEmail={handleDeleteEmail}
+          isSelectionMode={isSelectionMode}
+          selectedIds={selectedIds}
+          onToggleSelection={handleToggleSelection}
+        />
       )}
 
       {/* Email Composer Modal */}

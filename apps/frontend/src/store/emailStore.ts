@@ -22,6 +22,7 @@ interface EmailState {
   sendBulkEmails: (data: BulkEmailData) => Promise<any>;
   saveDraft: (data: SendEmailData) => Promise<Email>;
   deleteEmail: (id: string) => Promise<void>;
+  bulkDeleteEmails: (ids: string[]) => Promise<{ deleted: number }>;
   setSelectedEmail: (email: Email | null) => void;
 }
 
@@ -142,6 +143,25 @@ export const useEmailStore = create<EmailState>()(
         } catch (error: any) {
           set({
             error: error.response?.data?.error || 'Failed to delete email',
+            isLoading: false,
+          });
+          throw error;
+        }
+      },
+
+      bulkDeleteEmails: async (ids: string[]) => {
+        set({ isLoading: true, error: null });
+        try {
+          const result = await emailService.bulkDeleteEmails(ids);
+          set((state) => ({
+            emails: state.emails.filter((e) => !ids.includes(e.id)),
+            selectedEmail: state.selectedEmail && ids.includes(state.selectedEmail.id) ? null : state.selectedEmail,
+            isLoading: false,
+          }));
+          return result;
+        } catch (error: any) {
+          set({
+            error: error.response?.data?.error || 'Failed to bulk delete emails',
             isLoading: false,
           });
           throw error;

@@ -118,4 +118,9 @@ export const emailService = {
     const response = await api.delete<{ message: string }>(`/emails/${id}`);
     return response.data;
   },
+
+  async bulkDeleteEmails(ids: string[]): Promise<{ deleted: number; message: string }> {
+    const response = await api.post<{ deleted: number; message: string }>('/emails/bulk-delete', { ids });
+    return response.data;
+  },
 };

@@ -333,6 +333,16 @@ export async function deleteEmail(id: string) {
   return { message: 'Email deleted successfully' };
 }
 
+export async function bulkDeleteEmails(ids: string[]) {
+  const result = await prisma.email.deleteMany({
+    where: {
+      id: { in: ids },
+    },
+  });
+
+  return { deleted: result.count, message: `${result.count} emails deleted successfully` };
+}
+
 export async function trackEmailOpen(id: string) {
   const email = await prisma.email.findUnique({ where: { id } });
   if (!email) {

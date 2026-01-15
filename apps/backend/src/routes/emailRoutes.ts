@@ -41,5 +41,6 @@ router.post('/draft', emailController.saveDraft);
 
 // Delete
 router.delete('/:id', emailController.deleteEmail);
+router.post('/bulk-delete', emailController.bulkDeleteEmails);
 
 export default router;

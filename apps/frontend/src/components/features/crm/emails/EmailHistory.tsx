@@ -8,6 +8,9 @@ import { useNavigate } from 'react-router-dom';
 interface EmailHistoryProps {
   emails: Email[];
   onDeleteEmail: (id: string) => void;
+  isSelectionMode?: boolean;
+  selectedIds?: string[];
+  onToggleSelection?: (id: string) => void;
 }
 
 const statusColors: Record<EmailStatus, string> = {
@@ -30,7 +33,13 @@ const statusIcons: Record<EmailStatus, any> = {
   [EmailStatus.CLICKED]: MousePointer,
 };
 
-export function EmailHistory({ emails, onDeleteEmail }: EmailHistoryProps) {
+export function EmailHistory({
+  emails,
+  onDeleteEmail,
+  isSelectionMode = false,
+  selectedIds = [],
+  onToggleSelection,
+}: EmailHistoryProps) {
   const navigate = useNavigate();
 
   if (emails.length === 0) {
@@ -47,14 +56,36 @@ export function EmailHistory({ emails, onDeleteEmail }: EmailHistoryProps) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {emails.map((email) => {
         const StatusIcon = statusIcons[email.status];
+        const isSelected = selectedIds.includes(email.id);
+
+        const handleClick = () => {
+          if (isSelectionMode && onToggleSelection) {
+            onToggleSelection(email.id);
+          } else {
+            navigate(`/crm/emails/${email.id}`);
+          }
+        };
+
         return (
-          <div key={email.id} className="cursor-pointer" onClick={() => navigate(`/crm/emails/${email.id}`)}>
-            <Card className="hover:shadow-md transition-shadow h-full">
+          <div key={email.id} className="cursor-pointer" onClick={handleClick}>
+            <Card className={`hover:shadow-md transition-shadow h-full ${isSelected ? 'ring-2 ring-primary-500 bg-primary-50' : ''}`}>
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
-                  <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-                    <Mail className="h-5 w-5 text-primary-600" />
-                  </div>
+                  {isSelectionMode ? (
+                    <div className="flex items-center justify-center flex-shrink-0">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => onToggleSelection?.(email.id)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="h-5 w-5 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+                      <Mail className="h-5 w-5 text-primary-600" />
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-gray-900 truncate">{email.subject}</h3>
                   <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">

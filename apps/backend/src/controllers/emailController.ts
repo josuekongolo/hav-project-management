@@ -84,6 +84,21 @@ export async function deleteEmail(req: AuthRequest, res: Response) {
   }
 }
 
+export async function bulkDeleteEmails(req: AuthRequest, res: Response) {
+  try {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      res.status(400).json({ error: 'ids array is required' });
+      return;
+    }
+    const result = await emailHistoryService.bulkDeleteEmails(ids);
+    res.json(result);
+  } catch (error) {
+    console.error('Error bulk deleting emails:', error);
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to bulk delete emails' });
+  }
+}
+
 export async function trackEmailOpen(req: AuthRequest, res: Response) {
   try {
     const { id } = req.params;
